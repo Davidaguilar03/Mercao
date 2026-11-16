@@ -16,6 +16,8 @@ class MarketPick(BaseModel):
     predicted_price: int
     lower_price: int
     upper_price: int
+    latest_price: int | None
+    expected_change_percent: float | None
 
 
 class GroupRecommendation(BaseModel):
@@ -26,6 +28,7 @@ class GroupRecommendation(BaseModel):
     difference_per_kg: int
     difference_pct: float
     confidence: Literal["alta", "baja"]
+    distance_km: int
 
 
 class RecommendationsOut(BaseModel):

@@ -11,7 +11,7 @@ from backend.app import pipeline  # noqa: F401  (registers every table)
 from backend.app.core.config import Settings
 from backend.app.core.database import Base, create_db_engine
 from backend.app.domains.prices.service import seasonality_index
-from backend.app.domains.recommendations.service import COSTS_NOTE, compare_group
+from backend.app.domains.recommendations.service import COSTS_NOTE, compare_group, haversine_km
 
 # Monthly price factors: a series whose price depends only on the month has an exact seasonality index.
 FACTORS = [1.00, 0.90, 1.10, 1.20, 1.00, 0.80, 0.95, 1.05, 1.00, 1.10, 0.95, 0.95]
@@ -285,11 +285,37 @@ def test_recommendations_need_two_markets(client):
 def test_compare_group_single_market():
     row = {"market_id": 1, "market_name": "a", "city": "a", "comparable_group": "g", "target_iso_year": 2026,
            "target_iso_week": 48, "target_week_start": "2026-11-23", "predicted_price": 1000.0,
-           "lower_price": 900.0, "upper_price": 1100.0}
+           "lower_price": 900.0, "upper_price": 1100.0, "latitude": 4.711, "longitude": -74.072,
+           "latest_price": None}
     assert compare_group([row]) is None
     touching = compare_group([row, {**row, "market_id": 2, "predicted_price": 1200.0, "lower_price": 1100.0,
-                                    "upper_price": 1300.0}])
+                                    "upper_price": 1300.0, "latest_price": 1000.0}])
     assert touching["confidence"] == "baja"  # intervals that touch overlap
+    assert touching["distance_km"] == 0  # same coordinates
+    # Without an observed price in the origin week there is nothing to compare the forecast with.
+    assert touching["buy"]["latest_price"] is None and touching["buy"]["expected_change_percent"] is None
+    assert touching["sell"]["latest_price"] == 1000 and touching["sell"]["expected_change_percent"] == 20.0
+
+
+def test_haversine_between_known_colombian_cities():
+    bogota, medellin, barranquilla = (4.711, -74.072), (6.244, -75.581), (10.964, -74.796)
+    # Bogotá and Medellín are about 240 km apart in a straight line; Bogotá and Barranquilla about 700 km.
+    assert haversine_km(*bogota, *medellin) == pytest.approx(239, abs=2)
+    assert haversine_km(*bogota, *barranquilla) == pytest.approx(700, abs=5)
+    assert haversine_km(*medellin, *bogota) == pytest.approx(haversine_km(*bogota, *medellin))
+    assert haversine_km(*bogota, *bogota) == 0
+
+
+def test_recommendations_distance_and_expected_change(client):
+    group = client.get("/api/recommendations", params={"product_id": 1}).json()["groups"][0]
+    latest = client.get("/api/prices/latest", params={"product_id": 1}).json()["markets"]
+    latest_price = {market["market_id"]: market["mean_price"] for market in latest}
+    assert group["distance_km"] == 239  # Bogotá (market 1) to Medellín (market 2)
+    for side in ("buy", "sell"):
+        pick = group[side]
+        assert pick["latest_price"] == latest_price[pick["market_id"]]
+        expected = (pick["predicted_price"] / pick["latest_price"] - 1) * 100
+        assert pick["expected_change_percent"] == pytest.approx(expected, abs=0.2)
 
 
 def test_model_summary(client):
