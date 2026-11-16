@@ -310,10 +310,15 @@ Lectura:
   percentiles de los intervalos, las métricas de validación y de prueba y la fecha de creación. Los modelos guardados
   son los evaluados en la prueba, ajustados con entrenamiento + validación (datos hasta 2025-W46).
 - **Tabla `forecasts`** en `mercao.db`: `product_id`, `market_id`, `origin_iso_year`, `origin_iso_week`, `horizon`,
-  `predicted_price`, `lower_price`, `upper_price`, `model_version`. Para cada uno de los 116 pares se toma su última
-  semana con todas las variables (2026-W46 para todos en esta versión) y se pronostican los 4 horizontes: 464 filas.
-  La tabla se reemplaza en cada ejecución de `generate_forecasts`. Reconstruir la base con `build_database` la borra,
-  así que después hay que volver a ejecutar `generate_forecasts`.
+  `target_iso_year`, `target_iso_week`, `target_week_start`, `predicted_price`, `lower_price`, `upper_price`,
+  `model_version`. La semana objetivo es la semana de origen más `horizon` semanas; `target_week_start` es su lunes.
+  Para cada uno de los 116 pares se toma su última semana con todas las variables (2026-W46 para todos en esta
+  versión, así que las semanas objetivo van de 2026-W47 a 2026-W50) y se pronostican los 4 horizontes: 464 filas.
+  La tabla se borra y se vuelve a crear en cada ejecución de `generate_forecasts`.
+- **Reconstrucción de la base**: `build_database` reemplaza el archivo `mercao.db`, así que al terminar regenera la
+  tabla `forecasts` con los modelos guardados en `models/` y lo registra en el log y en `build_summary.json`
+  (`forecast_rows`). Si no hay modelos entrenados, el log lo advierte y la tabla queda sin generar hasta ejecutar
+  `train_models` y `generate_forecasts`.
 - **Figuras** en `docs/figures/`: `forecast_model_comparison.png`, `forecast_potato_bogota.png`,
   `forecast_feature_importance.png` y `forecast_error_by_product.png`.
 

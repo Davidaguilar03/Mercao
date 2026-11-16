@@ -80,8 +80,9 @@ python -m backend.scripts.train_models        # entrena y evalúa los modelos; g
 python -m backend.scripts.generate_forecasts  # escribe la tabla forecasts en mercao.db
 ```
 
-Reconstruir la base borra la tabla `forecasts`; vuelva a ejecutar `generate_forecasts` después. Diseño, resultados y
-limitaciones en `docs/forecasting_model.md`.
+`build_database` reemplaza el archivo de la base, así que al terminar regenera la tabla `forecasts` con los modelos
+guardados en `models/`. Si todavía no hay modelos entrenados, lo indica en el log y la tabla queda sin generar: ejecute
+`train_models` y luego `generate_forecasts`. Diseño, resultados y limitaciones en `docs/forecasting_model.md`.
 
 ## Pruebas
 
