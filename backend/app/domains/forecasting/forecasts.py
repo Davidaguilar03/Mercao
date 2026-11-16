@@ -6,7 +6,7 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-from sqlalchemy import Engine, delete
+from sqlalchemy import Engine
 
 from backend.app.core.config import REPO_ROOT
 from backend.app.domains.forecasting.dataset import build_features, load_series
@@ -25,6 +25,10 @@ def save_models(models: dict[int, object], metadata: dict, models_dir: Path = MO
                                               encoding="utf-8")
 
 
+def models_available(models_dir: Path = MODELS_DIR) -> bool:
+    return (models_dir / "metadata.json").exists()
+
+
 def load_models(models_dir: Path = MODELS_DIR) -> tuple[dict[int, object], dict]:
     metadata = json.loads((models_dir / "metadata.json").read_text(encoding="utf-8"))
     models = {h: joblib.load(models_dir / f"forecast_h{h}.joblib") for h in metadata["horizons"]}
@@ -39,21 +43,26 @@ def latest_forecasts(frame: pd.DataFrame, models: dict[int, object], metadata: d
     for h, model in models.items():
         log_ratio = model.predict(latest)
         lower, upper = interval_prices(current, log_ratio, tuple(metadata["interval_offsets"][str(h)]))
+        target_start = latest["week_start"] + pd.Timedelta(weeks=h)
+        target_iso = target_start.dt.isocalendar()
         parts.append(pd.DataFrame({
             "product_id": latest["product_id"].to_numpy(), "market_id": latest["market_id"].to_numpy(),
             "origin_iso_year": latest["iso_year"].to_numpy(), "origin_iso_week": latest["iso_week"].to_numpy(),
-            "horizon": h, "predicted_price": current * np.exp(log_ratio), "lower_price": lower,
-            "upper_price": upper, "model_version": metadata["model_version"],
+            "horizon": h, "target_iso_year": target_iso["year"].astype(int).to_numpy(),
+            "target_iso_week": target_iso["week"].astype(int).to_numpy(),
+            "target_week_start": target_start.dt.date.to_numpy(),
+            "predicted_price": current * np.exp(log_ratio), "lower_price": lower, "upper_price": upper,
+            "model_version": metadata["model_version"],
         }))
     return pd.concat(parts, ignore_index=True)
 
 
 def write_forecasts(engine: Engine, models_dir: Path = MODELS_DIR) -> pd.DataFrame:
-    """Replace the forecasts table with the forecasts of the saved models."""
+    """Replace the forecasts table (dropped and recreated, so its schema is always current) with new forecasts."""
     models, metadata = load_models(models_dir)
     forecasts = latest_forecasts(build_features(load_series(engine)), models, metadata)
-    Forecast.__table__.create(engine, checkfirst=True)
+    Forecast.__table__.drop(engine, checkfirst=True)
+    Forecast.__table__.create(engine)
     with engine.begin() as connection:
-        connection.execute(delete(Forecast))
         connection.execute(Forecast.__table__.insert(), forecasts.to_dict("records"))
     return forecasts

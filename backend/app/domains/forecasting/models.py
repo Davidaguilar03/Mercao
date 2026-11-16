@@ -1,6 +1,8 @@
 """Forecast table: predicted weekly mean price of each usable pair, h weeks after the origin week."""
 
-from sqlalchemy import Float, ForeignKey, Integer, String
+from datetime import date
+
+from sqlalchemy import Date, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.core.database import Base
@@ -9,6 +11,8 @@ from backend.app.domains.catalog import models as catalog_models  # noqa: F401  
 
 class Forecast(Base):
     """Prediction made at origin week (origin_iso_year, origin_iso_week) for the week `horizon` weeks later (COP/kg).
+
+    The target week is the origin week plus `horizon` weeks; target_week_start is its Monday.
 
     lower_price and upper_price are the 10th and 90th percentile interval.
     """
@@ -20,6 +24,9 @@ class Forecast(Base):
     origin_iso_year: Mapped[int] = mapped_column(Integer, primary_key=True)
     origin_iso_week: Mapped[int] = mapped_column(Integer, primary_key=True)
     horizon: Mapped[int] = mapped_column(Integer, primary_key=True)
+    target_iso_year: Mapped[int] = mapped_column(Integer, nullable=False)
+    target_iso_week: Mapped[int] = mapped_column(Integer, nullable=False)
+    target_week_start: Mapped[date] = mapped_column(Date, nullable=False)
     predicted_price: Mapped[float] = mapped_column(Float, nullable=False)
     lower_price: Mapped[float] = mapped_column(Float, nullable=False)
     upper_price: Mapped[float] = mapped_column(Float, nullable=False)

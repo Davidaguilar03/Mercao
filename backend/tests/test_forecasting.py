@@ -14,6 +14,7 @@ from backend.app.domains.forecasting.dataset import (
     target_column,
 )
 from backend.app.domains.forecasting.estimators import NaiveModel, SeasonalNaiveModel
+from backend.app.domains.forecasting.forecasts import latest_forecasts
 from backend.app.domains.forecasting.metrics import (
     coverage,
     directional_accuracy,
@@ -144,3 +145,20 @@ def test_interval_computation():
     assert upper[0] == pytest.approx(100 * np.exp(0.9))
     assert coverage(np.array([1.0, 2.0, 3.0, 4.0]), np.array([0.0, 2.5, 2.0, 5.0]),
                     np.array([2.0, 3.0, 3.0, 6.0])) == pytest.approx(50.0)
+
+
+def test_forecast_target_week_is_origin_plus_horizon():
+    weeks = np.arange(N_WEEKS)
+    prices = 1000 * (1.5 + np.sin(2 * np.pi * weeks / 52))
+    frame = build_features(make_series(prices))
+    models = {h: NaiveModel() for h in HORIZONS}
+    metadata = {"model_version": "test", "interval_offsets": {str(h): [-0.1, 0.1] for h in HORIZONS}}
+    forecasts = latest_forecasts(frame, models, metadata).set_index("horizon")
+    origin = FIRST_MONDAY + timedelta(weeks=N_WEEKS - 1)
+    assert forecasts["origin_iso_year"].eq(origin.isocalendar()[0]).all()
+    assert forecasts["origin_iso_week"].eq(origin.isocalendar()[1]).all()
+    for h in HORIZONS:
+        target = origin + timedelta(weeks=h)
+        assert forecasts.loc[h, "target_week_start"] == target
+        assert forecasts.loc[h, "target_iso_year"] == target.isocalendar()[0]
+        assert forecasts.loc[h, "target_iso_week"] == target.isocalendar()[1]
