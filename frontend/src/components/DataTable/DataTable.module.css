@@ -1,0 +1,87 @@
+/* Shared look for data tables. Wide tables scroll sideways inside their wrapper on phones. */
+.wrapper {
+  /* Positioned so the visually hidden texts inside the cells scroll with the table instead of
+     widening the page. */
+  position: relative;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: right;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 0;
+  text-align: left;
+  white-space: normal;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 0;
+}
+
+.table thead th {
+  color: var(--color-muted);
+  font-weight: 600;
+  vertical-align: bottom;
+  white-space: normal;
+}
+
+.table tbody th {
+  font-weight: 600;
+}
+
+.left {
+  text-align: left !important;
+}
+
+/* Row that names a comparable group. */
+.groupRow th {
+  padding-top: var(--space-4);
+  color: var(--color-primary-strong);
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  text-align: left;
+  white-space: normal;
+}
+
+.secondary {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+}
+
+.tag {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tagBuy {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.tagSell {
+  background: var(--color-terracotta-soft);
+  color: var(--color-terracotta-text);
+}
