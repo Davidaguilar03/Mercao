@@ -1,6 +1,9 @@
-pandas
-openpyxl
-requests
-beautifulsoup4
-matplotlib
-xlrd
+pandas>=3.0
+numpy>=2.0
+openpyxl>=3.1
+python-calamine>=0.9
+pyarrow>=20.0
+requests>=2.32
+beautifulsoup4>=4.12
+SQLAlchemy>=2.0
+pydantic>=2.10
