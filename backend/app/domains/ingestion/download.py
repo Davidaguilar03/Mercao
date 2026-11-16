@@ -1,21 +1,20 @@
-"""Discover and download official DANE SIPSA files (wholesale prices and supply) into data/raw.
+"""Discover and download the official DANE SIPSA files (wholesale prices and supply) into data/raw.
 
-Links are discovered by parsing the DANE pages, not guessed. Files already on disk are skipped.
-Failures are logged to data/raw/download_failures.log and the run continues.
-
-Usage: python scripts/download_sipsa.py [--only prices_weekly,prices_monthly,supply] [--delay 1.0]
+Links are discovered by parsing the DANE pages, not guessed. Files already on disk are skipped and failures are
+logged and skipped, so the step can be re-run safely.
 """
 
-import argparse
-import csv
 import logging
 import re
 import time
+from collections.abc import Callable
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, unquote
+from urllib.parse import unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
+
+from backend.app.domains.ingestion.manifest import ManifestEntry, load_manifest, write_manifest
 
 BASE_URL = "https://www.dane.gov.co"
 SIPSA_PATH = "/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa"
@@ -33,13 +32,14 @@ HEADERS = {
 }
 SPREADSHEET_RE = re.compile(r"\.(xlsx|xls|zip)$", re.IGNORECASE)
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
-RAW_DIR = ROOT_DIR / "data" / "raw"
+Link = tuple[str, str, str]
 
-log = logging.getLogger("download_sipsa")
+log = logging.getLogger(__name__)
 
 
-def fetch(session, url, retries=4, delay=1.0, stream=False):
+def fetch(session: requests.Session, url: str, retries: int = 4, delay: float = 1.0,
+          stream: bool = False) -> requests.Response | None:
+    """GET with retries and backoff; None on 404 or after the last failed attempt."""
     for attempt in range(1, retries + 1):
         wait = delay * attempt * 2
         try:
@@ -58,7 +58,8 @@ def fetch(session, url, retries=4, delay=1.0, stream=False):
     return None
 
 
-def get_links(session, page_url, delay):
+def get_links(session: requests.Session, page_url: str, delay: float) -> list[Link]:
+    """(absolute url, anchor text, first text of the enclosing row) for every link of a page."""
     response = fetch(session, page_url, delay=delay)
     time.sleep(delay)
     if response is None:
@@ -74,16 +75,15 @@ def get_links(session, page_url, delay):
     return links
 
 
-def discover_weekly_prices(session, delay):
-    """Weekly bulletin annexes: index page -> one page per year -> 'anex' spreadsheets."""
+def discover_weekly_prices(session: requests.Session, delay: float) -> list[tuple[str, str]]:
+    """Weekly bulletin annexes: index page, one page per year, then the 'anex' spreadsheets."""
     index_links = get_links(session, WEEKLY_INDEX_URL, delay)
     year_pages = sorted({
-        url for url, text, _ in index_links
-        if "/mayoristas-boletin-semanal-1/" in url and re.search(r"20(1[2-9]|2[0-6])", url)
+        url for url, _, _ in index_links
+        if "/mayoristas-boletin-semanal-1/" in url and re.search(r"20(1[2-9]|2[0-9])", url)
     })
-    found = {}
-    pages = [WEEKLY_INDEX_URL] + year_pages
-    for page in pages:
+    found: dict[str, str] = {}
+    for page in [WEEKLY_INDEX_URL, *year_pages]:
         links = index_links if page == WEEKLY_INDEX_URL else get_links(session, page, delay)
         for url, text, context in links:
             name = unquote(urlparse(url).path.rsplit("/", 1)[-1])
@@ -93,42 +93,45 @@ def discover_weekly_prices(session, delay):
     return sorted(found.items())
 
 
-def discover_monthly_prices(session, delay):
-    """Monthly historical price series (one file per year or range)."""
+def discover_monthly_prices(session: requests.Session, delay: float) -> list[tuple[str, str]]:
+    """Monthly historical price series (reference only, not used by the pipeline)."""
     links = get_links(session, MONTHLY_INDEX_URL, delay) + get_links(session, PRICES_MAIN_URL, delay)
-    found = {}
-    for url, text, context in links:
+    found: dict[str, str] = {}
+    for url, text, _ in links:
         name = urlparse(url).path.lower()
-        if not SPREADSHEET_RE.search(name):
-            continue
-        if "arroz" in name:
-            continue
-        if "seriehistoricamayorista" in name or "series-historicas-precios-mayoristas" in name:
+        if SPREADSHEET_RE.search(name) and "arroz" not in name and (
+            "seriehistoricamayorista" in name or "series-historicas-precios-mayoristas" in name
+        ):
             found[url] = text
     return sorted(found.items())
 
 
-def discover_supply(session, delay):
+def discover_supply(session: requests.Session, delay: float) -> list[tuple[str, str]]:
     """Supply historical series and yearly microdata."""
-    links = get_links(session, SUPPLY_INDEX_URL, delay)
-    found = {}
-    for url, text, context in links:
+    found: dict[str, str] = {}
+    for url, text, _ in get_links(session, SUPPLY_INDEX_URL, delay):
         name = urlparse(url).path.lower()
         if SPREADSHEET_RE.search(name) and ("series-historicas-abastecimiento" in name or "microdato" in name):
             found[url] = text
     return sorted(found.items())
 
 
-def download(session, url, target_dir, delay):
-    filename = unquote(urlparse(url).path.rsplit("/", 1)[-1])
-    target = target_dir / filename
+DISCOVERERS: dict[str, Callable[[requests.Session, float], list[tuple[str, str]]]] = {
+    "prices_weekly": discover_weekly_prices,
+    "prices_monthly": discover_monthly_prices,
+    "supply": discover_supply,
+}
+
+
+def download_file(session: requests.Session, url: str, target_dir: Path, delay: float) -> tuple[str, Path]:
+    """Download one file atomically; returns (status, target path)."""
+    target = target_dir / unquote(urlparse(url).path.rsplit("/", 1)[-1])
     if target.exists() and target.stat().st_size > 0:
         return "skipped", target
     response = fetch(session, url, delay=delay, stream=True)
     if response is None:
         return "failed", target
-    content_type = response.headers.get("Content-Type", "")
-    if "text/html" in content_type:
+    if "text/html" in response.headers.get("Content-Type", ""):
         log.warning("Got HTML instead of a file for %s", url)
         return "failed", target
     tmp = target.with_suffix(target.suffix + ".part")
@@ -140,63 +143,28 @@ def download(session, url, target_dir, delay):
     return "downloaded", target
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--only", default="prices_weekly,prices_monthly,supply")
-    parser.add_argument("--delay", type=float, default=1.0)
-    args = parser.parse_args()
-
-    RAW_DIR.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-        handlers=[logging.StreamHandler(), logging.FileHandler(RAW_DIR / "download.log", encoding="utf-8")],
-    )
-    discoverers = {
-        "prices_weekly": discover_weekly_prices,
-        "prices_monthly": discover_monthly_prices,
-        "supply": discover_supply,
-    }
+def download_all(raw_dir: Path, sources: list[str], delay: float = 1.0) -> dict[tuple[str, str], int]:
+    """Download every discovered file of the given sources and update the manifest. Returns counts by status."""
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    manifest: dict[str, ManifestEntry] = {}
+    if (raw_dir / "manifest.csv").exists():
+        manifest = {entry.url: entry for entry in load_manifest(raw_dir)}
     session = requests.Session()
-    manifest_path = RAW_DIR / "manifest.csv"
-    manifest = {}
-    if manifest_path.exists():
-        with open(manifest_path, newline="", encoding="utf-8") as handle:
-            manifest = {row["url"]: row for row in csv.DictReader(handle)}
-    manifest_rows = []
-    failures = []
-    for source in [s.strip() for s in args.only.split(",") if s.strip()]:
-        urls = discoverers[source](session, args.delay)
+    counts: dict[tuple[str, str], int] = {}
+    failures: list[str] = []
+    for source in sources:
+        urls = DISCOVERERS[source](session, delay)
         log.info("%s: %d files discovered", source, len(urls))
-        target_dir = RAW_DIR / source
+        target_dir = raw_dir / source
         target_dir.mkdir(exist_ok=True)
         for i, (url, label) in enumerate(urls, 1):
-            status, target = download(session, url, target_dir, args.delay)
+            status, target = download_file(session, url, target_dir, delay)
             log.info("[%s %d/%d] %s %s", source, i, len(urls), status, target.name)
-            row = {"source": source, "url": url, "file": target.relative_to(ROOT_DIR).as_posix(), "label": label, "status": status}
-            manifest_rows.append(row)
-            manifest[url] = row
+            manifest[url] = ManifestEntry(source=source, url=url, file=f"{raw_dir.parent.name}/{raw_dir.name}/"
+                                          f"{source}/{target.name}", label=label, status=status)
+            counts[(source, status)] = counts.get((source, status), 0) + 1
             if status == "failed":
                 failures.append(url)
-
-    with open(manifest_path, "w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["source", "url", "file", "label", "status"], extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(manifest.values())
-    with open(RAW_DIR / "download_failures.log", "w", encoding="utf-8") as handle:
-        handle.write("\n".join(failures) + ("\n" if failures else ""))
-
-    counts = {}
-    for row in manifest_rows:
-        counts[(row["source"], row["status"])] = counts.get((row["source"], row["status"]), 0) + 1
-    print("\nSummary:")
-    for (source, status), count in sorted(counts.items()):
-        print(f"  {source:15s} {status:11s} {count}")
-    if failures:
-        print("Failed URLs:")
-        for url in failures:
-            print("  ", url)
-
-
-if __name__ == "__main__":
-    main()
+    write_manifest(raw_dir, list(manifest.values()))
+    (raw_dir / "download_failures.log").write_text("\n".join(failures) + ("\n" if failures else ""), encoding="utf-8")
+    return counts
