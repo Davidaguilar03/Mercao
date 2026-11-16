@@ -339,6 +339,7 @@ def test_reversed_date_range_is_422(client):
     assert response.status_code == 422
 
 
-def test_cors_allows_vite_dev_server(client):
-    response = client.get("/api/health", headers={"Origin": "http://localhost:5173"})
-    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
+@pytest.mark.parametrize("origin", ["http://localhost:5173", "http://localhost:4173"])
+def test_cors_allows_vite_dev_and_preview_servers(client, origin):
+    response = client.get("/api/health", headers={"Origin": origin})
+    assert response.headers["access-control-allow-origin"] == origin
