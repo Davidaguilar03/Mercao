@@ -46,6 +46,6 @@
 }
 
 .option input:focus-visible + .pill {
-  outline: 3px solid var(--color-accent);
+  outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }

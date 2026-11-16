@@ -41,6 +41,10 @@
   white-space: normal;
 }
 
+.table tbody tr:hover > * {
+  background: var(--color-surface-tint);
+}
+
 .table tbody th {
   font-weight: 600;
 }
@@ -84,4 +88,19 @@
 .tagSell {
   background: var(--color-terracotta-soft);
   color: var(--color-terracotta-text);
+}
+
+/* Columns that give way on phones, and the text that replaces them there. */
+.onlyNarrow {
+  display: none;
+}
+
+@media (max-width: 479px) {
+  .hideNarrow {
+    display: none;
+  }
+
+  .secondary.onlyNarrow {
+    display: block;
+  }
 }
