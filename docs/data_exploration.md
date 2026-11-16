@@ -1,6 +1,8 @@
 # Exploración de datos SIPSA (DANE)
 
-_Generado automáticamente por `scripts/explore_sipsa.py` el 2026-11-15. Todas las cifras salen de los archivos descargados en `data/raw`; lo que no se pudo determinar se marca como **desconocido**._
+_Reporte generado el 2026-11-15 a partir de los archivos descargados en `data/raw`; lo que no se pudo determinar se marca como **desconocido**._
+
+> **Nota:** el script de exploración original ya no existe. Su lógica de lectura de archivos (formatos de los anexos, posición de los encabezados y caché en `data/interim`) ahora vive en el dominio de ingesta: `backend/app/domains/ingestion/` (`weekly_prices.py` para los anexos semanales y `supply_microdata.py` para los microdatos de abastecimiento). El pipeline que reemplaza este análisis está documentado en [data_pipeline.md](data_pipeline.md).
 
 ## 1. Fuentes descargadas
 

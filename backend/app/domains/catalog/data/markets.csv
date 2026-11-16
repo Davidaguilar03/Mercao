@@ -1,0 +1,12 @@
+market_id,market_name,city,department,latitude,longitude
+1,"Bogotá, D.C., Corabastos",Bogotá,"Bogotá, D.C.",4.711,-74.072
+2,"Medellín, Central Mayorista de Antioquia",Medellín,Antioquia,6.244,-75.581
+3,"Cali, Cavasa",Cali,Valle del Cauca,3.452,-76.532
+4,"Barranquilla, Barranquillita",Barranquilla,Atlántico,10.964,-74.796
+5,"Bucaramanga, Centroabastos",Bucaramanga,Santander,7.119,-73.122
+6,"Pereira, Mercasa",Pereira,Risaralda,4.814,-75.694
+7,"Armenia, Mercar",Armenia,Quindío,4.534,-75.681
+8,Cartago (Valle del Cauca),Cartago,Valle del Cauca,4.746,-75.912
+9,Chiquinquirá (Boyacá),Chiquinquirá,Boyacá,5.617,-73.819
+10,"Tunja, Complejo de Servicios del Sur",Tunja,Boyacá,5.535,-73.367
+11,"Ibagué, Plaza La 21",Ibagué,Tolima,4.438,-75.232
