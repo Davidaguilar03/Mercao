@@ -9,8 +9,9 @@ uvicorn backend.app.main:app --reload
 
 - Documentación interactiva (Swagger): http://localhost:8000/docs. Esquema OpenAPI: http://localhost:8000/openapi.json.
 - Todas las rutas están bajo `/api`. Solo hay peticiones `GET`.
-- CORS: permitido para el servidor de desarrollo de Vite (`http://localhost:5173`). Se cambia con la variable de
-  entorno `MERCAO_CORS_ORIGINS` (orígenes separados por comas).
+- CORS: permitido para el servidor de desarrollo de Vite (`http://localhost:5173`, `npm run dev`) y para el de vista
+  previa (`http://localhost:4173`, `npm run preview`). Se cambia con la variable de entorno `MERCAO_CORS_ORIGINS`
+  (orígenes separados por comas; reemplaza la lista por defecto).
 - Otras variables: `MERCAO_DATABASE_URL` (otra base) y `MERCAO_MODELS_DIR` (otra carpeta de modelos).
 
 ## Convenciones

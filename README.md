@@ -110,8 +110,8 @@ uvicorn backend.app.main:app --reload
 
 La API queda en http://localhost:8000/api y la documentación interactiva en http://localhost:8000/docs. Solo lee la
 base y `models/metadata.json`; no entrena modelos ni descarga datos. Por defecto acepta peticiones del servidor de
-desarrollo de Vite (`http://localhost:5173`); otros orígenes se configuran con `MERCAO_CORS_ORIGINS` (separados por
-comas). Endpoints, parámetros, ejemplos y errores en `docs/api.md`.
+desarrollo de Vite (`http://localhost:5173`) y del de vista previa (`http://localhost:4173`); otros orígenes se
+configuran con `MERCAO_CORS_ORIGINS` (separados por comas). Endpoints, parámetros, ejemplos y errores en `docs/api.md`.
 
 ## Frontend
 
@@ -143,7 +143,8 @@ Se definen en `frontend/.env` (copie `frontend/.env.example`).
 |---|---|---|
 | `VITE_API_URL` | `http://localhost:8000` | Dirección base de la API. Si se deja vacía (`VITE_API_URL=`), el frontend usa rutas relativas (`/api/...`) y el servidor de desarrollo las reenvía a `http://localhost:8000`. |
 
-Si el frontend corre en otro puerto o dominio, permita ese origen en la API con `MERCAO_CORS_ORIGINS`.
+La API acepta por defecto los puertos de `npm run dev` (5173) y de `npm run preview` (4173). Si el frontend corre en
+otro puerto o dominio, permita ese origen en la API con `MERCAO_CORS_ORIGINS`.
 
 ### Comandos del frontend
 
