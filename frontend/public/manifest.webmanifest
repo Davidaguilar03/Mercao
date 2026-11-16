@@ -1,0 +1,14 @@
+{
+  "name": "Mercao: precios de plaza, claros",
+  "short_name": "Mercao",
+  "description": "Precios mayoristas de alimentos en Colombia, comparados entre plazas y con pronóstico a cuatro semanas.",
+  "lang": "es-CO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F1E3",
+  "theme_color": "#1F6B4A",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
