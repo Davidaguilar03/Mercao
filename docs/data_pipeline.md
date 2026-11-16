@@ -37,14 +37,14 @@ enlace. De ese texto sale la fecha de cada semana, porque los nombres de archivo
 4. **Precios** (`domains/prices/builder.py`): asignación de semana ISO y reglas de limpieza (sección 3).
 5. **Cobertura** (`domains/prices/coverage.py`): cobertura de cada par producto–mercado del conjunto foco y regla
    `usable_for_model` (sección 6).
-6. **Abastecimiento** (`domains/supply/builder.py`): corrección de orígenes con DIVIPOLA, escritura archivo por
-   archivo y agregado semanal.
+6. **Abastecimiento** (`domains/supply/builder.py`): corrección de orígenes con DIVIPOLA y agregado por semana ISO
+   de los productos y mercados foco, archivo por archivo (sección 4).
 7. **Escritura**: todo se escribe en un archivo temporal que reemplaza a `mercao.db` solo si la construcción termina
    bien. El log queda en `data/processed/pipeline.log`.
 
-Tiempo de una reconstrucción completa con la caché llena: **688 s** (11,5 min), de los cuales unos 9 min son la
-escritura de los 23,4 millones de filas de abastecimiento. La primera lectura de los archivos crudos, sin caché,
-añade unos 7 min (los 14 microdatos suman 1,2 GB).
+Tiempo de una reconstrucción completa con la caché llena: **225 s** (3,7 min), de los cuales unos 2,5 min son las
+reglas de limpieza de precios sobre 3,3 millones de filas y 41 s el agregado de abastecimiento. La primera lectura de
+los archivos crudos, sin caché, añade unos 7 min (los 14 microdatos suman 1,2 GB). Tamaño de `mercao.db`: **406 MB**.
 
 ## 3. Reglas de limpieza de precios
 
@@ -127,7 +127,7 @@ Según las notas al pie de los anexos, todo está en pesos por kilogramo (`unit 
 
 ## 4. Reglas de abastecimiento
 
-| Archivo | Filas leídas | Filas cargadas | Notas | Mercados | Toneladas |
+| Archivo | Filas leídas | Filas válidas (en caché) | Notas | Mercados | Toneladas |
 |---|---|---|---|---|---|
 | microdato-abastecimiento-2013.xlsx | 1.046.815 | 1.046.815 | | 14 | 4.457.161 |
 | microdato-abastecimiento-2014.xlsx | 1.099.581 | 1.099.581 | | 14 | 4.514.684 |
@@ -163,7 +163,15 @@ Según las notas al pie de los anexos, todo está en pesos por kilogramo (`unit 
   Nuevo. Por eso el tonelaje total salta de 5,3 a 6,2 millones de toneladas, sin que haya un cambio real en el
   abastecimiento. También entran mercados en 2015 (2), 2016 (1), 2017 (3), 2023 (3) y 2025 (1). Los volúmenes entre
   años solo se pueden comparar con el mismo conjunto de mercados.
-- **`supply_weekly`**: suma de kilogramos por semana ISO de la fecha de ingreso, mercado y producto, solo para el
+- **Qué se guarda**: la base solo guarda el abastecimiento de los productos foco en los mercados foco que existen en
+  el componente de abastecimiento: 3.323.960 de las 23.390.309 filas diarias. Esas filas se suman por semana ISO de
+  la fecha de ingreso, mercado, producto y origen (código de departamento, código de municipio y país) en la tabla
+  `supply` (502.150 filas). Los nombres de departamentos y municipios están en las tablas de consulta
+  `origin_departments` (33, nombres oficiales DIVIPOLA) y `origin_municipalities` (1.095 códigos con su nombre y
+  departamento), no repetidos en cada fila. Las filas fuera del foco no se guardan en la base, pero el detalle diario
+  completo de los 14 archivos queda en la caché parquet (`data/interim/pipeline/supply/`). Para ampliar el foco basta
+  con regenerar el catálogo y reconstruir la base, sin volver a leer los archivos crudos.
+- **`supply_weekly`**: total de kilogramos por semana ISO, mercado y producto (todos los orígenes), solo para el
   conjunto foco. Se une con `prices` por (`iso_year`, `iso_week`, `market_id`, `product_id`). La semana de precios
   sale de boletines de sábado a viernes y la de abastecimiento es lunes a domingo, así que hay hasta un día de
   diferencia entre ambas.
@@ -287,10 +295,12 @@ al menos 2 mercados utilizables:
 | `markets` | 11 | market_id, market_name, city, department, latitude, longitude |
 | `market_mapping` | 21 | source, source_name, market_id, method (exact/normalized/alias) |
 | `price_files` | 729 | file_name, label, label_start, label_end, label_days, iso_year, iso_week, status, rows_read, layout, note |
-| `prices` | 3.273.093 | id, week_start, week_end, iso_year, iso_week, product_name (publicado), product_id, variety, market_name (publicado), market_id, min_price, max_price, mean_price, unit, source_file, range_inconsistent |
-| `price_exclusions` | 724 | mismas columnas que `prices` más reason y detail |
+| `prices` | 3.273.093 | id, week_start, week_end, iso_year, iso_week, product_name (publicado), product_id, variety, market_name (publicado), market_id, min_price, max_price, mean_price, unit, range_inconsistent. El archivo de origen se obtiene uniendo con `price_files` por (iso_year, iso_week): cada semana ISO viene de un solo anexo, y el pipeline falla si dejara de ser así |
+| `price_exclusions` | 724 | mismas columnas que `prices` más source_file, reason y detail |
 | `coverage` | 130 | product_id, market_id, first_week, last_week, n_weeks, weeks_since_2016, missing_share_since_2016, has_recent_data, usable_for_model, comparable_group |
-| `supply` | 23.390.309 | id, date, market_name (publicado), market_id, product_name (publicado), product_id, origin_department_code, origin_department_name, origin_municipality_code, origin_municipality_name, origin_country, quantity_kg |
+| `origin_departments` | 33 | code, name |
+| `origin_municipalities` | 1.095 | code, name, department_code |
+| `supply` | 502.150 | id, iso_year, iso_week, market_id, product_id, origin_department_code, origin_municipality_code, origin_country, quantity_kg |
 | `supply_weekly` | 59.094 | iso_year, iso_week, market_id, product_id, quantity_kg |
 | `pipeline_log` | 23 | step, level, message, value (archivos excluidos, conteos por regla, correcciones de origen, mercados nuevos por año) |
 
@@ -299,18 +309,19 @@ Los precios están en pesos colombianos corrientes por unidad (`unit`). Las fech
 
 ## 8. Fuera de alcance
 
-Todos los productos y mercados se cargan en `prices` y `supply` con el nombre publicado, pero solo el conjunto foco
-tiene id. Los nombres de abajo quedan con `product_id` o `market_id` vacío. **No son revisiones pendientes**: se
+En `prices` se cargan todos los productos y mercados con el nombre publicado, pero solo el conjunto foco tiene id;
+los demás quedan con `product_id` o `market_id` vacío. En abastecimiento, las filas fuera del foco no se guardan en
+la base y se conservan en la caché parquet (sección 4). **No son revisiones pendientes**: se
 dejaron fuera a propósito y se pueden incorporar después, agregándolos a `focus.py` y regenerando el catálogo con
 `python -m backend.scripts.generate_catalog`.
 
 | | Precios | Abastecimiento |
 |---|---|---|
-| Filas sin `product_id` | 2.977.873 de 3.273.093 | 17.796.825 de 23.390.309 |
+| Filas de productos no foco | 2.977.873 de 3.273.093 (en la base, sin `product_id`) | 17.796.825 de 23.390.309 (solo en caché) |
 | Productos distintos fuera de alcance (tras normalizar) | 388 (668 escrituras) | 186 |
-| Filas sin `market_id` | 2.356.351 | 9.291.832 |
+| Filas de mercados no foco | 2.356.351 (en la base, sin `market_id`) | 9.291.832 (solo en caché) |
 | Mercados distintos fuera de alcance (precios y abastecimiento) | 160 | |
-| Filas con producto y mercado foco | 85.026 | 3.323.960 |
+| Filas diarias con producto y mercado foco | 85.026 | 3.323.960 (guardadas como 502.150 filas semanales) |
 | Filas de productos foco en mercados no foco | 210.194 | |
 
 <details><summary>Productos de precios fuera de alcance (388)</summary>
@@ -349,5 +360,7 @@ Acacías (Meta) · Aguazul (Casanare) · Alvarado, La Guaira · Alvarado (Tolima
   municipios.
 - **Abastecimiento y precios no comparten catálogo**: el abastecimiento publica categorías agregadas («Papa
   criolla», «Mora», «Hortalizas de hoja») que no corresponden a una sola variedad de precios.
-- **Tamaño**: `mercao.db` ocupa unos 3,6 GB, porque `supply` conserva las 23,4 millones de filas diarias con
-  nombres de texto. Está excluida de git.
+- **Tamaño**: `mercao.db` ocupa 406 MB y está excluida de git. Casi todo es la tabla `prices` (3,3 millones de filas
+  de todos los productos, con los nombres publicados de producto y mercado en cada fila, como pide el diseño).
+- **Abastecimiento semanal**: la base no guarda el detalle diario; quien necesite fechas exactas debe leer la caché
+  parquet de `data/interim/pipeline/supply/`.

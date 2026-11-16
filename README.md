@@ -52,13 +52,16 @@ python -m backend.scripts.download_raw        # descarga los archivos del DANE e
 python -m backend.scripts.build_database      # reconstruye data/processed/mercao.db
 ```
 
-La primera construcción lee unos 1,2 GB de hojas de cálculo y tarda varios minutos. Los archivos ya leídos quedan en
-caché en `data/interim/pipeline`, así que una reconstrucción solo vuelve a leer los archivos que cambiaron. Para forzar
+La primera construcción lee unos 1,2 GB de hojas de cálculo y tarda unos 11 minutos. Los archivos ya leídos quedan en
+caché en `data/interim/pipeline` (el abastecimiento completo, en parquet), así que una reconstrucción solo vuelve a
+leer los archivos que cambiaron y tarda unos 4 minutos. La base resultante ocupa unos 400 MB: el abastecimiento se
+guarda solo para el conjunto foco, agregado por semana ISO y origen. Para forzar
 una lectura completa, borre esa carpeta. El log de cada construcción queda en `data/processed/pipeline.log` y un
 resumen con los conteos en `data/processed/build_summary.json`.
 
-Se cargan todos los productos y mercados publicados, pero solo el conjunto foco
-(`backend/app/domains/catalog/focus.py`: 13 productos y 11 mercados) recibe `product_id` y `market_id`. Para cambiar
+En precios se cargan todos los productos y mercados publicados, pero solo el conjunto foco
+(`backend/app/domains/catalog/focus.py`: 13 productos y 11 mercados) recibe `product_id` y `market_id`. En
+abastecimiento, la base solo guarda el conjunto foco. Para cambiar
 el conjunto foco, o si el DANE publica nuevas escrituras de un producto foco, regenere el catálogo y reconstruya la
 base:
 
