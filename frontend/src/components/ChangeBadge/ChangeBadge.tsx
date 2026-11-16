@@ -5,6 +5,8 @@ import styles from './ChangeBadge.module.css';
 interface ChangeBadgeProps {
   /** Percentage change of a price; null when it cannot be computed. */
   value: number | null;
+  /** "lg" shows the change as a headline figure, without the pill. */
+  size?: 'sm' | 'lg';
 }
 
 const ICONS = { up: TrendingUp, down: TrendingDown, flat: Minus };
@@ -16,15 +18,15 @@ const DESCRIPTIONS: Record<Trend, string> = {
   flat: 'Sin cambio',
 };
 
-export function ChangeBadge({ value }: ChangeBadgeProps) {
+export function ChangeBadge({ value, size = 'sm' }: ChangeBadgeProps) {
   if (value === null) {
-    return <span className={`${styles.badge} ${styles.flat}`}>Sin dato</span>;
+    return <span className={`${styles.badge} ${styles[size]} ${styles.flat}`}>Sin dato</span>;
   }
   const trend = getTrend(value);
   const Icon = ICONS[trend];
   return (
-    <span className={`${styles.badge} ${styles[trend]}`} data-trend={trend}>
-      <Icon size={14} strokeWidth={2.5} aria-hidden="true" />
+    <span className={`${styles.badge} ${styles[size]} ${styles[trend]}`} data-trend={trend}>
+      <Icon className={styles.icon} strokeWidth={2.5} aria-hidden="true" />
       <span className="visually-hidden">{DESCRIPTIONS[trend]}</span>
       {formatChange(value)}
     </span>

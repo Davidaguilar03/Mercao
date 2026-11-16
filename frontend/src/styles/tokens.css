@@ -28,13 +28,22 @@
   /* Tinted surface of the page header band. */
   --color-surface-tint: #eef5f0;
 
-  /* Semantic: price movement */
-  --color-price-up: var(--color-terracotta-text); /* 5.3:1 on its soft background */
-  --color-price-up-bg: var(--color-terracotta-soft);
-  --color-price-down: var(--color-primary); /* 5.5:1 on its soft background */
-  --color-price-down-bg: var(--color-primary-soft);
+  /* Semantic: price movement, with the market convention (a rise in green, a fall in red). */
+  --color-price-up: var(--color-primary); /* 5.5:1 on its soft background */
+  --color-price-up-bg: var(--color-primary-soft);
+  --color-price-down: var(--color-terracotta-text); /* 5.3:1 on its soft background */
+  --color-price-down-bg: var(--color-terracotta-soft);
+  --color-price-down-shape: var(--color-terracotta); /* icons and shapes only */
   --color-price-neutral: var(--color-muted); /* 5.3:1 on its soft background */
   --color-price-neutral-bg: #eeebe2;
+
+  /*
+   * Semantic: price level of a market against the others (cheaper, similar, more expensive).
+   * It is not a change, so it never uses the green and red of the price movement.
+   */
+  --color-level-cheaper: var(--color-accent); /* ink on top: 8.1:1 */
+  --color-level-similar: var(--color-surface); /* ink on top: 14.7:1 */
+  --color-level-expensive: var(--color-ink); /* white on top: 14.7:1 */
 
   /* Typography */
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
@@ -74,6 +83,7 @@
 
   /* Layout */
   --content-max-width: 1120px;
+  --page-gutter: var(--space-4);
   --header-height: 4rem;
 
   /*
@@ -82,5 +92,13 @@
    *   sm     480 px       large phones
    *   md     768 px       tablets, desktop navigation appears
    *   lg     1024 px      desktop
+   *   xl     1200 px      two-column pages, wider content and drawings in the side gutters
    */
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --content-max-width: 1480px;
+    --page-gutter: 4rem;
+  }
 }

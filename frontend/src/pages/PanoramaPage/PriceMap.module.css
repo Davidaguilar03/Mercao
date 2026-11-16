@@ -17,31 +17,23 @@
   font-size: var(--font-size-sm);
 }
 
-.marker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  box-shadow: var(--shadow-md);
-  color: #ffffff;
+/* The level mark fills the marker, with larger text and a white ring to stand out on the map. */
+.marker > span {
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+  box-shadow:
+    0 0 0 2px #ffffff,
+    var(--shadow-md);
+}
+
+.marker:focus-visible > span {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
 }
 
 .marker:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.cheaper {
-  background: var(--color-primary);
-}
-
-.similar {
-  background: var(--color-muted);
-}
-
-.expensive {
-  background: var(--color-terracotta);
+  outline: none;
 }
 
 .popup {
@@ -59,11 +51,21 @@
 }
 
 .popupLevel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--color-muted);
 }
 
 @media (min-width: 768px) {
   .map {
     height: 460px;
+  }
+}
+
+/* Desktop: the map takes the height left on the first screen, next to the table. */
+@media (min-width: 1200px) {
+  .map {
+    height: clamp(280px, calc(100vh - 32rem), 620px);
   }
 }

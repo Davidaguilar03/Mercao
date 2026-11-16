@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import type { Seasonality } from '../../api/types';
 import { useIsNarrowScreen } from '../../hooks/useIsNarrowScreen';
-import { CHART_COLORS, TOOLTIP_STYLE } from '../../lib/chartTheme';
+import { CHART_COLORS, LEVEL_COLORS, TOOLTIP_STYLE } from '../../lib/chartTheme';
 import { formatChange } from '../../lib/format';
 
 interface SeasonalityChartProps {
@@ -49,10 +49,11 @@ function MonthTooltip({ active, payload }: MonthTooltipProps) {
   );
 }
 
+// The same level colors as the map: corn yellow for the cheapest month, ink for the most expensive.
 const BAR_COLORS = {
-  cheapest: CHART_COLORS.primary,
-  expensive: CHART_COLORS.terracotta,
-  normal: CHART_COLORS.neutral,
+  cheapest: LEVEL_COLORS.cheaper,
+  expensive: LEVEL_COLORS.expensive,
+  normal: '#c9c6b8',
 };
 
 /** Monthly price index. Bars grow up or down from 100, the average of the year. */
@@ -73,7 +74,7 @@ export default function SeasonalityChart({ seasonality }: SeasonalityChartProps)
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 16, right: 4, left: 0, bottom: 0 }} barCategoryGap="18%">
         <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
         <XAxis

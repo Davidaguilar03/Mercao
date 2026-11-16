@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl } from 'react-leaflet';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChangeBadge } from '../../components/ChangeBadge/ChangeBadge';
+import { LevelMark } from '../../components/LevelMark/LevelMark';
+import { LEVEL_SYMBOLS, levelMarkClassName } from '../../components/LevelMark/levelSymbols';
 import { PriceTag } from '../../components/PriceTag/PriceTag';
 import { marketDetailPath } from '../../hooks/urlSelection';
 import type { PriceLevel } from '../../lib/analysis';
@@ -42,22 +44,14 @@ function boundsOf(markers: MapMarker[]): L.LatLngBounds {
   return L.latLngBounds(points).pad(0.2);
 }
 
-// The symbol repeats what the color says, for people who do not tell green from red.
-const SYMBOL_PATHS: Record<PriceLevel, string> = {
-  cheaper: 'M12 5v14M6 13l6 6 6-6',
-  similar: 'M6 9h12M6 15h12',
-  expensive: 'M12 19V5M6 11l6-6 6 6',
-};
-
+// The same mark as the legend and the table: peso signs on corn yellow, white or ink.
 function levelIcon(level: PriceLevel) {
   return L.divIcon({
-    className: `${styles.marker} ${styles[level]}`,
-    html:
-      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
-      `stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="${SYMBOL_PATHS[level]}"/></svg>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-    popupAnchor: [0, -14],
+    className: styles.marker,
+    html: `<span class="${levelMarkClassName(level)}">${LEVEL_SYMBOLS[level]}</span>`,
+    iconSize: [36, 26],
+    iconAnchor: [18, 13],
+    popupAnchor: [0, -12],
   });
 }
 
@@ -67,7 +61,7 @@ const ICONS: Record<PriceLevel, L.DivIcon> = {
   expensive: levelIcon('expensive'),
 };
 
-/** Map of the markets where the product is sold, colored by price level. */
+/** Map of the markets where the product is sold, marked by price level. */
 export default function PriceMap({ productId, markers, horizon }: PriceMapProps) {
   const [searchParams] = useSearchParams();
   // Without internet the background tiles do not load. The markers still show where each market
@@ -117,7 +111,10 @@ export default function PriceMap({ productId, markers, horizon }: PriceMapProps)
                 <span>
                   <PriceTag value={marker.price} /> esta semana
                 </span>
-                <span className={styles.popupLevel}>{LEVEL_LABELS[marker.level]}</span>
+                <span className={styles.popupLevel}>
+                  <LevelMark level={marker.level} />
+                  {LEVEL_LABELS[marker.level]}
+                </span>
                 <span>
                   <ChangeBadge value={marker.change4w} /> frente a hace 4 semanas
                 </span>

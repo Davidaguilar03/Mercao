@@ -21,6 +21,19 @@ describe('ChangeBadge', () => {
     expect(badge).toHaveClass('down');
   });
 
+  it('is a small pill by default and a headline figure in the large size', () => {
+    const { container } = render(
+      <>
+        <ChangeBadge value={-2.7} />
+        <ChangeBadge value={-2.7} size="lg" />
+      </>,
+    );
+    const [small, large] = [...container.children];
+    expect(small).toHaveClass('sm', 'down');
+    expect(large).toHaveClass('lg', 'down');
+    expect(large).toHaveAttribute('data-trend', 'down');
+  });
+
   it('treats a change that rounds to zero as neutral', () => {
     const { container } = render(<ChangeBadge value={0.02} />);
     const badge = container.firstElementChild!;

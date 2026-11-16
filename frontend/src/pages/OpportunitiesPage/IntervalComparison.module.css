@@ -30,7 +30,7 @@
   bottom: 0;
   min-width: 4px;
   border-radius: var(--radius-pill);
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 /* The dot marks the expected price inside the range. */
@@ -44,12 +44,13 @@
   transform: translate(-50%, -50%);
 }
 
+/* Price level colors: the cheap market in corn yellow, the expensive one in ink. */
 .buy {
-  background: var(--color-primary);
+  background: var(--color-level-cheaper);
 }
 
 .sell {
-  background: var(--color-terracotta);
+  background: var(--color-level-expensive);
 }
 
 .scale {
