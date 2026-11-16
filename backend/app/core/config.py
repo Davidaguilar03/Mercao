@@ -13,10 +13,16 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseModel):
-    """Runtime settings. Override the data folder with MERCAO_DATA_DIR and the database with MERCAO_DATABASE_URL."""
+    """Runtime settings. Override the data folder with MERCAO_DATA_DIR and the database with MERCAO_DATABASE_URL.
+
+    The API reads the trained model metadata from MERCAO_MODELS_DIR and accepts browser requests from the origins in
+    MERCAO_CORS_ORIGINS (comma separated; the Vite dev server by default).
+    """
 
     data_dir: Path
     database_url: str | None = None
+    models_dir: Path = REPO_ROOT / "models"
+    cors_origins: list[str] = ["http://localhost:5173"]
     supply_workers: int = 2
     prices_workers: int = 6
 
@@ -45,6 +51,11 @@ class Settings(BaseModel):
         return self.database_url or f"sqlite:///{self.database_path.as_posix()}"
 
     @property
+    def read_only_database_url(self) -> str:
+        """Same database opened read-only, so the API can never create or modify the SQLite file."""
+        return self.database_url or f"sqlite:///file:{self.database_path.as_posix()}?mode=ro&uri=true"
+
+    @property
     def catalog_dir(self) -> Path:
         return REPO_ROOT / "backend" / "app" / "domains" / "catalog" / "data"
 
@@ -55,6 +66,8 @@ def get_settings() -> Settings:
     return Settings(
         data_dir=Path(os.environ.get("MERCAO_DATA_DIR", REPO_ROOT / "data")),
         database_url=os.environ.get("MERCAO_DATABASE_URL"),
+        models_dir=Path(os.environ.get("MERCAO_MODELS_DIR", REPO_ROOT / "models")),
+        cors_origins=os.environ.get("MERCAO_CORS_ORIGINS", "http://localhost:5173").split(","),
         supply_workers=int(os.environ.get("MERCAO_SUPPLY_WORKERS", "2")),
         prices_workers=int(os.environ.get("MERCAO_PRICES_WORKERS", "6")),
     )
