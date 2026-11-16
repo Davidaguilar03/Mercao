@@ -1,17 +1,35 @@
+/* The grid counts its columns from the width of this wrapper. */
+.container {
+  container-type: inline-size;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
   margin: 0;
 }
 
-/* The cards of a row stretch to the same height; the content stays at the top. */
+@container (min-width: 520px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* The cards of a row share their height; each one is only as tall as its content needs. */
 .card {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   min-width: 0;
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
@@ -23,10 +41,14 @@
   font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
-  /* Room for two lines, so the figures of a row start at the same height. */
-  min-height: 2.5em;
   line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 /* One size for prices and percentages. */
@@ -36,10 +58,10 @@
   flex-wrap: wrap;
   gap: 0 var(--space-1);
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
   white-space: nowrap;
 }
 
@@ -69,37 +91,35 @@
   height: 0.9em;
 }
 
+.down .icon {
+  color: var(--color-price-down-shape);
+}
+
 .secondary {
   margin: 0;
   color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.45;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
 }
 
 .reference {
   display: block;
 }
 
-@media (min-width: 480px) {
-  .card {
-    padding: var(--space-4);
+/* Wide enough card: the figure on the left and its explanation on the right, on one line. */
+@container (min-width: 15rem) {
+  .inline .body {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
   }
 
-  .value {
-    font-size: var(--font-size-2xl);
-  }
-
-  .secondary {
-    font-size: var(--font-size-sm);
-  }
-}
-
-@media (min-width: 900px) {
-  .label {
-    min-height: 0;
-  }
-
-  .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .inline .secondary {
+    flex: 1;
+    min-width: 0;
+    max-width: 13rem;
+    font-size: var(--font-size-xs);
+    text-align: right;
   }
 }

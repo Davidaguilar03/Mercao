@@ -7,13 +7,23 @@ interface KpiGridProps {
   children: ReactNode;
   /** Names the group of figures for screen readers. */
   label: string;
+  /**
+   * "inline" puts the explanation beside the figure when the card is wide enough, for short
+   * explanations; "stacked" keeps it under the figure, for longer texts.
+   */
+  layout?: 'inline' | 'stacked';
 }
 
-/** Row of key figures: equal-height cards, two columns on phones and four on desktop. */
-export function KpiGrid({ children, label }: KpiGridProps) {
+/**
+ * Group of key figures. The number of columns follows the width of the place where the group
+ * is shown (one, two or four), not the width of the screen.
+ */
+export function KpiGrid({ children, label, layout = 'stacked' }: KpiGridProps) {
   return (
-    <div className={styles.grid} role="group" aria-label={label}>
-      {children}
+    <div className={styles.container}>
+      <div className={`${styles.grid} ${styles[layout]}`} role="group" aria-label={label}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -22,18 +32,22 @@ interface KpiCardProps {
   label: string;
   /** The figure, shown large. Every card of a row uses the same size. */
   value: ReactNode;
-  /** Colors the figure: a rising price in terracotta, a falling one in green. */
+  /** Colors the figure: a rise in green, a fall in terracotta. */
   tone?: Trend | 'neutral';
-  /** Secondary line under the figure: a short explanation, a reference or a small visual. */
+  /** Extra detail shown when the pointer rests on the card. */
+  title?: string;
+  /** Secondary text under or beside the figure: a short explanation, a reference or a small visual. */
   children?: ReactNode;
 }
 
-export function KpiCard({ label, value, tone = 'neutral', children }: KpiCardProps) {
+export function KpiCard({ label, value, tone = 'neutral', title, children }: KpiCardProps) {
   return (
-    <div className={styles.card}>
+    <div className={styles.card} title={title}>
       <p className={styles.label}>{label}</p>
-      <p className={`${styles.value} ${styles[tone]}`}>{value}</p>
-      {children && <div className={styles.secondary}>{children}</div>}
+      <div className={styles.body}>
+        <p className={`${styles.value} ${styles[tone]}`}>{value}</p>
+        {children && <div className={styles.secondary}>{children}</div>}
+      </div>
     </div>
   );
 }

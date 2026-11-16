@@ -1,7 +1,6 @@
 .ranges {
   display: flex;
   gap: var(--space-2);
-  margin-bottom: var(--space-3);
 }
 
 .rangeButton {
@@ -72,19 +71,26 @@
 }
 
 .seasonChart {
-  height: 260px;
+  height: 240px;
   margin-top: var(--space-3);
 }
 
-.columns {
-  display: grid;
-  gap: var(--space-4);
-}
+/* Desktop: smaller buttons beside the title, and a chart as tall as the first screen allows. */
+@media (min-width: 1200px) {
+  .rangeButton {
+    min-height: 36px;
+    padding: 0 var(--space-3);
+  }
 
-@media (min-width: 900px) {
-  .columns {
-    grid-template-columns: 1fr 1fr;
-    /* Each column keeps its own height instead of stretching to match the other. */
-    align-items: start;
+  .legend {
+    font-size: var(--font-size-xs);
+  }
+
+  .priceChart {
+    height: clamp(260px, calc(100vh - 38rem), 440px);
+  }
+
+  .seasonChart {
+    height: 200px;
   }
 }

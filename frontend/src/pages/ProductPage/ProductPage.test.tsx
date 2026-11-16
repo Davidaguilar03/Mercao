@@ -34,16 +34,16 @@ describe('ProductPage', () => {
     expect(cards).toHaveLength(4);
     // Every figure, price or percentage, uses the same large style.
     for (const card of cards) {
-      expect(card.querySelector('p + p')).toHaveClass('value');
+      expect(card.querySelector('p + div > p')).toHaveClass('value');
     }
 
     const [latest, fourWeeks, year, forecast] = cards.map((card) => plain(card.textContent));
     expect(latest).toBe('Último precio$ 3.063 /kgSemana del 9 al 15 de noviembre de 2026');
-    expect(fourWeeks).toContain('Frente a hace 4 semanasSubió+4,8 %Más caro que hace 4 semanas');
-    expect(year).toContain('Frente a hace un añoSubió+154,0 %Más caro que hace un año');
+    expect(fourWeeks).toContain('Frente a hace 4 semanasSubió+4,8 %Hoy está más caro');
+    expect(year).toContain('Frente a hace un añoSubió+154,0 %Hoy está más caro');
     expect(cards[1].querySelector('.value')).toHaveClass('up');
-    expect(forecast).toContain('Pronóstico a 4 semanas$ 2.941 /kg');
-    expect(forecast).toContain('Rango probable para la semana del 7 al 13 de diciembre de 2026');
+    expect(forecast).toContain('Pronóstico a 4 semanas$ 2.941 /kgRango probable');
+    expect(cards[3]).toHaveAttribute('title', 'Para la semana del 7 al 13 de diciembre de 2026');
     expect(
       within(cards[3] as HTMLElement).getByRole('img', {
         name: /Rango probable: de \$.2\.172 a \$.3\.843/,

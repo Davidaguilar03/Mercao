@@ -22,6 +22,26 @@ describe('KpiCard', () => {
     const group = screen.getByRole('group', { name: 'Cifras clave' });
     expect(group).toHaveTextContent('Último precio$ 3.063Semana del 9 al 15 de noviembre de 2026');
     expect(screen.getByText('$ 3.063')).toHaveClass('value', 'neutral');
+    // Longer explanations stay under the figure unless the group asks for the inline layout.
+    expect(group).toHaveClass('stacked');
+  });
+
+  it('can place the explanation beside the figure', () => {
+    render(
+      <KpiGrid label="Cifras clave" layout="inline">
+        <KpiCard label="Último precio" value="$ 3.063" title="Detalle">
+          Semana del 9 al 15 de noviembre de 2026
+        </KpiCard>
+      </KpiGrid>,
+    );
+
+    const group = screen.getByRole('group', { name: 'Cifras clave' });
+    expect(group).toHaveClass('inline');
+    // Figure and explanation share one block, so they can sit side by side.
+    const body = screen.getByText('$ 3.063').parentElement!;
+    expect(body).toHaveClass('body');
+    expect(body).toHaveTextContent('Semana del 9 al 15 de noviembre de 2026');
+    expect(group.firstElementChild).toHaveAttribute('title', 'Detalle');
   });
 });
 
