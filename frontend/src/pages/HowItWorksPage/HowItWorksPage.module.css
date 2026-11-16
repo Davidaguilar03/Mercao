@@ -1,0 +1,147 @@
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.section {
+  margin-top: var(--space-4);
+}
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.meta,
+.caption {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.stat {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+
+.stat dt {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.stat dd {
+  margin: var(--space-1) 0;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+}
+
+.stat p {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.subheading {
+  margin-top: var(--space-5);
+  font-size: var(--font-size-lg);
+}
+
+.caption {
+  margin: var(--space-1) 0 var(--space-3);
+}
+
+/* Reserves the space while the chart loads. */
+.chart {
+  height: 260px;
+}
+
+.tableWrapper {
+  margin-top: var(--space-4);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 36rem;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table th:first-child {
+  text-align: left;
+}
+
+.table thead th {
+  color: var(--color-muted);
+  font-weight: 600;
+  white-space: normal;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feature {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+}
+
+.featureTrack {
+  grid-column: 1 / -1;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-price-neutral-bg);
+}
+
+.featureBar {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+}
+
+.features + .caption {
+  margin: var(--space-4) 0 0;
+}
+
+.limitations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.limitations li::marker {
+  color: var(--color-terracotta);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

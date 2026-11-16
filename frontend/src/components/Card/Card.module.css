@@ -1,0 +1,32 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4);
+  min-width: 0;
+}
+
+.header {
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: var(--space-5);
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+}
