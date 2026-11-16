@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+data/raw/
+data/interim/
+data/processed/
+.idea/
+.claude/settings.local.json
