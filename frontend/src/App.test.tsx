@@ -98,4 +98,38 @@ describe('routing shell', () => {
     expect(await within(footer).findByText(/Datos hasta la semana 46 de 2026/)).toBeInTheDocument();
     expect(footer).toHaveTextContent('Los pronósticos son estimaciones');
   });
+
+  it('shows the brand, the authors, the project and the repository in the footer', () => {
+    renderApp();
+
+    const footer = screen.getByRole('contentinfo');
+    expect(within(footer).getByText('Mercao')).toBeInTheDocument();
+    expect(within(footer).getByText('Precios de plaza, claros.')).toBeInTheDocument();
+    expect(
+      within(footer)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual([
+      'David Aguilar Castillo',
+      'Valeria Tocarruncho Mosquera',
+      'Andrés Santiago Daza Quintana',
+    ]);
+    expect(footer).toHaveTextContent(
+      'Proyecto de Inteligencia Computacional, Universidad Pedagógica y Tecnológica de Colombia',
+    );
+    expect(within(footer).getByRole('link', { name: 'Ver el código en GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/Davidaguilar03/Mercao',
+    );
+  });
+
+  it('puts the selectors of each page inside its header band', () => {
+    renderApp('/oportunidades');
+
+    const band = screen
+      .getByRole('heading', { level: 1, name: 'Oportunidades' })
+      .closest('header')!;
+    expect(within(band).getByRole('combobox', { name: 'Producto' })).toBeInTheDocument();
+    expect(within(band).getByRole('group', { name: 'Pronóstico a' })).toBeInTheDocument();
+  });
 });
