@@ -1,0 +1,22 @@
+source,source_name,market_id,method
+prices,"Armenia, Mercar",7,exact
+prices,"Barranquilla, Barranquillita",4,exact
+prices,"Bogotá, D,C,, Corabastos",1,normalized
+prices,"Bogotá, D.C., Corabastos",1,exact
+prices,"Bucaramanga, Centroabastos",5,exact
+prices,"Cali, Cavasa",3,exact
+prices,Cartago (Valle del Cauca),8,exact
+prices,Chiquinquirá (Boyacá),9,exact
+prices,"Ibagué, Plaza La 21",11,exact
+prices,"Medellín, Central Mayorista de Antioquia",2,exact
+prices,"Pereira, Mercasa",6,exact
+prices,"Tunja, Complejo de Servicios del Sur",10,exact
+supply,"Armenia, Mercar",7,exact
+supply,"Barranquilla, Barranquillita",4,exact
+supply,"Bogotá, D.C., Corabastos",1,exact
+supply,"Bucaramanga, Centroabastos",5,exact
+supply,"Cali, Cavasa",3,exact
+supply,"Ibagué, Plaza La 21",11,exact
+supply,"Medellín, Central Mayorista de Antioquia",2,exact
+supply,"Pereira, Mercasa",6,exact
+supply,"Tunja, Complejo de Servicios del Sur",10,exact

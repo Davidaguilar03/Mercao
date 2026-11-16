@@ -1,0 +1,32 @@
+source,source_name,product_id,method,cpc_code
+prices,Arveja Verde en Vaina,8,normalized,
+prices,Arveja verde en vaina,8,exact,
+prices,Cebolla Cabezona Blanca,2,normalized,
+prices,Cebolla Junca,3,normalized,
+prices,Cebolla Junca Aquitania,4,normalized,
+prices,Cebolla cabezona blanca,2,exact,
+prices,Cebolla junca,3,exact,
+prices,Cebolla junca Aquitania,4,exact,
+prices,Cilantro,10,exact,
+prices,Habichuela,7,exact,
+prices,Lulo,12,exact,
+prices,Mora de Castilla,11,exact,
+prices,Papa Parda Pastusa,1,normalized,
+prices,Papa parda pastusa,1,exact,
+prices,Pimentón,13,exact,
+prices,Plátano Hartón Verde,9,normalized,
+prices,Plátano hartón verde,9,exact,
+prices,Tomate Chonto,5,normalized,
+prices,Tomate chonto,5,exact,
+prices,Zanahoria,6,exact,
+supply,Arveja verde en vaina,8,normalized,0124201
+supply,Cebolla cabezona blanca,2,normalized,0125301
+supply,Cebolla junca,3,normalized,0125302
+supply,Cilantro,10,normalized,0165403
+supply,Habichuela,7,normalized,0121901
+supply,Lulo,12,normalized,0131904
+supply,Papa parda pastusa,1,normalized,0151001
+supply,Pimentón,13,normalized,0123102
+supply,Plátano hartón verde,9,normalized,0131301
+supply,Tomate chonto,5,normalized,0123401
+supply,Zanahoria,6,normalized,0125101
