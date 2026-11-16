@@ -33,7 +33,8 @@ En el encabezado el logo va a la izquierda del nombre "Mercao" escrito en Fraunc
 
 - No lo deforme, no lo gire ni le cambie los colores.
 - No le agregue sombras, bordes ni efectos.
-- No lo ponga sobre el verde principal ni sobre fondos oscuros: el asa y el borde del canasto se pierden.
+- No lo ponga directamente sobre el verde principal ni sobre fondos oscuros: el asa y el borde del canasto se
+  pierden. En el pie de página, que es verde, va dentro de un círculo crema.
 - No use la versión antigua con fondo crema incorporado.
 
 ## Paleta
@@ -44,11 +45,11 @@ Los colores salen del logo.
 |---|---|---|---|
 | Verde plaza (principal) | `#1F6B4A` | `--color-primary` | Nombre de la marca, enlaces, botones, pie de página |
 | Verde oscuro | `#17523A` | `--color-primary-strong` | Estados al pasar el cursor o presionar |
-| Verde suave | `#E4F1EA` | `--color-primary-soft` | Fondos de selección y de "precio baja" |
-| Amarillo maíz (acento) | `#F2B705` | `--color-accent` | Detalles: subrayado de la página actual, borde de avisos |
-| Terracota | `#C8553D` | `--color-terracotta` | Íconos y formas; no para texto pequeño |
-| Terracota para texto | `#A8402A` | `--color-terracotta-text` | Texto de "precio sube" y mensajes de error |
-| Terracota suave | `#FBEAE5` | `--color-terracotta-soft` | Fondo de "precio sube" |
+| Verde suave | `#E4F1EA` | `--color-primary-soft` | Fondos de selección y de "precio sube" |
+| Amarillo maíz (acento) | `#F2B705` | `--color-accent` | Detalles: subrayado de la página actual, borde de avisos, plaza más barata |
+| Terracota | `#C8553D` | `--color-terracotta` | Íconos y formas (flecha de "precio baja"); no para texto pequeño |
+| Terracota para texto | `#A8402A` | `--color-terracotta-text` | Texto de "precio baja" y mensajes de error |
+| Terracota suave | `#FBEAE5` | `--color-terracotta-soft` | Fondo de "precio baja" |
 | Crema (fondo) | `#F7F1E3` | `--color-background` | Fondo de la página |
 | Blanco (superficies) | `#FFFFFF` | `--color-surface` | Tarjetas, encabezado, campos |
 | Tinta | `#1E2B24` | `--color-ink` | Texto principal |
@@ -61,14 +62,33 @@ Los colores salen del logo.
 
 ### Colores con significado
 
+Mercao usa dos familias de color con significado, y no se mezclan.
+
+**Cambio de precio** (subió o bajó frente a otra fecha, o lo que se espera frente al último precio). Sigue la
+convención de los mercados: verde si sube, rojo si baja.
+
 | Significado | Texto | Fondo | Ícono |
 |---|---|---|---|
-| El precio sube | `#A8402A` | `#FBEAE5` | Flecha hacia arriba |
-| El precio baja | `#1F6B4A` | `#E4F1EA` | Flecha hacia abajo |
+| El precio sube | `#1F6B4A` | `#E4F1EA` | Flecha hacia arriba, verde |
+| El precio baja | `#A8402A` | `#FBEAE5` | Flecha hacia abajo, terracota `#C8553D` |
 | Sin cambio o sin dato | `#55635B` | `#EEEBE2` | Raya |
 
-Que el precio suba se muestra en terracota porque encarece la compra; que baje, en verde. El color nunca va solo:
-siempre lo acompañan una flecha y el número con su signo.
+El color nunca va solo: siempre lo acompañan una flecha y el número con su signo. El texto de una baja usa el
+terracota oscuro, que sí cumple contraste; el terracota del logo queda para la flecha.
+
+**Nivel de precio** (una plaza frente a las demás que venden la misma variedad, o un mes frente al resto del año). No
+es un cambio, así que no usa verde ni rojo: usa amarillo maíz, blanco y tinta, y signos de pesos.
+
+| Significado | Fondo | Texto | Marca |
+|---|---|---|---|
+| Más barata que la mayoría | `#F2B705` | `#1E2B24` | `$` |
+| Precio parecido al de la mayoría | `#FFFFFF` con borde tinta | `#1E2B24` | `$$` |
+| Más cara que la mayoría | `#1E2B24` | `#FFFFFF` | `$$$` |
+
+Estas marcas aparecen en el mapa, en su leyenda y en la tabla de plazas de Panorama. Los mismos dos colores
+distinguen dónde comprar (amarillo, la plaza barata) y dónde vender (tinta, la plaza cara) en Oportunidades, y el mes
+más barato y el más caro en la gráfica de temporadas. La leyenda del mapa aclara que las marcas no dicen si el precio
+subió o bajó.
 
 ### Contraste
 
@@ -81,6 +101,7 @@ Todos los colores de texto cumplen el nivel AA de WCAG 2.1 (mínimo 4,5:1 para t
 | Verde `#1F6B4A` | 6,4:1 | 5,7:1 | 5,5:1 |
 | Terracota para texto `#A8402A` | 6,1:1 | 5,4:1 | 5,3:1 |
 | Blanco sobre verde `#1F6B4A` | 6,4:1 | | |
+| Crema `#F7F1E3` sobre verde `#1F6B4A` (pie de página) | 5,7:1 | | |
 
 El terracota del logo (`#C8553D`) llega a 4,35:1 sobre blanco y 3,9:1 sobre crema: no alcanza para texto normal, por
 eso el texto usa la variante más oscura. El amarillo maíz no se usa para texto; si lleva texto encima, va en tinta
@@ -88,15 +109,20 @@ eso el texto usa la variante más oscura. El amarillo maíz no se usa para texto
 
 ## Ilustración
 
-Mercao tiene una ilustración de línea en el verde de la marca, con el mismo trazo redondeado del logo. Muestra una
-plaza de mercado: canasto, papa, tomate, cebolla, hoja, puesto con toldo, bulto y una línea de tendencia que sube.
-Está dibujada en SVG dentro del código (`frontend/src/components/illustrations/`), así que no pesa ni depende de
-internet.
+Mercao tiene una ilustración de línea en el verde de la marca, con el mismo trazo redondeado del logo. Son quince
+dibujos de la plaza de mercado: canasto, bulto, guacal, balanza, puesto con toldo, carretilla, etiqueta de precio,
+papa, tomate, cebolla, zanahoria, plátano, hoja y dos líneas de tendencia. Todos se dibujan en una caja de 64 × 64
+con trazo de 2 px y puntas redondeadas, en SVG dentro del código (`frontend/src/components/illustrations/`), así que
+no pesan ni dependen de internet.
 
-- **Franja de título.** Cada página empieza con una franja blanca que se degrada a verde muy suave, con la escena
-  de la plaza a la derecha del título. En celulares solo se asoma una esquina, muy tenue.
-- **Márgenes.** En pantallas anchas (desde 1360 px) los dibujos aparecen sueltos en los márgenes libres, al 9 % de
-  opacidad. Nunca van detrás de textos, tablas ni gráficas.
+- **Franja de título.** Cada página empieza con una franja blanca que se degrada a verde muy suave. Lleva el
+  título, la descripción, los selectores de la página y una escena pequeña de la plaza (puesto, canasto, bulto,
+  guacal y tendencia). En celulares solo se asoma una esquina de la escena, muy tenue.
+- **Costados.** Desde 1200 px de ancho los dibujos forman una cinta a cada lado del contenido, ocho por lado, que
+  alterna recipientes, productos y señales del oficio. En portátiles la cinta cabe en el margen de 64 px y va al
+  14 % de opacidad; en pantallas anchas los dibujos crecen y se reparten por el margen libre, al 11 %. Nunca van
+  detrás de textos, controles, tablas ni gráficas.
+- **Pie de página.** La escena se repite pequeña, en crema, en la franja inferior del pie.
 - Es solo decoración: no lleva texto, no se anima y los lectores de pantalla la ignoran.
 - No la use a color, con relleno ni como reemplazo del logo.
 
@@ -104,9 +130,27 @@ internet.
 
 - Todas las tarjetas y contenedores llevan el mismo contorno verde de 1 px, radio de 16 px y una sombra suave
   (`--shadow-card`). Cada tarjeta ocupa solo el alto de su contenido.
-- Las cifras clave usan un mismo sistema: rótulo pequeño en mayúsculas, cifra grande y una línea de explicación.
-  Precios y porcentajes van del mismo tamaño. Un porcentaje lleva flecha y color: terracota si sube, verde si baja.
+- Las cifras clave usan un mismo sistema: rótulo pequeño en mayúsculas, cifra grande y una explicación corta.
+  Cuando la tarjeta es ancha, la explicación va a la derecha de la cifra para que la tarjeta no quede con espacio
+  vacío; cuando es angosta o el texto es largo, va debajo. Precios y porcentajes van del mismo tamaño. Un
+  porcentaje lleva flecha y color: verde si sube, rojo si baja.
 - El rango probable de un pronóstico se dibuja como una barra corta con un punto en el precio esperado.
+
+## Distribución de las páginas
+
+- Hasta 1199 px de ancho todo va en una columna. Desde 1200 px el contenido se ensancha (hasta 1480 px) y Panorama
+  y Producto usan dos columnas, para ver lo principal con poco desplazamiento en pantallas de 1366 × 768 en adelante.
+- Panorama: a la izquierda el título con el selector, la frase resumen y el mapa; a la derecha la tabla de plazas
+  (que se desplaza dentro de su tarjeta si no cabe) y el origen.
+- Producto: a la izquierda los selectores, las cifras clave y la gráfica de precios; a la derecha temporadas,
+  departamentos y municipios.
+- Oportunidades y Cómo funciona ocupan todo el ancho y reparten sus bloques en dos o tres columnas.
+
+## Pie de página
+
+Fondo verde principal con texto crema y una línea amarillo maíz arriba. Lleva el logo dentro de un círculo crema con
+el nombre y el lema, una descripción corta, el enlace al repositorio en GitHub, la fuente de los datos y la última
+semana con datos, los autores y, en una franja más oscura, el nombre de la materia y la universidad.
 
 ## Tipografía
 
@@ -133,7 +177,8 @@ Las dos fuentes van dentro de la aplicación (paquetes `@fontsource-variable`), 
 - Espaciado en múltiplos de 4 px: 4, 8, 12, 16, 24, 32, 48 y 64 (`--space-1` a `--space-8`).
 - Radios: 6 px (elementos pequeños), 10 px (campos y botones), 16 px (tarjetas) y píldora para etiquetas.
 - Sombras suaves y de un solo tono (`--shadow-sm`, `--shadow-md`, `--shadow-lg`).
-- Tamaños de pantalla: desde 360 px (celulares); 480 px, 768 px (aparece el menú horizontal) y 1024 px.
+- Tamaños de pantalla: desde 360 px (celulares); 480 px, 768 px (aparece el menú horizontal), 1024 px y 1200 px
+  (dos columnas y dibujos en los costados).
 - Botones y enlaces del menú miden al menos 44 px de alto para que se puedan tocar con el dedo.
 
 ## Tono de voz
