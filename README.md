@@ -73,6 +73,17 @@ python -m backend.scripts.build_database
 Variables de entorno opcionales: `MERCAO_DATA_DIR` (carpeta de datos), `MERCAO_DATABASE_URL`,
 `MERCAO_SUPPLY_WORKERS` y `MERCAO_PRICES_WORKERS` (procesos en paralelo para leer archivos).
 
+## Modelo de pronóstico
+
+```bash
+python -m backend.scripts.train_models        # entrena y evalúa los modelos; guarda el final en models/ (no versionado)
+python -m backend.scripts.generate_forecasts  # escribe la tabla forecasts en mercao.db
+```
+
+`build_database` reemplaza el archivo de la base, así que al terminar regenera la tabla `forecasts` con los modelos
+guardados en `models/`. Si todavía no hay modelos entrenados, lo indica en el log y la tabla queda sin generar: ejecute
+`train_models` y luego `generate_forecasts`. Diseño, resultados y limitaciones en `docs/forecasting_model.md`.
+
 ## Pruebas
 
 ```bash

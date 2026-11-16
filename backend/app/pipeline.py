@@ -6,6 +6,7 @@ import sqlite3
 import time
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -16,6 +17,7 @@ from backend.app.domains.catalog import models as catalog_models  # noqa: F401  
 from backend.app.domains.catalog.focus import FOCUS_MARKETS, FOCUS_PRODUCTS
 from backend.app.domains.catalog.generator import build_market_catalog, build_product_catalog
 from backend.app.domains.catalog.loader import Catalog, load_catalog
+from backend.app.domains.forecasting.forecasts import MODELS_DIR, models_available, write_forecasts
 from backend.app.domains.ingestion import models as ingestion_models  # noqa: F401
 from backend.app.domains.ingestion.manifest import ManifestEntry, load_manifest
 from backend.app.domains.ingestion.runner import ensure_supply_parsed, ensure_weekly_parsed, load_weekly, supply_cache
@@ -156,6 +158,23 @@ def _events(price_stats: dict[str, Any], supply_stats: dict[str, Any], files: pd
     return pd.DataFrame(rows, columns=["step", "level", "message", "value"])
 
 
+def _refresh_forecasts(database: Path) -> int | None:
+    """The rebuild replaces the database file, so the forecasts table is regenerated from the saved models."""
+    if not models_available():
+        log.warning("No trained models in %s: the forecasts table was not generated. Run "
+                    "python -m backend.scripts.train_models and then python -m backend.scripts.generate_forecasts",
+                    MODELS_DIR)
+        return None
+    engine = create_db_engine(f"sqlite:///{database.as_posix()}")
+    try:
+        forecasts = write_forecasts(engine)
+    finally:
+        engine.dispose()
+    log.info("Forecasts regenerated from the saved models: %d rows, %d pairs, model %s", len(forecasts),
+             forecasts.groupby(["product_id", "market_id"]).ngroups, forecasts["model_version"].iloc[0])
+    return len(forecasts)
+
+
 def build_database(settings: Settings) -> dict[str, Any]:
     """Rebuild data/processed/mercao.db from the raw files. The new database replaces the old one only on success."""
     started = time.perf_counter()
@@ -203,6 +222,7 @@ def build_database(settings: Settings) -> dict[str, Any]:
         engine.dispose()
     target.unlink(missing_ok=True)
     tmp.replace(target)
+    forecast_rows = _refresh_forecasts(target)
 
     usable = coverage[coverage["usable_for_model"]]
     group_sizes = usable.groupby("comparable_group")["market_id"].nunique()
@@ -218,6 +238,7 @@ def build_database(settings: Settings) -> dict[str, Any]:
                     "product_names_by_method": catalog.product_mapping["method"].value_counts().to_dict(),
                     "market_names_mapped": len(catalog.market_mapping)},
         "out_of_scope": {"prices": price_tables.stats["out_of_scope"], "supply": supply.stats["out_of_scope"]},
+        "forecast_rows": forecast_rows,
         "runtime_seconds": round(time.perf_counter() - started, 1),
     }
     (settings.processed_dir / "build_summary.json").write_text(
