@@ -5,6 +5,9 @@
 }
 
 .main {
+  /* Above the decorative backdrop. */
+  position: relative;
+  z-index: 1;
   flex: 1;
   width: 100%;
   max-width: var(--content-max-width);

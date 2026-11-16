@@ -1,0 +1,38 @@
+/* Hidden until the screen has free margins beside the 1120 px content column. */
+.backdrop {
+  display: none;
+}
+
+@media (min-width: 1360px) {
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: var(--header-height) 0 0;
+    z-index: 0;
+    overflow: hidden;
+    color: var(--color-primary);
+    opacity: 0.09;
+    pointer-events: none;
+  }
+
+  .column {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    /* The free space on each side of the content column. */
+    width: calc((100vw - var(--content-max-width)) / 2);
+  }
+
+  .left {
+    left: 0;
+  }
+
+  .right {
+    right: 0;
+  }
+
+  .item {
+    position: absolute;
+    display: block;
+  }
+}
