@@ -34,7 +34,8 @@ export function OpportunitiesPage() {
         <span>
           <strong>Tenga en cuenta:</strong> las diferencias no incluyen transporte, almacenamiento
           ni intermediación. Los precios son pronósticos del precio mayorista promedio: son
-          estimaciones, no precios garantizados.
+          estimaciones, no precios garantizados. La distancia entre plazas se mide en línea recta y
+          no refleja la ruta real por carretera, que siempre es más larga.
         </span>
       </p>
 

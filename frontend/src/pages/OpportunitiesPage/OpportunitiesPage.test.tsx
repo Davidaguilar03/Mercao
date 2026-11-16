@@ -13,13 +13,48 @@ describe('OpportunitiesPage', () => {
     expect(plain(buy.textContent)).toContain('Pereira, Mercasa$ 2.254 /kg');
     const sell = screen.getByText('Vender en').parentElement!;
     expect(plain(sell.textContent)).toContain('Cartago (Valle del Cauca)$ 3.355 /kg');
-    expect(plain(screen.getByText(/Diferencia esperada/).textContent)).toBe(
-      'Diferencia esperada: $ 1.101 por kilo (48,8 %)',
+    expect(plain(screen.getByText('Diferencia esperada').parentElement!.textContent)).toBe(
+      'Diferencia esperada$ 1.101 por kilo (48,8 %)',
     );
     expect(
       screen.getByText(/Pronóstico para la semana del 23 al 29 de noviembre de 2026/),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Variedad: parda pastusa' })).toBeInTheDocument();
+  });
+
+  it('shows the expected change of each market against its latest price', async () => {
+    mockApi(fullApi);
+    renderWithProviders(<OpportunitiesPage />);
+
+    const buy = plain((await screen.findByText('Comprar en')).parentElement!.textContent);
+    expect(buy).toContain('Bajó\u22122,7 %frente al último precio ($ 2.317 /kg)');
+    const sell = screen.getByText('Vender en').parentElement!;
+    expect(plain(sell.textContent)).toContain(
+      'Bajó\u22123,5 %frente al último precio ($ 3.477 /kg)',
+    );
+    expect(sell.querySelector('[data-trend]')).toHaveAttribute('data-trend', 'down');
+  });
+
+  it('says there is no data when a market has no latest price', async () => {
+    const withoutLatest = recommendationsFor(2);
+    withoutLatest.groups[0].buy.latest_price = null;
+    withoutLatest.groups[0].buy.expected_change_percent = null;
+    mockApi({ ...fullApi, '/api/recommendations': withoutLatest });
+    renderWithProviders(<OpportunitiesPage />);
+
+    const buy = (await screen.findByText('Comprar en')).parentElement!;
+    expect(buy).toHaveTextContent('Sin dato');
+    expect(buy).not.toHaveTextContent('frente al último precio');
+  });
+
+  it('shows the straight-line distance between the two cities', async () => {
+    mockApi(fullApi);
+    renderWithProviders(<OpportunitiesPage />);
+
+    const label = await screen.findByText('Distancia aproximada en línea recta');
+    expect(plain(label.parentElement!.textContent)).toBe(
+      'Distancia aproximada en línea recta25 km entre Pereira y Cartago',
+    );
   });
 
   it('explains a low confidence and shows the two ranges', async () => {
@@ -53,10 +88,17 @@ describe('OpportunitiesPage', () => {
 
     const table = await screen.findByRole('table');
     const rows = within(table).getAllByRole('row').slice(1);
-    expect(rows.map((row) => plain(row.textContent))).toEqual([
-      'Pereira, MercasaComprar$ 2.254 /kg$ 1.777 a $ 2.769',
-      'Bogotá, D.C., Corabastos$ 2.938 /kg$ 2.316 a $ 3.608',
-      'Cartago (Valle del Cauca)Vender$ 3.355 /kg$ 2.645 a $ 4.120',
+    // Header cell (market and tag), then price and range; the price cell repeats the range for
+    // phones, where the range column is hidden.
+    const cells = rows.map((row) =>
+      [within(row).getByRole('rowheader'), ...within(row).getAllByRole('cell')].map((cell) =>
+        plain(cell.textContent),
+      ),
+    );
+    expect(cells).toEqual([
+      ['Pereira, MercasaComprar', '$ 2.254 /kg$ 1.777 a $ 2.769', '$ 1.777 a $ 2.769'],
+      ['Bogotá, D.C., Corabastos', '$ 2.938 /kg$ 2.316 a $ 3.608', '$ 2.316 a $ 3.608'],
+      ['Cartago (Valle del Cauca)Vender', '$ 3.355 /kg$ 2.645 a $ 4.120', '$ 2.645 a $ 4.120'],
     ]);
   });
 
@@ -67,6 +109,7 @@ describe('OpportunitiesPage', () => {
     const note = screen.getByRole('note');
     expect(note).toHaveTextContent('no incluyen transporte, almacenamiento ni intermediación');
     expect(note).toHaveTextContent('son estimaciones, no precios garantizados');
+    expect(note).toHaveTextContent('no refleja la ruta real por carretera');
   });
 
   it('explains when there are not two markets to compare', async () => {
