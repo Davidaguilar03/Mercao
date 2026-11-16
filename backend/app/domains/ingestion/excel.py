@@ -10,8 +10,12 @@ Row = list[Any]
 
 
 def read_sheets(path: Path) -> dict[str, list[Row]]:
-    """Every sheet as a list of rows, keeping empty leading rows and columns so positions match Excel."""
-    workbook = CalamineWorkbook.from_path(str(path))
+    """Every sheet as a list of rows, keeping empty leading rows and columns so positions match Excel.
+
+    The format is detected from the content, not the extension: 27 annexes are .xlsx files published as .xls.
+    """
+    with open(path, "rb") as handle:
+        workbook = CalamineWorkbook.from_filelike(handle)
     try:
         return {
             name: workbook.get_sheet_by_name(name).to_python(skip_empty_area=False)

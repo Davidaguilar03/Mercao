@@ -15,7 +15,7 @@ import pandas as pd
 from backend.app.domains.ingestion.excel import Row, read_sheets
 from backend.app.domains.ingestion.text import clean_text, name_key, to_number
 
-PARSER_VERSION = "weekly-1"
+PARSER_VERSION = "weekly-2"
 WEEKLY_COLUMNS = ["product_name", "market_name", "group_label", "min_price", "max_price", "mean_price"]
 _GROUP_TITLE_RE = re.compile(r"^\s*(?:cuadro\s+)?\d+(?:\.\d+)*\.?\s+(.+)$", re.IGNORECASE)
 
