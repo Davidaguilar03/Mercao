@@ -1,63 +1,81 @@
-.grid {
+/* Steps: a vertical timeline on phones, a row joined by a line on desktop. */
+.steps {
   display: grid;
   gap: var(--space-4);
-}
-
-.section {
-  margin-top: var(--space-4);
-}
-
-.prose {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.meta,
-.caption {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--space-3);
   margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
 }
 
-.stat {
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-background);
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
 }
 
-.stat dt {
-  font-size: var(--font-size-sm);
+/* Line that joins one step with the next. */
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 3rem;
+  bottom: calc(-1 * var(--space-4));
+  left: 1.5rem;
+  width: 2px;
+  background: var(--color-primary-soft);
+}
+
+.stepMarker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--color-card-border);
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.stepNumber {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.stepTitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
   font-weight: 600;
+  line-height: 1.3;
 }
 
-.stat dd {
-  margin: var(--space-1) 0;
-  color: var(--color-primary);
-  font-family: var(--font-display);
-  font-size: var(--font-size-2xl);
-  font-weight: 600;
-  line-height: var(--line-height-tight);
-}
-
-.stat p {
+.stepText {
+  margin-top: var(--space-1);
   color: var(--color-muted);
   font-size: var(--font-size-sm);
 }
 
-.subheading {
-  margin-top: var(--space-5);
-  font-size: var(--font-size-lg);
+.sectionHeading {
+  margin: var(--space-3) 0 var(--space-3);
 }
 
-.caption {
-  margin: var(--space-1) 0 var(--space-3);
+.sectionHeading p {
+  margin-top: var(--space-1);
+  color: var(--color-muted);
 }
 
 /* Reserves the space while the chart loads. */
@@ -67,32 +85,6 @@
 
 .tableWrapper {
   margin-top: var(--space-4);
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  min-width: 36rem;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.table th,
-.table td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  text-align: right;
-  white-space: nowrap;
-}
-
-.table th:first-child {
-  text-align: left;
-}
-
-.table thead th {
-  color: var(--color-muted);
-  font-weight: 600;
-  white-space: normal;
 }
 
 .features {
@@ -108,29 +100,31 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
 }
 
 .featureTrack {
   grid-column: 1 / -1;
-  height: 8px;
-  border-radius: var(--radius-pill);
+  height: 12px;
+  border-radius: var(--radius-sm);
   background: var(--color-price-neutral-bg);
 }
 
 .featureBar {
   display: block;
   height: 100%;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   background: var(--color-primary);
 }
 
-.features + .caption {
-  margin: var(--space-4) 0 0;
+/* The limitations box is set apart with the terracotta of the brand. */
+.limits {
+  border-color: var(--color-terracotta);
+  background: var(--color-terracotta-soft);
 }
 
 .limitations {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--space-3);
   margin: 0;
   padding-left: var(--space-5);
@@ -140,8 +134,34 @@
   color: var(--color-terracotta);
 }
 
-@media (min-width: 768px) {
-  .grid {
+.footnote {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  .steps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .step {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .step:not(:last-child)::before {
+    top: 1.5rem;
+    bottom: auto;
+    left: 3.5rem;
+    right: calc(-1 * var(--space-4));
+    width: auto;
+    height: 2px;
+  }
+
+  .limitations {
     grid-template-columns: 1fr 1fr;
+    gap: var(--space-3) var(--space-6);
   }
 }

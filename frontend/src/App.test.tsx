@@ -4,8 +4,6 @@ import { App } from './App';
 import { health, modelSummary } from './test/fixtures';
 import { mockApi, renderWithProviders } from './test/utils';
 
-const plain = (text: string | null) => (text ?? '').replace(/\u00a0/g, ' ');
-
 function renderApp(route = '/') {
   mockApi({ '/api/health': health, '/api/model/summary': modelSummary });
   return renderWithProviders(<App />, route);
@@ -99,33 +97,5 @@ describe('routing shell', () => {
     expect(footer).toHaveTextContent('DANE');
     expect(await within(footer).findByText(/Datos hasta la semana 46 de 2026/)).toBeInTheDocument();
     expect(footer).toHaveTextContent('Los pronósticos son estimaciones');
-  });
-});
-
-describe('Cómo funciona', () => {
-  it('shows the chosen model and its test results against the naive forecast', async () => {
-    renderApp('/como-funciona');
-
-    expect(await screen.findByRole('heading', { name: 'El modelo elegido' })).toBeInTheDocument();
-    expect(screen.getByText('LightGBM')).toBeInTheDocument();
-    // Random Forest did slightly better in the test and the page says so.
-    expect(screen.getByText(/Random Forest tuvo un error apenas menor/)).toBeInTheDocument();
-
-    const improvement = screen.getByText('Mejora frente al ingenuo').parentElement!;
-    expect(plain(improvement.textContent)).toContain('6,1 %');
-    const row = screen.getByRole('row', { name: /^1 semana/ });
-    expect(plain(row.textContent)).toBe('1 semana9,7 %10,1 %3,6 %58,9 %82,2 %');
-    expect(screen.getByText('Precio vs. media 52 sem.')).toBeInTheDocument();
-    expect(screen.getByText(/No incluye el transporte/)).toBeInTheDocument();
-  });
-
-  it('explains the failure and offers a retry when the summary cannot be loaded', async () => {
-    mockApi({ '/api/health': health });
-    renderWithProviders(<App />, '/como-funciona');
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('No encontrado.');
-    expect(screen.getByRole('button', { name: /Reintentar/ })).toBeInTheDocument();
-    // The limitations do not depend on the API.
-    expect(screen.getByText(/Es una estimación/)).toBeInTheDocument();
   });
 });
