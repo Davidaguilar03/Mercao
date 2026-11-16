@@ -40,7 +40,7 @@ export default function ErrorByHorizonChart({ byHorizon, modelLabel }: ErrorByHo
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} barGap={2} barCategoryGap="22%" margin={{ top: 16, right: 4, left: 0 }}>
         <CartesianGrid vertical={false} stroke={GRID} />
         <XAxis

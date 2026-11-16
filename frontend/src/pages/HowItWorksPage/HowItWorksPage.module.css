@@ -70,7 +70,17 @@
 }
 
 .sectionHeading {
-  margin: var(--space-3) 0 var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+/* The sections after the results: one column, or two on desktop once the results are loaded. */
+.layout {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.layout > * {
+  min-width: 0;
 }
 
 .sectionHeading p {
@@ -80,7 +90,7 @@
 
 /* Reserves the space while the chart loads. */
 .chart {
-  height: 260px;
+  height: 240px;
 }
 
 .tableWrapper {
@@ -159,9 +169,31 @@
     width: auto;
     height: 2px;
   }
+}
 
+/* One wide column: the limitations fit in two columns. */
+@media (min-width: 900px) and (max-width: 1199.98px) {
   .limitations {
     grid-template-columns: 1fr 1fr;
     gap: var(--space-3) var(--space-6);
+  }
+}
+
+/* Desktop: the sections flow into two balanced columns, in the same reading order. */
+@media (min-width: 1200px) {
+  .layoutReady {
+    display: block;
+    columns: 2;
+    column-gap: var(--space-4);
+  }
+
+  .layoutReady > * {
+    break-inside: avoid;
+    margin-bottom: var(--space-4);
+  }
+
+  /* The margin under the sections already separates the footnote. */
+  .layoutReady + .footnote {
+    margin-top: calc(-1 * var(--space-4));
   }
 }

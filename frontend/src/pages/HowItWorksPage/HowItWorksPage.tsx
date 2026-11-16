@@ -65,12 +65,12 @@ export function HowItWorksPage() {
 
   return (
     <>
-      <PageHeader
-        title="Cómo funciona"
-        description="De dónde salen los precios que ve en Mercao, cómo se calculan los pronósticos y qué tanto se puede confiar en ellos."
-      />
-
       <div className={page.stack}>
+        <PageHeader
+          title="Cómo funciona"
+          description="De dónde salen los precios que ve en Mercao, cómo se calculan los pronósticos y qué tanto se puede confiar en ellos."
+        />
+
         <Card
           title="De los boletines del DANE al pronóstico"
           subtitle="Lo que pasa cada semana, paso a paso."
@@ -95,37 +95,44 @@ export function HowItWorksPage() {
         {summary.isError && (
           <ErrorState message={summary.error.message} onRetry={() => summary.refetch()} />
         )}
-        {summary.data && <ModelSections summary={summary.data} />}
+        {summary.data && <ModelResults summary={summary.data} />}
 
-        <Card
-          title="Lo que Mercao no hace"
-          subtitle="Téngalo presente antes de tomar una decisión con estos datos."
-          className={styles.limits}
-        >
-          <ul className={styles.limitations}>
-            <li>
-              <strong>No garantiza precios.</strong> El pronóstico es una estimación a partir de lo
-              que ha pasado antes. Un paro, una helada o un derrumbe pueden cambiarlo todo de una
-              semana a otra.
-            </li>
-            <li>
-              <strong>No acierta mucho más que suponer que el precio sigue igual.</strong> La mejora
-              es modesta. Úselo como una señal más, no como la única.
-            </li>
-            <li>
-              <strong>No incluye el transporte.</strong> Las diferencias entre plazas no descuentan
-              fletes, cargue, mermas ni intermediación, y la distancia se mide en línea recta.
-            </li>
-            <li>
-              <strong>No muestra el precio que usted va a conseguir.</strong> Son precios mayoristas
-              promedio; el suyo cambia con la calidad, la cantidad y el día de la semana.
-            </li>
-            <li>
-              <strong>No ve igual de bien a lo lejos.</strong> El pronóstico a cuatro semanas falla
-              más que el de una semana.
-            </li>
-          </ul>
-        </Card>
+        {/* Desktop: two columns of sections; one column below 1200 px, in this same order. */}
+        <div className={`${styles.layout} ${summary.data ? styles.layoutReady : ''}`}>
+          {summary.data && <ModelDetails summary={summary.data} />}
+
+          <Card
+            title="Lo que Mercao no hace"
+            subtitle="Téngalo presente antes de tomar una decisión con estos datos."
+            className={styles.limits}
+          >
+            <ul className={styles.limitations}>
+              <li>
+                <strong>No garantiza precios.</strong> El pronóstico es una estimación a partir de
+                lo que ha pasado antes. Un paro, una helada o un derrumbe pueden cambiarlo todo de
+                una semana a otra.
+              </li>
+              <li>
+                <strong>No acierta mucho más que suponer que el precio sigue igual.</strong> La
+                mejora es modesta. Úselo como una señal más, no como la única.
+              </li>
+              <li>
+                <strong>No incluye el transporte.</strong> Las diferencias entre plazas no
+                descuentan fletes, cargue, mermas ni intermediación, y la distancia se mide en línea
+                recta.
+              </li>
+              <li>
+                <strong>No muestra el precio que usted va a conseguir.</strong> Son precios
+                mayoristas promedio; el suyo cambia con la calidad, la cantidad y el día de la
+                semana.
+              </li>
+              <li>
+                <strong>No ve igual de bien a lo lejos.</strong> El pronóstico a cuatro semanas
+                falla más que el de una semana.
+              </li>
+            </ul>
+          </Card>
+        </div>
 
         {summary.data && (
           <p className={styles.footnote}>
@@ -146,9 +153,51 @@ export function HowItWorksPage() {
   );
 }
 
-function ModelSections({ summary }: { summary: ModelSummary }) {
+/** The headline results of the chosen model, as four tiles. */
+function ModelResults({ summary }: { summary: ModelSummary }) {
   const chosen = summary.overall.find((row) => row.model === summary.model_type);
   const naive = summary.overall.find((row) => row.model === 'naive');
+  if (!chosen || !naive) return null;
+
+  return (
+    <section aria-labelledby="results-title">
+      <div className={styles.sectionHeading}>
+        <h2 id="results-title">Qué tan bien acierta</h2>
+        <p>
+          Resultados del modelo elegido ({summary.model_label}) al ponerlo a prueba con un año de
+          precios que nunca había visto.
+        </p>
+      </div>
+      <KpiGrid label="Resultados del modelo">
+        <KpiCard label="Error promedio" value={formatPercent(chosen.mape_pct)}>
+          Es lo que el pronóstico se aleja del precio real, en promedio. En plata, unos{' '}
+          {formatPesos(chosen.mae)} por kilo.
+        </KpiCard>
+        <KpiCard label="Mejora frente al ingenuo" value={formatPercent(chosen.skill_mape_pct)}>
+          El pronóstico ingenuo supone que el precio no cambia y falla en{' '}
+          {formatPercent(naive.mape_pct)}. El modelo reduce ese error, pero poco.
+        </KpiCard>
+        {chosen.directional_accuracy_pct !== null && (
+          <KpiCard
+            label="Acierta si sube o baja"
+            value={formatPercent(chosen.directional_accuracy_pct)}
+          >
+            De las veces que el precio cambió. Adivinar al azar daría cerca de 50 %.
+          </KpiCard>
+        )}
+        <KpiCard
+          label="Precios dentro del rango"
+          value={formatPercent(summary.interval_coverage_overall_pct)}
+        >
+          Se esperaba {summary.interval_nominal_pct} %, así que el rango probable es confiable.
+        </KpiCard>
+      </KpiGrid>
+    </section>
+  );
+}
+
+/** The tested models, the variables, how the model was chosen and the error by horizon. */
+function ModelDetails({ summary }: { summary: ModelSummary }) {
   const coverageByHorizon = new Map(
     summary.interval_coverage.map((row) => [row.horizon, row.coverage_pct]),
   );
@@ -156,79 +205,43 @@ function ModelSections({ summary }: { summary: ModelSummary }) {
 
   return (
     <>
-      {chosen && naive && (
-        <section aria-labelledby="results-title">
-          <div className={styles.sectionHeading}>
-            <h2 id="results-title">Qué tan bien acierta</h2>
-            <p>
-              Resultados del modelo elegido ({summary.model_label}) al ponerlo a prueba con un año
-              de precios que nunca había visto.
-            </p>
-          </div>
-          <KpiGrid label="Resultados del modelo">
-            <KpiCard label="Error promedio" value={formatPercent(chosen.mape_pct)}>
-              Es lo que el pronóstico se aleja del precio real, en promedio. En plata, unos{' '}
-              {formatPesos(chosen.mae)} por kilo.
-            </KpiCard>
-            <KpiCard label="Mejora frente al ingenuo" value={formatPercent(chosen.skill_mape_pct)}>
-              El pronóstico ingenuo supone que el precio no cambia y falla en{' '}
-              {formatPercent(naive.mape_pct)}. El modelo reduce ese error, pero poco.
-            </KpiCard>
-            {chosen.directional_accuracy_pct !== null && (
-              <KpiCard
-                label="Acierta si sube o baja"
-                value={formatPercent(chosen.directional_accuracy_pct)}
-              >
-                De las veces que el precio cambió. Adivinar al azar daría cerca de 50 %.
-              </KpiCard>
-            )}
-            <KpiCard
-              label="Precios dentro del rango"
-              value={formatPercent(summary.interval_coverage_overall_pct)}
-            >
-              Se esperaba {summary.interval_nominal_pct} %, así que el rango probable es confiable.
-            </KpiCard>
-          </KpiGrid>
-        </section>
+      <Card
+        title={`Los ${summary.overall.length} modelos que se probaron`}
+        subtitle="Error promedio de cada uno en la prueba. La barra más corta es la mejor."
+      >
+        <ModelComparison summary={summary} />
+      </Card>
+
+      {summary.top_features.length > 0 && (
+        <Card
+          title="En qué se fija el modelo"
+          subtitle="Las variables que más pesan en el pronóstico y qué parte del peso tiene cada una."
+        >
+          <ol className={styles.features}>
+            {summary.top_features.map((feature) => (
+              <li key={feature.feature} className={styles.feature}>
+                <span>{feature.label}</span>
+                <span className="tabular">{formatPercent(feature.importance_pct)}</span>
+                <span className={styles.featureTrack} aria-hidden="true">
+                  <span
+                    className={styles.featureBar}
+                    style={{ width: `${(feature.importance_pct / maxImportance) * 100}%` }}
+                  />
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className={`${page.caption} ${page.captionAfter}`}>
+            En palabras simples: el modelo mira sobre todo qué tan lejos está el precio de hoy de su
+            nivel habitual, de qué producto se trata y en qué época del año estamos.
+            {summary.importance_kind && <> Medida usada: {summary.importance_kind}.</>}
+          </p>
+        </Card>
       )}
 
-      <div className={page.grid}>
-        <Card
-          title={`Los ${summary.overall.length} modelos que se probaron`}
-          subtitle="Error promedio de cada uno en la prueba. La barra más corta es la mejor."
-        >
-          <ModelComparison summary={summary} />
-        </Card>
-
-        {summary.top_features.length > 0 && (
-          <Card
-            title="En qué se fija el modelo"
-            subtitle="Las variables que más pesan en el pronóstico y qué parte del peso tiene cada una."
-          >
-            <ol className={styles.features}>
-              {summary.top_features.map((feature) => (
-                <li key={feature.feature} className={styles.feature}>
-                  <span>{feature.label}</span>
-                  <span className="tabular">{formatPercent(feature.importance_pct)}</span>
-                  <span className={styles.featureTrack} aria-hidden="true">
-                    <span
-                      className={styles.featureBar}
-                      style={{ width: `${(feature.importance_pct / maxImportance) * 100}%` }}
-                    />
-                  </span>
-                </li>
-              ))}
-            </ol>
-            <p className={`${page.caption} ${page.captionAfter}`}>
-              En palabras simples: el modelo mira sobre todo qué tan lejos está el precio de hoy de
-              su nivel habitual, de qué producto se trata y en qué época del año estamos.
-              {summary.importance_kind && <> Medida usada: {summary.importance_kind}.</>}
-            </p>
-          </Card>
-        )}
+      <div>
+        <ModelChoiceNote summary={summary} />
       </div>
-
-      <ModelChoiceNote summary={summary} />
 
       <Card
         title="Entre más lejos, menos preciso"
@@ -241,7 +254,7 @@ function ModelSections({ summary }: { summary: ModelSummary }) {
         </div>
 
         <div className={`${table.wrapper} ${styles.tableWrapper}`}>
-          <table className={table.table} style={{ minWidth: '36rem' }}>
+          <table className={`${table.table} ${table.compact}`} style={{ minWidth: '31rem' }}>
             <caption className="visually-hidden">Resultados de la prueba por horizonte</caption>
             <thead>
               <tr>
