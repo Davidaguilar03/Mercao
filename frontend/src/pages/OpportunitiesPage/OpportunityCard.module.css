@@ -3,10 +3,12 @@
   gap: var(--space-3);
 }
 
+/* Market and expected price on the left; expected change, large, on the right. */
 .side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
   min-width: 0;
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-card-border);
@@ -15,13 +17,24 @@
   background: var(--color-surface);
 }
 
-/* The same colors as the two bars of the range comparison below. */
+/*
+ * Buying and selling use the colors of the price level (the cheap market in corn yellow, the
+ * expensive one in ink), the same as the two bars of the range comparison. Green and terracotta
+ * are left for the expected change.
+ */
 .buy {
-  border-top-color: var(--color-primary);
+  border-top-color: var(--color-level-cheaper);
 }
 
 .sell {
-  border-top-color: var(--color-terracotta);
+  border-top-color: var(--color-level-expensive);
+}
+
+.sideMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .sideTitle {
@@ -38,27 +51,51 @@
   line-height: var(--line-height-tight);
 }
 
-.change {
+.sidePrice {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-1) var(--space-2);
-  margin-top: var(--space-2);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
+  align-items: baseline;
+  gap: 0 var(--space-2);
+}
+
+.change {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  max-width: 9.5rem;
+  text-align: right;
+}
+
+.changeNote {
   color: var(--color-muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
 }
 
 .facts {
   display: grid;
   gap: var(--space-3);
-  margin: var(--space-4) 0 0;
+  margin-top: var(--space-3);
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-tint);
 }
 
 .fact dt {
   color: var(--color-muted);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .fact dd {
@@ -66,7 +103,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0 var(--space-2);
-  margin: 0;
+  margin: var(--space-1) 0 0;
   font-size: var(--font-size-lg);
   font-weight: 700;
 }
@@ -82,10 +119,7 @@
 }
 
 .confidence {
-  margin-top: var(--space-4);
-  padding: var(--space-3) var(--space-4);
   border-left: 4px solid;
-  border-radius: var(--radius-md);
 }
 
 .confidence p {
@@ -103,9 +137,62 @@
   background: var(--color-accent-soft);
 }
 
-@media (min-width: 560px) {
+.details {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.details > * {
+  min-width: 0;
+}
+
+/* Phones: the change goes under the price, on one line, still large and colored. */
+@media (max-width: 479px) {
+  .side {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .change {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    max-width: none;
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+@media (min-width: 640px) {
   .sides,
   .facts {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .confidence {
+    grid-column: 1 / -1;
+  }
+
+  .change {
+    max-width: 12rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .facts {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+
+  .confidence {
+    grid-column: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .details {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-5);
   }
 }

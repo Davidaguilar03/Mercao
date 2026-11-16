@@ -38,15 +38,21 @@ interface SideProps {
 function Side({ title, side, tone }: SideProps) {
   return (
     <div className={`${styles.side} ${styles[tone]}`}>
-      <span className={styles.sideTitle}>{title}</span>
-      <strong className={styles.sideMarket}>{side.market_name}</strong>
-      <PriceTag value={side.predicted_price} size="lg" />
-      <span className={page.caption}>precio esperado</span>
+      <div className={styles.sideMain}>
+        <span className={styles.sideTitle}>{title}</span>
+        <strong className={styles.sideMarket}>{side.market_name}</strong>
+        <span className={styles.sidePrice}>
+          <PriceTag value={side.predicted_price} size="lg" />
+          <span className={page.caption}>precio esperado</span>
+        </span>
+      </div>
       {/* How the forecast compares with the latest price observed in this market. */}
       <p className={styles.change}>
-        <ChangeBadge value={side.expected_change_percent} />
+        <ChangeBadge value={side.expected_change_percent} size="lg" />
         {side.latest_price !== null && (
-          <span>frente al último precio ({formatPricePerKg(side.latest_price)})</span>
+          <span className={styles.changeNote}>
+            frente al último precio ({formatPricePerKg(side.latest_price)})
+          </span>
         )}
       </p>
     </div>
@@ -74,15 +80,16 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
         <Side title="Vender en" side={sell} tone="sell" />
       </div>
 
-      <dl className={styles.facts}>
-        <div className={styles.fact}>
+      {/* Desktop: difference, distance and confidence side by side. */}
+      <div className={styles.facts}>
+        <dl className={styles.fact}>
           <dt>Diferencia esperada</dt>
           <dd className="tabular">
             {formatPesos(group.difference_per_kg)} por kilo
             <span className={styles.factDetail}> ({formatPercent(group.difference_pct)})</span>
           </dd>
-        </div>
-        <div className={styles.fact}>
+        </dl>
+        <dl className={styles.fact}>
           <dt>Distancia aproximada en línea recta</dt>
           <dd className="tabular">
             <Route className={styles.factIcon} size={20} aria-hidden="true" />
@@ -92,63 +99,72 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
               entre {buy.city} y {sell.city}
             </span>
           </dd>
+        </dl>
+        <div className={`${styles.fact} ${styles.confidence} ${styles[group.confidence]}`}>
+          <strong>Confianza {group.confidence}</strong>
+          <p>{explainConfidence(group.confidence, buy.city, sell.city)}</p>
         </div>
-      </dl>
-
-      <div className={`${styles.confidence} ${styles[group.confidence]}`}>
-        <strong>Confianza {group.confidence}</strong>
-        <p>{explainConfidence(group.confidence, buy.city, sell.city)}</p>
       </div>
 
-      <h3 className={page.subheading}>Rango probable de precio en cada plaza</h3>
-      <IntervalComparison buy={buy} sell={sell} />
-
-      <h3 className={page.subheading}>Todas las plazas, de la más barata a la más cara</h3>
-      {forecasts === undefined ? (
-        <p className={page.caption}>Cargando las demás plazas…</p>
-      ) : (
-        <div className={table.wrapper}>
-          <table className={table.table}>
-            <caption className="visually-hidden">
-              Pronóstico por plaza a {horizon} semanas, de la más barata a la más cara
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Plaza</th>
-                <th scope="col">Precio esperado</th>
-                <th scope="col" className={table.hideNarrow}>
-                  Rango probable
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ranking.map(({ market, forecast }) => (
-                <tr key={market.market_id}>
-                  <th scope="row">
-                    {market.market_name}
-                    {market.market_id === buy.market_id && (
-                      <span className={`${table.tag} ${table.tagBuy}`}>Comprar</span>
-                    )}
-                    {market.market_id === sell.market_id && (
-                      <span className={`${table.tag} ${table.tagSell}`}>Vender</span>
-                    )}
-                  </th>
-                  <td>
-                    <PriceTag value={forecast.predicted_price} />
-                    {/* On phones the range goes under the price instead of in its own column. */}
-                    <span className={`${table.secondary} ${table.onlyNarrow}`}>
-                      {formatPesos(forecast.lower_price)} a {formatPesos(forecast.upper_price)}
-                    </span>
-                  </td>
-                  <td className={table.hideNarrow}>
-                    {formatPesos(forecast.lower_price)} a {formatPesos(forecast.upper_price)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Desktop: the two ranges on the left and the list of markets on the right. */}
+      <div className={styles.details}>
+        <div>
+          <h3 className={page.subheading}>Rango probable de precio en cada plaza</h3>
+          <IntervalComparison buy={buy} sell={sell} />
+          <p className={`${page.caption} ${page.captionAfter}`}>
+            El punto marca el precio esperado y la barra, el rango donde debería caer el precio 8 de
+            cada 10 veces.
+          </p>
         </div>
-      )}
+        <div>
+          <h3 className={page.subheading}>Todas las plazas, de la más barata a la más cara</h3>
+          {forecasts === undefined ? (
+            <p className={page.caption}>Cargando las demás plazas…</p>
+          ) : (
+            <div className={table.wrapper}>
+              <table className={table.table}>
+                <caption className="visually-hidden">
+                  Pronóstico por plaza a {horizon} semanas, de la más barata a la más cara
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Plaza</th>
+                    <th scope="col">Precio esperado</th>
+                    <th scope="col" className={table.hideNarrow}>
+                      Rango probable
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ranking.map(({ market, forecast }) => (
+                    <tr key={market.market_id}>
+                      <th scope="row">
+                        {market.market_name}
+                        {market.market_id === buy.market_id && (
+                          <span className={`${table.tag} ${table.tagBuy}`}>Comprar</span>
+                        )}
+                        {market.market_id === sell.market_id && (
+                          <span className={`${table.tag} ${table.tagSell}`}>Vender</span>
+                        )}
+                      </th>
+                      <td>
+                        <PriceTag value={forecast.predicted_price} />
+                        {/* On phones the range goes under the price instead of in its own column. */}
+                        <span className={`${table.secondary} ${table.onlyNarrow}`}>
+                          {formatPesos(forecast.lower_price)} a {formatPesos(forecast.upper_price)}
+                        </span>
+                      </td>
+                      <td className={table.hideNarrow}>
+                        {formatPesos(forecast.lower_price)} a {formatPesos(forecast.upper_price)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </Card>
   );
 }

@@ -26,13 +26,19 @@ describe('OpportunitiesPage', () => {
     mockApi(fullApi);
     renderWithProviders(<OpportunitiesPage />);
 
-    const buy = plain((await screen.findByText('Comprar en')).parentElement!.textContent);
-    expect(buy).toContain('Bajó\u22122,7 %frente al último precio ($ 2.317 /kg)');
-    const sell = screen.getByText('Vender en').parentElement!;
+    // The market and its expected price on the left; the expected change, large, on the right.
+    const buy = (await screen.findByText('Comprar en')).closest('.side')!;
+    expect(plain(buy.textContent)).toBe(
+      'Comprar enPereira, Mercasa$ 2.254 /kgprecio esperado' +
+        'Bajó\u22122,7 %frente al último precio ($ 2.317 /kg)',
+    );
+    const sell = screen.getByText('Vender en').closest('.side')!;
     expect(plain(sell.textContent)).toContain(
       'Bajó\u22123,5 %frente al último precio ($ 3.477 /kg)',
     );
-    expect(sell.querySelector('[data-trend]')).toHaveAttribute('data-trend', 'down');
+    const change = sell.querySelector('[data-trend]');
+    expect(change).toHaveAttribute('data-trend', 'down');
+    expect(change).toHaveClass('lg', 'down');
   });
 
   it('says there is no data when a market has no latest price', async () => {
@@ -42,7 +48,7 @@ describe('OpportunitiesPage', () => {
     mockApi({ ...fullApi, '/api/recommendations': withoutLatest });
     renderWithProviders(<OpportunitiesPage />);
 
-    const buy = (await screen.findByText('Comprar en')).parentElement!;
+    const buy = (await screen.findByText('Comprar en')).closest('.side')!;
     expect(buy).toHaveTextContent('Sin dato');
     expect(buy).not.toHaveTextContent('frente al último precio');
   });

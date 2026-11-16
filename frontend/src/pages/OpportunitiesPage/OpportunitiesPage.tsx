@@ -18,19 +18,18 @@ export function OpportunitiesPage() {
   const [horizon, setHorizon] = useHorizonSelection();
 
   return (
-    <>
+    <div className={page.stack}>
       <PageHeader
         title="Oportunidades"
         description="Dónde convendría comprar y dónde vender un producto en las próximas semanas."
-      />
-      <div className={page.controls}>
+      >
         <ProductSelector value={productId} onChange={setProductId} />
         <HorizonSelector value={horizon} onChange={setHorizon} />
-      </div>
+      </PageHeader>
 
       {/* Always visible, whatever the data says. */}
       <p className={styles.notice} role="note">
-        <Info size={20} aria-hidden="true" className={styles.noticeIcon} />
+        <Info size={18} aria-hidden="true" className={styles.noticeIcon} />
         <span>
           <strong>Tenga en cuenta:</strong> las diferencias no incluyen transporte, almacenamiento
           ni intermediación. Los precios son pronósticos del precio mayorista promedio: son
@@ -44,7 +43,7 @@ export function OpportunitiesPage() {
       ) : (
         !productsQuery.isError && <LoadingState />
       )}
-    </>
+    </div>
   );
 }
 
