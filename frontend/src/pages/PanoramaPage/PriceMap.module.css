@@ -52,6 +52,12 @@
   font-size: var(--font-size-sm);
 }
 
+.popup .popupLink {
+  margin-top: var(--space-1);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 .popupLevel {
   color: var(--color-muted);
 }

@@ -17,6 +17,22 @@ function readPositiveInt(raw: string | null): number | null {
   return raw !== null && /^[1-9]\d*$/.test(raw) ? Number(raw) : null;
 }
 
+/**
+ * Address of the Producto view for a product in a market. Keeps the horizon of the current
+ * address so the selection survives the change of page.
+ */
+export function marketDetailPath(
+  productId: number,
+  marketId: number,
+  current: URLSearchParams,
+): string {
+  const params = new URLSearchParams({ [PRODUCT_PARAM]: String(productId) });
+  const horizon = current.get(HORIZON_PARAM);
+  if (horizon) params.set(HORIZON_PARAM, horizon);
+  params.set(MARKET_PARAM, String(marketId));
+  return `/producto?${params}`;
+}
+
 function useNumberParam(name: string): [number | null, (value: number) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
   const value = readPositiveInt(searchParams.get(name));

@@ -91,7 +91,12 @@ function PanoramaContent({ product }: { product: Product }) {
               >
                 <Suspense fallback={<LoadingState message="Cargando el mapa…" />}>
                   {/* The map frames the markets once, so each product gets its own map. */}
-                  <PriceMap key={product.product_id} markers={markers} horizon={PANORAMA_HORIZON} />
+                  <PriceMap
+                    key={product.product_id}
+                    productId={product.product_id}
+                    markers={markers}
+                    horizon={PANORAMA_HORIZON}
+                  />
                 </Suspense>
                 <MapLegend />
               </Card>
