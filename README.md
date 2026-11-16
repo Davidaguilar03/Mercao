@@ -4,10 +4,10 @@ Proyecto de grado (Inteligencia Computacional, UPTC). Aplicación web que convie
 
 ## Etapa actual
 
-Pipeline de datos, modelo de pronóstico, API REST de solo lectura y la base del frontend. Los archivos crudos del DANE
-se convierten en tablas limpias en una base SQLite (`data/processed/mercao.db`), sobre la que se entrena el modelo y
-que expone la API. El frontend ya tiene la marca, la navegación, la capa de API, los componentes compartidos y la
-página Cómo funciona; las vistas Panorama, Producto y Oportunidades se construyen en la siguiente etapa.
+Pipeline de datos, modelo de pronóstico, API REST de solo lectura y frontend con sus cuatro vistas. Los archivos
+crudos del DANE se convierten en tablas limpias en una base SQLite (`data/processed/mercao.db`), sobre la que se
+entrena el modelo y que expone la API. El frontend muestra esos datos en las vistas Panorama, Producto, Oportunidades
+y Cómo funciona (descritas en la sección [Frontend](#frontend)).
 
 - Exploración inicial de los datos: [docs/data_exploration.md](docs/data_exploration.md)
 - Pipeline, reglas de limpieza y esquema de tablas: [docs/data_pipeline.md](docs/data_pipeline.md)
@@ -134,6 +134,22 @@ npm run dev
 ```
 
 La aplicación queda en http://localhost:5173 y consulta la API en http://localhost:8000.
+
+### Vistas
+
+| Vista | Dirección | Qué muestra |
+|---|---|---|
+| Panorama | `/` | Un producto en todo el país: una frase que resume la semana, un mapa con las plazas marcadas según si están más baratas, parecidas o más caras que la mayoría, una tabla de plazas ordenada por precio (con el cambio frente a hace 4 semanas y un año, y el pronóstico a 2 semanas) y de qué departamentos viene el producto. |
+| Producto | `/producto` | Un producto en una plaza: último precio, cambios y pronóstico a 4 semanas; la gráfica del precio semana a semana (1 año, 3 años o todo) con el pronóstico y su rango probable; los meses en que suele estar más barato y más caro; y de qué departamentos y municipios llega a esa plaza. |
+| Oportunidades | `/oportunidades` | Dónde comprar y dónde vender de 1 a 4 semanas adelante: las dos plazas con su precio esperado, la diferencia por kilo, qué tan confiable es esa diferencia (con los dos rangos de precio lado a lado) y la lista de todas las plazas de la más barata a la más cara. Siempre recuerda que no se incluyen transporte, almacenamiento ni intermediación. |
+| Cómo funciona | `/como-funciona` | De dónde vienen los datos, qué hace el modelo, qué tan bien acierta y sus limitaciones. |
+
+Lo que se elige queda en la dirección para poder compartir el enlace: `producto` (identificador del producto),
+`horizonte` (semanas del pronóstico, de 1 a 4) y `plaza` (identificador de la plaza, solo en Producto). Por ejemplo,
+`/oportunidades?producto=3&horizonte=4`. Sin `producto` se muestra la papa parda pastusa, y sin `horizonte`, 2 semanas.
+
+El mapa usa imágenes de OpenStreetMap, que necesitan internet. Sin conexión, los puntos de las plazas se siguen
+mostrando con su nombre y la tabla trae la misma información.
 
 ### Variables de entorno del frontend
 
