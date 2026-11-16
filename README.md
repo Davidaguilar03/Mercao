@@ -4,14 +4,16 @@ Proyecto de grado (Inteligencia Computacional, UPTC). Aplicación web que convie
 
 ## Etapa actual
 
-Pipeline de datos, modelo de pronóstico y API REST de solo lectura. Los archivos crudos del DANE se convierten en
-tablas limpias en una base SQLite (`data/processed/mercao.db`), sobre la que se entrena el modelo y que expone la API.
-Todavía no hay frontend.
+Pipeline de datos, modelo de pronóstico, API REST de solo lectura y la base del frontend. Los archivos crudos del DANE
+se convierten en tablas limpias en una base SQLite (`data/processed/mercao.db`), sobre la que se entrena el modelo y
+que expone la API. El frontend ya tiene la marca, la navegación, la capa de API, los componentes compartidos y la
+página Cómo funciona; las vistas Panorama, Producto y Oportunidades se construyen en la siguiente etapa.
 
 - Exploración inicial de los datos: [docs/data_exploration.md](docs/data_exploration.md)
 - Pipeline, reglas de limpieza y esquema de tablas: [docs/data_pipeline.md](docs/data_pipeline.md)
 - Modelo de pronóstico: [docs/forecasting_model.md](docs/forecasting_model.md)
 - API REST: [docs/api.md](docs/api.md)
+- Marca (logo, colores, tipografía y tono de voz): [docs/brand.md](docs/brand.md)
 
 ## Estructura
 
@@ -36,6 +38,17 @@ data/
   interim/                caché de archivos ya leídos (no versionado)
   processed/              mercao.db y logs del pipeline (no versionado)
 docs/
+frontend/
+  public/                 favicon, íconos y manifiesto web
+  src/
+    api/                  cliente HTTP, tipos de las respuestas y hooks de TanStack Query por dominio
+    assets/brand/         logo
+    components/           componentes compartidos y estructura de la página (encabezado y pie)
+    hooks/                producto seleccionado en la URL
+    lib/                  formato de pesos, porcentajes y fechas
+    pages/                una página por ruta
+    styles/               tokens de diseño y estilos globales
+    test/                 configuración y datos de las pruebas
 ```
 
 ## Instalación
@@ -100,8 +113,57 @@ base y `models/metadata.json`; no entrena modelos ni descarga datos. Por defecto
 desarrollo de Vite (`http://localhost:5173`); otros orígenes se configuran con `MERCAO_CORS_ORIGINS` (separados por
 comas). Endpoints, parámetros, ejemplos y errores en `docs/api.md`.
 
+## Frontend
+
+Aplicación web en `frontend/` (Vite, React y TypeScript). Requiere Node.js 22 o superior.
+
+```bash
+cd frontend
+npm install
+```
+
+Para trabajar se necesitan dos terminales: una con la API y otra con el servidor de desarrollo del frontend.
+
+```bash
+# Terminal 1, desde la raíz del repositorio
+uvicorn backend.app.main:app --reload
+
+# Terminal 2
+cd frontend
+npm run dev
+```
+
+La aplicación queda en http://localhost:5173 y consulta la API en http://localhost:8000.
+
+### Variables de entorno del frontend
+
+Se definen en `frontend/.env` (copie `frontend/.env.example`).
+
+| Variable | Por defecto | Para qué sirve |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:8000` | Dirección base de la API. Si se deja vacía (`VITE_API_URL=`), el frontend usa rutas relativas (`/api/...`) y el servidor de desarrollo las reenvía a `http://localhost:8000`. |
+
+Si el frontend corre en otro puerto o dominio, permita ese origen en la API con `MERCAO_CORS_ORIGINS`.
+
+### Comandos del frontend
+
+Se ejecutan dentro de `frontend/`.
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor de desarrollo con recarga automática |
+| `npm run build` | Revisa los tipos y genera la versión de producción en `frontend/dist` |
+| `npm run preview` | Sirve la versión de producción ya generada |
+| `npm run lint` | Revisa el código con ESLint |
+| `npm run typecheck` | Revisa los tipos con TypeScript |
+| `npm run format` | Da formato al código con Prettier |
+| `npm run format:check` | Verifica el formato sin cambiar archivos |
+| `npm test` | Ejecuta las pruebas una vez (Vitest y React Testing Library) |
+| `npm run test:watch` | Ejecuta las pruebas y las repite al guardar cambios |
+
 ## Pruebas
 
 ```bash
-python -m pytest
+python -m pytest                 # backend, desde la raíz
+npm test                         # frontend, dentro de frontend/
 ```
