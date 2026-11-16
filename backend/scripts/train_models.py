@@ -31,6 +31,7 @@ from backend.app.domains.forecasting.validation import make_splits
 FIGURES_DIR = REPO_ROOT / "docs" / "figures"
 NATIVE_LABELS = {"lightgbm": "Ganancia (% del total)", "random_forest": "Reducción de impureza (% del total)",
                  "ridge": "|Coeficiente| estandarizado (% del total)"}
+NATIVE_KINDS = {"lightgbm": "gain", "random_forest": "impurity", "ridge": "abs_coefficient"}
 POTATO_ID, BOGOTA_ID = 1, 1
 
 
@@ -90,9 +91,14 @@ def main() -> None:
         "selected_hyperparameters_all_models": {m: {str(h): p for h, p in ps.items()}
                                                 for m, ps in result.best_params.items()},
         "interval_offsets": {str(h): list(v) for h, v in result.interval_offsets.items()},
-        "interval_coverage_test": coverage.round(2).to_dict(),
+        "interval_coverage_test": coverage.round(4).to_dict(),
         "validation_mape": result.validation_mape.round(3).to_dict(),
         "test_metrics": {name: table.round(3).to_dict("records") for name, table in tables.items()},
+        "feature_importance": None if result.native_importance is None else {
+            "native_kind": NATIVE_KINDS[final],
+            "native_pct": result.native_importance.round(3).to_dict(),
+            "permutation_mae_increase": result.permutation_importance.round(6).to_dict(),
+        },
         "fit_seconds_by_model": {m: round(s, 1) for m, s in result.seconds.items()},
         "training_seconds": round(training_seconds, 1),
     }
