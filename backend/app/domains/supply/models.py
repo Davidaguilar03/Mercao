@@ -1,38 +1,52 @@
-"""Supply tables: daily volumes by origin and the weekly aggregate that joins with prices."""
+"""Supply tables: weekly volumes of the focus products by origin, weekly totals and origin lookups."""
 
-from datetime import date
-
-from sqlalchemy import Date, Float, ForeignKey, Index, Integer, String
+from sqlalchemy import Float, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.app.core.database import Base
 
 
-class Supply(Base):
-    """Kilograms of one product entering one market on one day from one origin (DANE SIPSA microdata).
+class OriginDepartment(Base):
+    """Official DIVIPOLA department."""
 
-    Every published row is kept; market_id and product_id are empty outside the focus set.
+    __tablename__ = "origin_departments"
+
+    code: Mapped[str] = mapped_column(String, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+
+
+class OriginMunicipality(Base):
+    """Municipality of origin; the name is the most frequent spelling published for the code."""
+
+    __tablename__ = "origin_municipalities"
+
+    code: Mapped[str] = mapped_column(String, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    department_code: Mapped[str] = mapped_column(ForeignKey("origin_departments.code"), nullable=False)
+
+
+class Supply(Base):
+    """Kilograms of one focus product entering one focus market in one ISO week from one origin.
+
+    Origin codes are empty for imported food (then origin_country is the country) and for unknown origins.
     """
 
     __tablename__ = "supply"
-    __table_args__ = (Index("ix_supply_market_product_date", "market_id", "product_id", "date"),)
+    __table_args__ = (Index("ix_supply_pair_week", "product_id", "market_id", "iso_year", "iso_week"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    date: Mapped[date] = mapped_column(Date, nullable=False)
-    market_name: Mapped[str] = mapped_column(String, nullable=False)
-    market_id: Mapped[int | None] = mapped_column(ForeignKey("markets.market_id"))
-    product_name: Mapped[str] = mapped_column(String, nullable=False)
-    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.product_id"))
-    origin_department_code: Mapped[str | None] = mapped_column(String)
-    origin_department_name: Mapped[str | None] = mapped_column(String)
-    origin_municipality_code: Mapped[str | None] = mapped_column(String)
-    origin_municipality_name: Mapped[str | None] = mapped_column(String)
+    iso_year: Mapped[int] = mapped_column(Integer, nullable=False)
+    iso_week: Mapped[int] = mapped_column(Integer, nullable=False)
+    market_id: Mapped[int] = mapped_column(ForeignKey("markets.market_id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.product_id"), nullable=False)
+    origin_department_code: Mapped[str | None] = mapped_column(ForeignKey("origin_departments.code"))
+    origin_municipality_code: Mapped[str | None] = mapped_column(ForeignKey("origin_municipalities.code"))
     origin_country: Mapped[str | None] = mapped_column(String)
     quantity_kg: Mapped[float] = mapped_column(Float, nullable=False)
 
 
 class SupplyWeekly(Base):
-    """Supply of the focus products and markets summed by ISO week, to join with the weekly price table."""
+    """Supply of the focus products and markets summed by ISO week (all origins), to join with prices."""
 
     __tablename__ = "supply_weekly"
 

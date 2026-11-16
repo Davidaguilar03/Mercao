@@ -17,7 +17,7 @@ from backend.app.domains.prices.cleaning import flag_unit_jumps, is_header_artif
 log = logging.getLogger(__name__)
 
 PRICE_COLUMNS = ["week_start", "week_end", "iso_year", "iso_week", "product_name", "product_id", "variety",
-                 "market_name", "market_id", "min_price", "max_price", "mean_price", "unit", "source_file"]
+                 "market_name", "market_id", "min_price", "max_price", "mean_price", "unit"]
 
 
 @dataclass
@@ -57,6 +57,9 @@ def build_price_tables(items: list[tuple[ManifestEntry, pd.DataFrame, dict[str, 
     """Combine every dated annex, map names to the catalog and apply the cleaning rules in a fixed order:
     header artifacts, missing prices, duplicates, unit jumps. Excluded rows go to the exclusions frame."""
     files = describe_files(items)
+    weeks_per_file = files[files["status"] == "ok"].groupby(["iso_year", "iso_week"]).size()
+    if (weeks_per_file > 1).any():  # prices rows rely on (iso_year, iso_week) -> one file in price_files
+        raise ValueError(f"Several annexes assigned to the same ISO week: {weeks_per_file[weeks_per_file > 1]}")
     ok_files = files.set_index("file_name")
     frames = []
     for entry, frame, _ in items:
@@ -123,7 +126,7 @@ def build_price_tables(items: list[tuple[ManifestEntry, pd.DataFrame, dict[str, 
                                   | (data["mean_price"] > data["max_price"] + 1))
     prices = data[data["reason"] == ""][PRICE_COLUMNS + ["range_inconsistent"]].sort_values(
         ["product_id", "market_id", "iso_year", "iso_week"]).reset_index(drop=True)
-    exclusions = data[data["reason"] != ""][PRICE_COLUMNS + ["reason", "detail"]].reset_index(drop=True)
+    exclusions = data[data["reason"] != ""][PRICE_COLUMNS + ["source_file", "reason", "detail"]].reset_index(drop=True)
 
     stats["rows_excluded_by_reason"] = exclusions["reason"].value_counts().to_dict()
     stats["rows_kept"] = int(len(prices))

@@ -191,7 +191,10 @@ def build_database(settings: Settings) -> dict[str, Any]:
         log.info("Building supply")
         cache = supply_cache(settings.pipeline_cache_dir)
         paths = [e.path(settings.raw_dir) for e in sources.supply]
-        supply = build_supply(cache, paths, catalog, lambda frame: writer.write("supply", frame))
+        supply = build_supply(cache, paths, catalog)
+        writer.write("origin_departments", supply.departments)
+        writer.write("origin_municipalities", supply.municipalities)
+        writer.write("supply", supply.supply)
         writer.write("supply_weekly", supply.weekly)
         writer.write("pipeline_log", _events(price_tables.stats, supply.stats, price_tables.files))
         raw.driver_connection.commit()

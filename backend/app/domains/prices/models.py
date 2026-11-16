@@ -40,11 +40,13 @@ class _PriceColumns:
     max_price: Mapped[float | None] = mapped_column(Float)
     mean_price: Mapped[float | None] = mapped_column(Float)
     unit: Mapped[str] = mapped_column(String, nullable=False)
-    source_file: Mapped[str] = mapped_column(String, nullable=False)
 
 
 class Price(_PriceColumns, Base):
-    """Clean weekly wholesale price of one product in one market (COP per unit)."""
+    """Clean weekly wholesale price of one product in one market (COP per unit).
+
+    Every ISO week comes from exactly one annex, so the source file is price_files joined on (iso_year, iso_week).
+    """
 
     __tablename__ = "prices"
     __table_args__ = (Index("ix_prices_pair_week", "product_id", "market_id", "iso_year", "iso_week"),)
@@ -59,6 +61,7 @@ class PriceExclusion(_PriceColumns, Base):
     __tablename__ = "price_exclusions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    source_file: Mapped[str] = mapped_column(String, nullable=False)
     reason: Mapped[str] = mapped_column(String, nullable=False, index=True)
     detail: Mapped[str] = mapped_column(String, nullable=False, default="")
 
