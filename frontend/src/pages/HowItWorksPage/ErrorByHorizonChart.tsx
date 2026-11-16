@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { HorizonComparison } from '../../api/types';
+import { useIsNarrowScreen } from '../../hooks/useIsNarrowScreen';
 import { formatPercent } from '../../lib/format';
 
 interface ErrorByHorizonChartProps {
@@ -28,8 +29,12 @@ const formatLabel = (value: unknown) => (typeof value === 'number' ? formatPerce
 
 /** Average error (MAPE) of the model and of the naive forecast for each horizon. */
 export default function ErrorByHorizonChart({ byHorizon, modelLabel }: ErrorByHorizonChartProps) {
+  // On phones the value labels of neighbouring bars run into each other, so they are left out;
+  // the table under the chart has the same numbers.
+  const isNarrow = useIsNarrowScreen();
+  const unit = isNarrow ? 'sem.' : 'semanas';
   const data = byHorizon.map((row) => ({
-    horizon: row.horizon === 1 ? '1 semana' : `${row.horizon} semanas`,
+    horizon: row.horizon === 1 && !isNarrow ? '1 semana' : `${row.horizon} ${unit}`,
     model: row.model.mape_pct,
     naive: row.naive.mape_pct,
   }));
@@ -40,6 +45,7 @@ export default function ErrorByHorizonChart({ byHorizon, modelLabel }: ErrorByHo
         <CartesianGrid vertical={false} stroke={GRID} />
         <XAxis
           dataKey="horizon"
+          interval={0}
           tickLine={false}
           axisLine={{ stroke: GRID }}
           tick={{ fill: MUTED, fontSize: 12 }}
@@ -69,7 +75,9 @@ export default function ErrorByHorizonChart({ byHorizon, modelLabel }: ErrorByHo
           maxBarSize={36}
           isAnimationActive={false}
         >
-          <LabelList position="top" formatter={formatLabel} fill={INK} fontSize={11} />
+          {!isNarrow && (
+            <LabelList position="top" formatter={formatLabel} fill={INK} fontSize={11} />
+          )}
         </Bar>
         <Bar
           dataKey="naive"
@@ -79,7 +87,9 @@ export default function ErrorByHorizonChart({ byHorizon, modelLabel }: ErrorByHo
           maxBarSize={36}
           isAnimationActive={false}
         >
-          <LabelList position="top" formatter={formatLabel} fill={INK} fontSize={11} />
+          {!isNarrow && (
+            <LabelList position="top" formatter={formatLabel} fill={INK} fontSize={11} />
+          )}
         </Bar>
       </BarChart>
     </ResponsiveContainer>
