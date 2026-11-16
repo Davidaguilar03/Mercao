@@ -1,0 +1,10 @@
+.header {
+  margin-bottom: var(--space-5);
+}
+
+.description {
+  max-width: 44rem;
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-lg);
+}
