@@ -45,7 +45,7 @@ Los colores salen del logo.
 | Verde plaza (principal) | `#1F6B4A` | `--color-primary` | Nombre de la marca, enlaces, botones, pie de página |
 | Verde oscuro | `#17523A` | `--color-primary-strong` | Estados al pasar el cursor o presionar |
 | Verde suave | `#E4F1EA` | `--color-primary-soft` | Fondos de selección y de "precio baja" |
-| Amarillo maíz (acento) | `#F2B705` | `--color-accent` | Detalles: subrayado de la página actual, foco del teclado |
+| Amarillo maíz (acento) | `#F2B705` | `--color-accent` | Detalles: subrayado de la página actual, borde de avisos |
 | Terracota | `#C8553D` | `--color-terracotta` | Íconos y formas; no para texto pequeño |
 | Terracota para texto | `#A8402A` | `--color-terracotta-text` | Texto de "precio sube" y mensajes de error |
 | Terracota suave | `#FBEAE5` | `--color-terracotta-soft` | Fondo de "precio sube" |
@@ -53,7 +53,10 @@ Los colores salen del logo.
 | Blanco (superficies) | `#FFFFFF` | `--color-surface` | Tarjetas, encabezado, campos |
 | Tinta | `#1E2B24` | `--color-ink` | Texto principal |
 | Texto secundario | `#55635B` | `--color-muted` | Notas, unidades, descripciones |
-| Borde | `#E3DCCB` | `--color-border` | Bordes de tarjetas y líneas de tablas |
+| Borde de tarjetas | `#6D9F89` | `--color-card-border` | Contorno de 1 px de tarjetas y contenedores (3,0:1 sobre blanco, 2,7:1 sobre crema) |
+| Verde muy suave | `#EEF5F0` | `--color-surface-tint` | Fondo de la franja de título y fila resaltada en tablas |
+| Foco | `#17523A` | `--color-focus` | Contorno del elemento activo al navegar con teclado (9,1:1 sobre blanco) |
+| Línea | `#E3DCCB` | `--color-border` | Líneas de tablas y separadores |
 | Borde fuerte | `#8A8F80` | `--color-border-strong` | Contorno de campos; serie de referencia en gráficas |
 
 ### Colores con significado
@@ -82,6 +85,28 @@ Todos los colores de texto cumplen el nivel AA de WCAG 2.1 (mínimo 4,5:1 para t
 El terracota del logo (`#C8553D`) llega a 4,35:1 sobre blanco y 3,9:1 sobre crema: no alcanza para texto normal, por
 eso el texto usa la variante más oscura. El amarillo maíz no se usa para texto; si lleva texto encima, va en tinta
 (8,1:1).
+
+## Ilustración
+
+Mercao tiene una ilustración de línea en el verde de la marca, con el mismo trazo redondeado del logo. Muestra una
+plaza de mercado: canasto, papa, tomate, cebolla, hoja, puesto con toldo, bulto y una línea de tendencia que sube.
+Está dibujada en SVG dentro del código (`frontend/src/components/illustrations/`), así que no pesa ni depende de
+internet.
+
+- **Franja de título.** Cada página empieza con una franja blanca que se degrada a verde muy suave, con la escena
+  de la plaza a la derecha del título. En celulares solo se asoma una esquina, muy tenue.
+- **Márgenes.** En pantallas anchas (desde 1360 px) los dibujos aparecen sueltos en los márgenes libres, al 9 % de
+  opacidad. Nunca van detrás de textos, tablas ni gráficas.
+- Es solo decoración: no lleva texto, no se anima y los lectores de pantalla la ignoran.
+- No la use a color, con relleno ni como reemplazo del logo.
+
+## Tarjetas y cifras
+
+- Todas las tarjetas y contenedores llevan el mismo contorno verde de 1 px, radio de 16 px y una sombra suave
+  (`--shadow-card`). Cada tarjeta ocupa solo el alto de su contenido.
+- Las cifras clave usan un mismo sistema: rótulo pequeño en mayúsculas, cifra grande y una línea de explicación.
+  Precios y porcentajes van del mismo tamaño. Un porcentaje lleva flecha y color: terracota si sube, verde si baja.
+- El rango probable de un pronóstico se dibuja como una barra corta con un punto en el precio esperado.
 
 ## Tipografía
 
