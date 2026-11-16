@@ -5,7 +5,7 @@ import { groupProducts } from './groupProducts';
 import styles from './ProductSelector.module.css';
 
 interface ProductSelectorProps {
-  /** Selected product id, usually from useSelectedProductId (the URL). */
+  /** Selected product id, usually from useProductSelection (the URL). */
   value: number | null;
   onChange: (productId: number) => void;
   label?: string;

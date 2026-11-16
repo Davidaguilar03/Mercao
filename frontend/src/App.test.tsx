@@ -48,12 +48,16 @@ describe('routing shell', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Oportunidades' })).toBeInTheDocument();
   });
 
-  it('keeps the selected product in the links between product pages', () => {
-    renderApp('/producto?producto=5');
+  it('keeps the selected product and horizon in the links between the main pages', () => {
+    renderApp('/producto?producto=5&horizonte=3&plaza=2');
 
     expect(screen.getByRole('link', { name: 'Oportunidades' })).toHaveAttribute(
       'href',
-      '/oportunidades?producto=5',
+      '/oportunidades?producto=5&horizonte=3',
+    );
+    expect(screen.getByRole('link', { name: 'Panorama' })).toHaveAttribute(
+      'href',
+      '/?producto=5&horizonte=3',
     );
     expect(screen.getByRole('link', { name: 'Cómo funciona' })).toHaveAttribute(
       'href',

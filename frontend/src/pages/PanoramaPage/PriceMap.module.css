@@ -1,0 +1,69 @@
+.map {
+  height: 360px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  /* Seen when the background tiles do not load. */
+  background: #e6ecea;
+  font-family: var(--font-body);
+  /* Keeps the map under the sticky header and the product list. */
+  z-index: 0;
+}
+
+.notice {
+  margin-bottom: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  font-size: var(--font-size-sm);
+}
+
+.marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+  color: #ffffff;
+}
+
+.marker:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cheaper {
+  background: var(--color-primary);
+}
+
+.similar {
+  background: var(--color-muted);
+}
+
+.expensive {
+  background: var(--color-terracotta);
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+}
+
+.popup .popupLink {
+  margin-top: var(--space-1);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.popupLevel {
+  color: var(--color-muted);
+}
+
+@media (min-width: 768px) {
+  .map {
+    height: 460px;
+  }
+}

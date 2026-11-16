@@ -2,22 +2,26 @@ import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useSearchParams } from 'react-router-dom';
 import logo from '../../assets/brand/logo.png';
-import { PRODUCT_PARAM } from '../../hooks/useSelectedProductId';
+import { HORIZON_PARAM, PRODUCT_PARAM } from '../../hooks/urlSelection';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Panorama', keepsProduct: true },
-  { to: '/producto', label: 'Producto', keepsProduct: true },
-  { to: '/oportunidades', label: 'Oportunidades', keepsProduct: true },
-  { to: '/como-funciona', label: 'Cómo funciona', keepsProduct: false },
+  { to: '/', label: 'Panorama', keepsSelection: true },
+  { to: '/producto', label: 'Producto', keepsSelection: true },
+  { to: '/oportunidades', label: 'Oportunidades', keepsSelection: true },
+  { to: '/como-funciona', label: 'Cómo funciona', keepsSelection: false },
 ];
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchParams] = useSearchParams();
-  const productId = searchParams.get(PRODUCT_PARAM);
-  // The product pages keep the selected product when moving between them.
-  const productSearch = productId ? `?${PRODUCT_PARAM}=${encodeURIComponent(productId)}` : '';
+  // The product and the horizon travel with the links, so they survive a change of page.
+  const kept = new URLSearchParams();
+  for (const name of [PRODUCT_PARAM, HORIZON_PARAM]) {
+    const value = searchParams.get(name);
+    if (value) kept.set(name, value);
+  }
+  const selectionSearch = kept.size > 0 ? `?${kept}` : '';
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -64,7 +68,7 @@ export function Header() {
             {NAV_ITEMS.map((item) => (
               <li key={item.to}>
                 <NavLink
-                  to={{ pathname: item.to, search: item.keepsProduct ? productSearch : '' }}
+                  to={{ pathname: item.to, search: item.keepsSelection ? selectionSearch : '' }}
                   end={item.to === '/'}
                   className={({ isActive }) =>
                     `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`

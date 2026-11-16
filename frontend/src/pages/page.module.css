@@ -1,0 +1,93 @@
+/* Layout shared by the three main views. */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.summary {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--font-size-lg);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.caption {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.captionAfter {
+  margin-top: var(--space-3);
+}
+
+.subheading {
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: var(--font-size-lg);
+}
+
+.subheading:first-child {
+  margin-top: 0;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.figure dt {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.figure dd {
+  margin: 0;
+}
+
+.figureNote {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (min-width: 768px) {
+  .controls {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .figures {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

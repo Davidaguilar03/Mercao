@@ -1,0 +1,15 @@
+.notice {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  font-size: var(--font-size-sm);
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
