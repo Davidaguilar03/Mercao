@@ -75,3 +75,16 @@
   height: 260px;
   margin-top: var(--space-3);
 }
+
+.columns {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .columns {
+    grid-template-columns: 1fr 1fr;
+    /* Each column keeps its own height instead of stretching to match the other. */
+    align-items: start;
+  }
+}

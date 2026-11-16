@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { Seasonality } from '../../api/types';
+import { useIsNarrowScreen } from '../../hooks/useIsNarrowScreen';
 import { CHART_COLORS, TOOLTIP_STYLE } from '../../lib/chartTheme';
 import { formatChange } from '../../lib/format';
 
@@ -56,8 +57,10 @@ const BAR_COLORS = {
 
 /** Monthly price index. Bars grow up or down from 100, the average of the year. */
 export default function SeasonalityChart({ seasonality }: SeasonalityChartProps) {
+  // Twelve three-letter labels do not fit on a phone; initials do.
+  const isNarrow = useIsNarrowScreen();
   const data: MonthBar[] = seasonality.months.map((month) => ({
-    short: month.month_name.slice(0, 3),
+    short: isNarrow ? month.month_name.charAt(0).toUpperCase() : month.month_name.slice(0, 3),
     name: month.month_name,
     index: month.index,
     deviation: Math.round((month.index - 100) * 10) / 10,
@@ -91,7 +94,7 @@ export default function SeasonalityChart({ seasonality }: SeasonalityChartProps)
         <ReferenceLine y={0} stroke={CHART_COLORS.ink} />
         <Bar dataKey="deviation" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={false}>
           {data.map((month) => (
-            <Cell key={month.short} fill={BAR_COLORS[month.highlight ?? 'normal']} />
+            <Cell key={month.name} fill={BAR_COLORS[month.highlight ?? 'normal']} />
           ))}
           {/* Only the cheapest and the most expensive months carry their value. */}
           <LabelList

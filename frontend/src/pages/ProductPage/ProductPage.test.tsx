@@ -24,24 +24,58 @@ describe('ProductPage', () => {
     ).toEqual(['Bogotá, D.C., Corabastos', 'Cartago (Valle del Cauca)', 'Pereira, Mercasa']);
   });
 
-  it('shows the key figures of the product in the market', async () => {
+  it('shows the four key figures in one system: label, large figure and explanation', async () => {
     mockApi(fullApi);
     renderWithProviders(<ProductPage />);
 
-    const latest = (await screen.findByText('Último precio')).parentElement!;
-    expect(plain(latest.textContent)).toContain('$ 3.063 /kg');
-    expect(plain(latest.textContent)).toContain('Semana del 9 al 15 de noviembre de 2026');
-    expect(plain(screen.getByText('Frente a hace 4 semanas').parentElement!.textContent)).toContain(
-      '+4,8 %',
-    );
-    expect(plain(screen.getByText('Frente a hace un año').parentElement!.textContent)).toContain(
-      '+154,0 %',
-    );
-    const forecast = (await screen.findByText('Pronóstico a 4 semanas')).parentElement!;
-    await vi.waitFor(() => expect(plain(forecast.textContent)).toContain('$ 2.941 /kg'));
-    expect(plain(forecast.textContent)).toContain(
-      'Semana del 7 al 13 de diciembre de 2026. Rango probable: $ 2.172 a $ 3.843',
-    );
+    const figures = await screen.findByRole('group', { name: 'Cifras clave' });
+    await vi.waitFor(() => expect(plain(figures.textContent)).toContain('$ 2.941 /kg'));
+    const cards = [...figures.children];
+    expect(cards).toHaveLength(4);
+    // Every figure, price or percentage, uses the same large style.
+    for (const card of cards) {
+      expect(card.querySelector('p + p')).toHaveClass('value');
+    }
+
+    const [latest, fourWeeks, year, forecast] = cards.map((card) => plain(card.textContent));
+    expect(latest).toBe('Último precio$ 3.063 /kgSemana del 9 al 15 de noviembre de 2026');
+    expect(fourWeeks).toContain('Frente a hace 4 semanasSubió+4,8 %Más caro que hace 4 semanas');
+    expect(year).toContain('Frente a hace un añoSubió+154,0 %Más caro que hace un año');
+    expect(cards[1].querySelector('.value')).toHaveClass('up');
+    expect(forecast).toContain('Pronóstico a 4 semanas$ 2.941 /kg');
+    expect(forecast).toContain('Rango probable para la semana del 7 al 13 de diciembre de 2026');
+    expect(
+      within(cards[3] as HTMLElement).getByRole('img', {
+        name: /Rango probable: de \$.2\.172 a \$.3\.843/,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the reference price of four weeks and a year ago when the history has it', async () => {
+    const history = {
+      ...priceHistory,
+      series: [
+        { week_start: '2025-11-10', mean_price: 1206, min_price: 1100, max_price: 1300 },
+        { week_start: '2026-10-12', mean_price: 2923, min_price: 2800, max_price: 3000 },
+        { week_start: '2026-11-09', mean_price: 3063, min_price: 2800, max_price: 3400 },
+      ],
+    };
+    mockApi({ ...fullApi, '/api/prices/history': history });
+    renderWithProviders(<ProductPage />);
+
+    const figures = await screen.findByRole('group', { name: 'Cifras clave' });
+    await vi.waitFor(() => expect(plain(figures.textContent)).toContain('Estaba en $ 2.923 /kg'));
+    expect(plain(figures.textContent)).toContain('Estaba en $ 1.206 /kg');
+  });
+
+  it('says so when a change cannot be computed', async () => {
+    mockApi(fullApi);
+    renderWithProviders(<ProductPage />, '/producto?plaza=8');
+
+    // Cartago has no price a year ago in the test data.
+    expect(
+      await screen.findByText('No hay precio de hace un año para comparar.'),
+    ).toBeInTheDocument();
   });
 
   it('describes the price chart in words and changes the period with the range buttons', async () => {

@@ -1,0 +1,105 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* The cards of a row stretch to the same height; the content stays at the top. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.label {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  /* Room for two lines, so the figures of a row start at the same height. */
+  min-height: 2.5em;
+  line-height: 1.25;
+}
+
+/* One size for prices and percentages. */
+.value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 var(--space-1);
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* The unit of a price is part of the figure but quieter. */
+.value small {
+  color: var(--color-muted);
+  font-size: 0.5em;
+  font-weight: 500;
+}
+
+.neutral,
+.flat {
+  color: var(--color-ink);
+}
+
+.up {
+  color: var(--color-price-up);
+}
+
+.down {
+  color: var(--color-price-down);
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 0.9em;
+  height: 0.9em;
+}
+
+.secondary {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.reference {
+  display: block;
+}
+
+@media (min-width: 480px) {
+  .card {
+    padding: var(--space-4);
+  }
+
+  .value {
+    font-size: var(--font-size-2xl);
+  }
+
+  .secondary {
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (min-width: 900px) {
+  .label {
+    min-height: 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
