@@ -3,6 +3,7 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
 
+from fastapi import Request
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -45,3 +46,9 @@ def session_scope(engine: Engine | None = None) -> Iterator[Session]:
         raise
     finally:
         session.close()
+
+
+def get_session(request: Request) -> Iterator[Session]:
+    """FastAPI dependency: one session per request on the engine created by the app factory."""
+    with Session(request.app.state.engine) as session:
+        yield session

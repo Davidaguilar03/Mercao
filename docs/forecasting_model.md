@@ -2,7 +2,7 @@
 
 Este documento describe el modelo que pronostica el precio medio semanal mayorista de cada par producto–mercado
 utilizable, 1, 2, 3 y 4 semanas hacia adelante, y lo evalúa frente a referencias simples. Las cifras corresponden al
-entrenamiento del 2026-11-16 (versión `lightgbm-202611160816`) sobre la base construida el 2026-11-15, con datos hasta
+entrenamiento del 2026-11-16 (versión `lightgbm-202611160849`) sobre la base construida el 2026-11-15, con datos hasta
 la semana ISO 2026-W46. Todas se pueden comprobar en `models/metadata.json` y `models/training.log`, que genera cada
 entrenamiento.
 
@@ -307,7 +307,8 @@ Lectura:
 
 - **Modelos**: `models/forecast_h1.joblib` a `forecast_h4.joblib` (excluidos de git) y `models/metadata.json`, con el
   tipo de modelo, la versión, los horizontes, las variables, las fechas de cada partición, los hiperparámetros, los
-  percentiles de los intervalos, las métricas de validación y de prueba y la fecha de creación. Los modelos guardados
+  percentiles de los intervalos, las métricas de validación y de prueba, la importancia de las variables (ganancia y
+  permutación) y la fecha de creación. La API lee este archivo en `/api/model/summary`. Los modelos guardados
   son los evaluados en la prueba, ajustados con entrenamiento + validación (datos hasta 2025-W46).
 - **Tabla `forecasts`** en `mercao.db`: `product_id`, `market_id`, `origin_iso_year`, `origin_iso_week`, `horizon`,
   `target_iso_year`, `target_iso_week`, `target_week_start`, `predicted_price`, `lower_price`, `upper_price`,
