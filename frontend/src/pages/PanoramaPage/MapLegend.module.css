@@ -1,0 +1,46 @@
+.legend {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #ffffff;
+}
+
+.cheaper {
+  background: var(--color-primary);
+}
+
+.similar {
+  background: var(--color-muted);
+}
+
+.expensive {
+  background: var(--color-terracotta);
+}
+
+.note {
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+}
