@@ -4,25 +4,30 @@ Proyecto de grado (Inteligencia Computacional, UPTC). Aplicación web que convie
 
 ## Etapa actual
 
-Pipeline de datos: los archivos crudos del DANE se convierten en tablas limpias en una base SQLite
-(`data/processed/mercao.db`). Todavía no hay API ni frontend.
+Pipeline de datos, modelo de pronóstico y API REST de solo lectura. Los archivos crudos del DANE se convierten en
+tablas limpias en una base SQLite (`data/processed/mercao.db`), sobre la que se entrena el modelo y que expone la API.
+Todavía no hay frontend.
 
 - Exploración inicial de los datos: [docs/data_exploration.md](docs/data_exploration.md)
 - Pipeline, reglas de limpieza y esquema de tablas: [docs/data_pipeline.md](docs/data_pipeline.md)
+- Modelo de pronóstico: [docs/forecasting_model.md](docs/forecasting_model.md)
+- API REST: [docs/api.md](docs/api.md)
 
 ## Estructura
 
 ```
 backend/
   app/
-    core/                 configuración, rutas, logging y sesión de base de datos
+    core/                 configuración, rutas, logging, sesión de base de datos y manejo de errores
     domains/
       ingestion/          descarga y lectura de los archivos del DANE
       catalog/            productos, variedades, mercados y equivalencias de nombres (CSV en data/)
+                          (los dominios con endpoints tienen router.py, service.py, repository.py y schemas.py)
       prices/             precios semanales, exclusiones y cobertura
       supply/             abastecimiento por origen y agregado semanal
-      forecasting/        (vacío por ahora)
-      recommendations/    (vacío por ahora)
+      forecasting/        conjunto de datos, modelos de pronóstico, tabla forecasts y resumen del modelo
+      recommendations/    dónde comprar y dónde vender según los pronósticos
+    main.py               aplicación FastAPI (rutas bajo /api)
     pipeline.py           orquesta la construcción de la base
   scripts/                comandos de línea
   tests/                  pruebas con muestras pequeñas en tests/fixtures
@@ -83,6 +88,17 @@ python -m backend.scripts.generate_forecasts  # escribe la tabla forecasts en me
 `build_database` reemplaza el archivo de la base, así que al terminar regenera la tabla `forecasts` con los modelos
 guardados en `models/`. Si todavía no hay modelos entrenados, lo indica en el log y la tabla queda sin generar: ejecute
 `train_models` y luego `generate_forecasts`. Diseño, resultados y limitaciones en `docs/forecasting_model.md`.
+
+## API
+
+```bash
+uvicorn backend.app.main:app --reload
+```
+
+La API queda en http://localhost:8000/api y la documentación interactiva en http://localhost:8000/docs. Solo lee la
+base y `models/metadata.json`; no entrena modelos ni descarga datos. Por defecto acepta peticiones del servidor de
+desarrollo de Vite (`http://localhost:5173`); otros orígenes se configuran con `MERCAO_CORS_ORIGINS` (separados por
+comas). Endpoints, parámetros, ejemplos y errores en `docs/api.md`.
 
 ## Pruebas
 
