@@ -1,6 +1,6 @@
 # Modelo de pronóstico de precios mayoristas
 
-Este documento describe el modelo que pronostica el precio medio semanal mayorista de cada par producto–mercado
+Este documento describe el modelo que pronostica el precio medio semanal mayorista de cada par producto-mercado
 utilizable, 1, 2, 3 y 4 semanas hacia adelante, y lo evalúa frente a referencias simples. Las cifras corresponden al
 entrenamiento del 2026-11-16 (versión `lightgbm-202611160849`) sobre la base construida el 2026-11-15, con datos hasta
 la semana ISO 2026-W46. Todas se pueden comprobar en `models/metadata.json` y `models/training.log`, que genera cada
@@ -19,7 +19,7 @@ evaluación), `forecasts.py` (modelos guardados y tabla `forecasts`) y `figures.
 
 ## 1. Planteamiento del problema
 
-- **Unidad de pronóstico**: un par producto–mercado con `usable_for_model = 1` en la tabla `coverage` (116 pares de
+- **Unidad de pronóstico**: un par producto-mercado con `usable_for_model = 1` en la tabla `coverage` (116 pares de
   13 productos y 11 mercados).
 - **Serie**: precio medio semanal (`mean_price`, pesos por kilogramo) por semana ISO, desde 2016-W01.
 - **Semana de origen t**: la semana en la que se hace el pronóstico; solo se usa información disponible al cierre de
@@ -134,8 +134,8 @@ Todos usan las mismas variables, filas y particiones, y predicen el log-cambio.
 
 | Modelo | Descripción | Hiperparámetros |
 |---|---|---|
-| Ingenuo | El precio sigue igual que esta semana (ŷ = 0) | — |
-| Ingenuo estacional | El precio cambia en la misma proporción que cambió en las mismas semanas del año anterior: ŷ = log(precio[t−52+h] / precio[t−52]). Si falta alguno de esos precios usa ŷ = 0 (menos del 0,8 % de las filas) | — |
+| Ingenuo | El precio sigue igual que esta semana (ŷ = 0) | No aplica |
+| Ingenuo estacional | El precio cambia en la misma proporción que cambió en las mismas semanas del año anterior: ŷ = log(precio[t−52+h] / precio[t−52]). Si falta alguno de esos precios usa ŷ = 0 (menos del 0,8 % de las filas) | No aplica |
 | Ridge | Regresión lineal con penalización L2; variables numéricas estandarizadas, producto y mercado en one-hot | alpha ∈ {0,1; 1; 10; 100} |
 | Random Forest | 200 árboles, `max_features = 0,5`, producto y mercado en one-hot | `max_depth` ∈ {8, 16} × `min_samples_leaf` ∈ {20, 100} |
 | LightGBM | Gradient boosting con producto y mercado como categóricas nativas; `learning_rate = 0,03`, `min_child_samples = 50`, `subsample = 0,8`, `colsample_bytree = 0,8`, `reg_lambda = 1` | `num_leaves` ∈ {15, 63} × `n_estimators` ∈ {200, 600} |
@@ -174,7 +174,7 @@ predice cambio, así que no aplica.
 
 | Modelo | MAE (pesos/kg) | MAPE (%) | Precisión direccional (%) | Mejora MAE (%) | Mejora MAPE (%) |
 |---|---|---|---|---|---|
-| Ingenuo | 533,9 | 14,88 | — | 0,0 | 0,0 |
+| Ingenuo | 533,9 | 14,88 | No aplica | 0,0 | 0,0 |
 | Ingenuo estacional | 838,7 | 22,91 | 50,9 | −57,1 | −53,9 |
 | Ridge | 517,7 | 14,62 | 58,0 | 3,0 | 1,8 |
 | Random Forest | 492,8 | 13,86 | 60,2 | 7,7 | 6,9 |
