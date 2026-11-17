@@ -105,11 +105,14 @@
   flex: 1;
 }
 
+/* Aligned with the top of the city name, not centered on the city and the full name. */
 .change {
   display: flex;
   flex: none;
+  align-self: flex-start;
   align-items: center;
   justify-content: flex-end;
+  margin-top: -2px;
 }
 
 .price {
@@ -130,14 +133,15 @@
   display: none;
 }
 
-/* Decoration only: faint, in the bottom right corner, behind the sparkline. */
+/* Decoration only: small and faint, just above and to the left of the sparkline. */
 .doodle {
   position: absolute;
-  right: -10px;
-  bottom: -12px;
+  top: -10px;
+  right: calc(100% + var(--space-2));
   z-index: -1;
-  width: 6rem;
-  height: 6rem;
+  grid-area: spark;
+  width: 2rem;
+  height: 2rem;
   color: var(--color-ink);
   opacity: 0.06;
   pointer-events: none;
