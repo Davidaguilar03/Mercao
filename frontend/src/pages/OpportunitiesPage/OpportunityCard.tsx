@@ -39,34 +39,31 @@ interface SideProps {
 function Side({ title, side, tone }: SideProps) {
   return (
     <div className={`${styles.tile} ${styles.side} ${styles[tone]}`}>
+      <span className={styles.label}>{title}</span>
       {/* The city on one line, with the full market name under it, so long names never wrap. */}
-      <div className={styles.sideMain}>
-        <span className={styles.label}>{title}</span>
-        <span className={styles.group}>
-          <strong className={styles.sideMarket} title={side.market_name}>
-            {side.city}
-          </strong>
-          <span className={styles.sideMarketFull} title={side.market_name}>
-            {side.market_name}
-          </span>
+      <span className={styles.group}>
+        <strong className={styles.sideMarket} title={side.market_name}>
+          {side.city}
+        </strong>
+        <span className={styles.sideMarketFull} title={side.market_name}>
+          {side.market_name}
         </span>
-        <span className={styles.group}>
-          <span className={styles.value}>
+      </span>
+      {/* Expected price on the left and, on the same baseline, its change against the latest price. */}
+      <span className={styles.group}>
+        <span className={styles.priceRow}>
+          <span className={styles.value} title="Precio esperado">
+            <span className="visually-hidden">Precio esperado: </span>
             <PriceTag value={side.predicted_price} size="lg" />
           </span>
-          <span className={styles.detail}>precio esperado</span>
+          <ChangeBadge value={side.expected_change_percent} size="lg" />
         </span>
-      </div>
-      {/* How the forecast compares with the latest price observed in this market. */}
-      <p className={styles.change}>
-        <ChangeBadge value={side.expected_change_percent} size="lg" />
         {side.latest_price !== null && (
-          <span className={styles.changeNote}>
-            <span>frente al último precio</span>{' '}
-            <span>({formatPricePerKg(side.latest_price)})</span>
+          <span className={styles.detail}>
+            frente al último precio ({formatPricePerKg(side.latest_price)})
           </span>
         )}
-      </p>
+      </span>
     </div>
   );
 }

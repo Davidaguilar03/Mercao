@@ -10,9 +10,11 @@ describe('OpportunitiesPage', () => {
     renderWithProviders(<OpportunitiesPage />);
 
     const buy = (await screen.findByText('Comprar en')).parentElement!;
-    expect(plain(buy.textContent)).toContain('Pereira, Mercasa$ 2.254 /kg');
+    expect(plain(buy.textContent)).toContain('Pereira, MercasaPrecio esperado: $ 2.254 /kg');
     const sell = screen.getByText('Vender en').parentElement!;
-    expect(plain(sell.textContent)).toContain('Cartago (Valle del Cauca)$ 3.355 /kg');
+    expect(plain(sell.textContent)).toContain(
+      'Cartago (Valle del Cauca)Precio esperado: $ 3.355 /kg',
+    );
     expect(plain(screen.getByText('Diferencia esperada').parentElement!.textContent)).toBe(
       'Diferencia esperada$ 1.101 /kg48,8 % sobre el precio de compra',
     );
@@ -26,11 +28,11 @@ describe('OpportunitiesPage', () => {
     mockApi(fullApi);
     renderWithProviders(<OpportunitiesPage />);
 
-    // The market and its expected price on the left; the expected change, large, on the right.
+    // The market, then the expected price and its change on one row, then the latest price.
     const buy = (await screen.findByText('Comprar en')).closest<HTMLElement>('.side')!;
     expect(within(buy).getByText('Pereira')).toHaveAttribute('title', 'Pereira, Mercasa');
     expect(plain(buy.textContent)).toBe(
-      'Comprar enPereiraPereira, Mercasa$ 2.254 /kgprecio esperado' +
+      'Comprar enPereiraPereira, MercasaPrecio esperado: $ 2.254 /kg' +
         'Bajó\u22122,7 %frente al último precio ($ 2.317 /kg)',
     );
     const sell = screen.getByText('Vender en').closest('.side')!;

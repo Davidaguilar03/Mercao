@@ -68,20 +68,12 @@
   border-top-color: var(--color-level-expensive);
 }
 
-/* Market and expected price on the left; the expected change, centered, in its own segment. */
+/* One column: label, market, then the expected price and its change on one row. */
 .side {
-  container-type: inline-size;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(8rem, 42%);
-}
-
-/* Label at the top, market in the middle and price at the bottom: no gap at either end. */
-.sideMain {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: var(--space-2);
-  min-width: 0;
   padding: var(--space-3) var(--space-4);
 }
 
@@ -110,36 +102,27 @@
   font-size: var(--font-size-xs);
 }
 
-.changeNote {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.4;
-}
-
-/* "frente al último precio" and the price break between them, never inside. */
-.changeNote > span {
-  white-space: nowrap;
-}
-
-.change {
+/* Price on the left, change on the right, on one baseline; the change wraps under it, left aligned. */
+.priceRow {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  min-width: 0;
-  margin: 0;
-  padding: var(--space-3);
-  border-left: 1px solid var(--color-border);
-  text-align: center;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px var(--space-3);
 }
 
+.side .detail {
+  font-size: var(--font-size-xs);
+}
+
+/* The difference and the distance carry the brand green, so the four tiles share one system. */
 .fact {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border-top-color: var(--color-primary);
 }
 
 /* The value and, beside it on the same baseline (or under it when it does not fit), its detail. */
@@ -173,20 +156,6 @@
 .ranges {
   display: flex;
   flex-direction: column;
-}
-
-/* Narrow tile: the change goes under the price, still centered, after a divider. */
-@container (max-width: 20rem) {
-  .sideMain,
-  .change {
-    grid-column: 1 / -1;
-  }
-
-  .change {
-    padding: var(--space-3) var(--space-4);
-    border-top: 1px solid var(--color-border);
-    border-left: 0;
-  }
 }
 
 @media (min-width: 640px) {

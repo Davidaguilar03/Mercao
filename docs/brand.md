@@ -166,11 +166,13 @@ no pesan ni dependen de internet.
   la derecha, apiladas, la diferencia esperada y la distancia; debajo, a todo el ancho, la nota de confianza; y
   después los rangos y la lista de plazas. En celulares todo va en una columna, en ese orden.
 - Los cuatro bloques de cada variedad en Oportunidades comparten borde, radio, margen interno y escala de letra: rótulo
-  pequeño en gris, valor grande del tamaño de un precio destacado y una línea secundaria en gris. "Comprar en" y
-  "Vender en" tienen siempre la misma altura: la ciudad va en una sola línea, con el nombre completo de la plaza debajo
-  (recortado si no cabe y completo al pasar el puntero), y el cambio esperado ocupa un segmento propio a la derecha,
-  separado por una línea fina y centrado en ambos sentidos (debajo del precio en celulares). La diferencia esperada y
-  la distancia, apiladas, suman exactamente la altura de esas dos tarjetas.
+  pequeño en gris, valor grande del tamaño de un precio destacado y una línea secundaria en gris. Todos llevan un borde
+  superior de color: amarillo maíz en "Comprar en", tinta en "Vender en" y verde principal en la diferencia esperada y
+  la distancia. "Comprar en" y "Vender en" son compactas y tienen siempre la misma altura: la ciudad va en una sola
+  línea, con el nombre completo de la plaza debajo (recortado si no cabe y completo al pasar el puntero); luego, en una
+  misma fila y sobre la misma línea base, el precio esperado a la izquierda y el cambio esperado a la derecha, y debajo
+  una línea pequeña con el último precio. Si la fila no cabe (en celulares), el cambio baja bajo el precio, alineado a
+  la izquierda. La diferencia esperada y la distancia, apiladas, suman exactamente la altura de esas dos tarjetas.
 - El rango probable de cada plaza usa un solo eje de precios con pocas marcas en pesos, las dos barras en los colores
   de comprar y vender, el precio esperado como un círculo con su valor encima y, si los rangos se cruzan, una franja
   rayada con el rótulo "Zona donde los rangos se cruzan". El gráfico crece hasta la altura de la tabla de plazas.
