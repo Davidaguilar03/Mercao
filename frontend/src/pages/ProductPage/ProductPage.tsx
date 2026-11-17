@@ -15,7 +15,7 @@ import { ProductSelector } from '../../components/ProductSelector/ProductSelecto
 import { QueryBoundary } from '../../components/QueryBoundary/QueryBoundary';
 import { RangeBar } from '../../components/RangeBar/RangeBar';
 import { departmentItems, municipalityItems } from '../../components/ShareBars/originItems';
-import { ShareBars } from '../../components/ShareBars/ShareBars';
+import { ShareBars, type ShareItem } from '../../components/ShareBars/ShareBars';
 import { EmptyState } from '../../components/states/EmptyState';
 import { LoadingState } from '../../components/states/LoadingState';
 import { useMarketSelection, useProductSelection } from '../../hooks/urlSelection';
@@ -229,12 +229,12 @@ function ProductContext({ product, market }: ProductContentProps) {
       )}
 
       {origins && origins.total_kg > 0 ? (
-        <Card
-          title="Municipios que más aportan"
-          subtitle={`Los ${origins.municipalities.length} municipios que más carga enviaron a ${market.city}.`}
-        >
-          <ShareBars items={municipalityItems(origins)} label="Origen por municipio" />
-        </Card>
+        <Municipalities
+          // Each product and market starts with the short list again.
+          key={`${product.product_id}-${market.market_id}`}
+          items={municipalityItems(origins)}
+          city={market.city}
+        />
       ) : (
         <Card
           title="¿De dónde llega a esta plaza?"
@@ -255,6 +255,33 @@ function ProductContext({ product, market }: ProductContentProps) {
         </Card>
       )}
     </>
+  );
+}
+
+/** How many municipalities are shown before "Ver más". */
+const MUNICIPALITIES_SHORT = 5;
+
+/** The municipalities that send the most: the first five, and the rest on demand. */
+function Municipalities({ items, city }: { items: ShareItem[]; city: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const shown = expanded ? items : items.slice(0, MUNICIPALITIES_SHORT);
+  return (
+    <Card
+      title="Municipios que más aportan"
+      subtitle={`Los ${shown.length} municipios que más carga enviaron a ${city}.`}
+    >
+      <ShareBars items={shown} label="Origen por municipio" />
+      {items.length > MUNICIPALITIES_SHORT && (
+        <button
+          type="button"
+          className={styles.moreButton}
+          aria-expanded={expanded}
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? 'Ver menos' : 'Ver más'}
+        </button>
+      )}
+    </Card>
   );
 }
 

@@ -7,6 +7,7 @@ import {
   latestPrices,
   priceHistory,
   seasonality,
+  supplyOrigins,
 } from '../../test/viewFixtures';
 import { ProductPage } from './ProductPage';
 
@@ -104,6 +105,46 @@ describe('ProductPage', () => {
     expect(plain(within(municipalities).getAllByRole('listitem')[0].textContent)).toBe(
       'Ipiales (Nariño)2.000 t20,0 %',
     );
+  });
+
+  it('shows the top five municipalities and the rest with "Ver más"', async () => {
+    const names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    const origins = {
+      ...supplyOrigins,
+      municipalities: names.map((name, index) => ({
+        code: `1500${index}`,
+        name: `MUNICIPIO ${name}`,
+        department: 'BOYACÁ',
+        kg: 1000000 - index * 50000,
+        share_pct: 10 - index * 0.5,
+      })),
+    };
+    mockApi({ ...fullApi, '/api/supply/origins': origins });
+    const user = userEvent.setup();
+    renderWithProviders(<ProductPage />);
+
+    const list = await screen.findByRole('list', { name: 'Origen por municipio' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.getByText(/Los 5 municipios que más carga enviaron/)).toBeInTheDocument();
+
+    const more = screen.getByRole('button', { name: 'Ver más' });
+    expect(more).toHaveAttribute('aria-expanded', 'false');
+    await user.click(more);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+    expect(screen.getByText(/Los 10 municipios que más carga enviaron/)).toBeInTheDocument();
+
+    const less = screen.getByRole('button', { name: 'Ver menos' });
+    expect(less).toHaveAttribute('aria-expanded', 'true');
+    await user.click(less);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+  });
+
+  it('does not offer "Ver más" when there are five municipalities or fewer', async () => {
+    mockApi(fullApi);
+    renderWithProviders(<ProductPage />);
+
+    await screen.findByRole('list', { name: 'Origen por municipio' });
+    expect(screen.queryByRole('button', { name: 'Ver más' })).not.toBeInTheDocument();
   });
 
   it('explains why a market has no supply data', async () => {
