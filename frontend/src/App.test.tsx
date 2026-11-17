@@ -99,7 +99,7 @@ describe('routing shell', () => {
     expect(footer).toHaveTextContent('Los pronósticos son estimaciones');
   });
 
-  it('shows the brand, the authors, the project and the repository in the footer', () => {
+  it('shows the brand, the four authors and the project in the footer, without links', () => {
     renderApp();
 
     const footer = screen.getByRole('contentinfo');
@@ -113,14 +113,12 @@ describe('routing shell', () => {
       'David Aguilar Castillo',
       'Valeria Tocarruncho Mosquera',
       'Andrés Santiago Daza Quintana',
+      'Oscar Alejandro Roa Doncel',
     ]);
     expect(footer).toHaveTextContent(
       'Proyecto de Inteligencia Computacional, Universidad Pedagógica y Tecnológica de Colombia',
     );
-    expect(within(footer).getByRole('link', { name: 'Ver el código en GitHub' })).toHaveAttribute(
-      'href',
-      'https://github.com/Davidaguilar03/Mercao',
-    );
+    expect(within(footer).queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('puts the selectors of each page inside its header band', () => {
