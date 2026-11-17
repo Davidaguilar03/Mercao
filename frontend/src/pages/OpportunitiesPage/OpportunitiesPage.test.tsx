@@ -14,7 +14,7 @@ describe('OpportunitiesPage', () => {
     const sell = screen.getByText('Vender en').parentElement!;
     expect(plain(sell.textContent)).toContain('Cartago (Valle del Cauca)$ 3.355 /kg');
     expect(plain(screen.getByText('Diferencia esperada').parentElement!.textContent)).toBe(
-      'Diferencia esperada$ 1.101 por kilo (48,8 %)',
+      'Diferencia esperada$ 1.101 /kg48,8 % sobre el precio de compra',
     );
     expect(
       screen.getByText(/Pronóstico para la semana del 23 al 29 de noviembre de 2026/),
@@ -27,9 +27,10 @@ describe('OpportunitiesPage', () => {
     renderWithProviders(<OpportunitiesPage />);
 
     // The market and its expected price on the left; the expected change, large, on the right.
-    const buy = (await screen.findByText('Comprar en')).closest('.side')!;
+    const buy = (await screen.findByText('Comprar en')).closest<HTMLElement>('.side')!;
+    expect(within(buy).getByText('Pereira')).toHaveAttribute('title', 'Pereira, Mercasa');
     expect(plain(buy.textContent)).toBe(
-      'Comprar enPereira, Mercasa$ 2.254 /kgprecio esperado' +
+      'Comprar enPereiraPereira, Mercasa$ 2.254 /kgprecio esperado' +
         'Bajó\u22122,7 %frente al último precio ($ 2.317 /kg)',
     );
     const sell = screen.getByText('Vender en').closest('.side')!;
@@ -59,7 +60,7 @@ describe('OpportunitiesPage', () => {
 
     const label = await screen.findByText('Distancia aproximada en línea recta');
     expect(plain(label.parentElement!.textContent)).toBe(
-      'Distancia aproximada en línea recta25 km entre Pereira y Cartago',
+      'Distancia aproximada en línea recta25 kmentre Pereira y Cartago',
     );
   });
 
@@ -73,19 +74,23 @@ describe('OpportunitiesPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('img', {
-        name: /Rango probable en Pereira: de \$.1\.777 a \$.2\.769\. Rango probable en Cartago: de \$.2\.645 a \$.4\.120\./,
+        name: /Rango probable en Pereira: de \$.1\.777 a \$.2\.769\. Rango probable en Cartago: de \$.2\.645 a \$.4\.120\. Los rangos se cruzan entre \$.2\.645 y \$.2\.769\./,
       }),
     ).toBeInTheDocument();
+    // The stretch both ranges share is marked and named.
+    expect(screen.getByText('Zona donde los rangos se cruzan')).toBeInTheDocument();
   });
 
   it('explains a high confidence', async () => {
     const high = recommendationsFor(2);
     high.groups[0].confidence = 'alta';
+    high.groups[0].sell.lower_price = 2800;
     mockApi({ ...fullApi, '/api/recommendations': high });
     renderWithProviders(<OpportunitiesPage />);
 
     expect(await screen.findByText('Confianza alta')).toBeInTheDocument();
     expect(screen.getByText(/no se superponen/)).toBeInTheDocument();
+    expect(screen.queryByText('Zona donde los rangos se cruzan')).not.toBeInTheDocument();
   });
 
   it('ranks every market of the group from the cheapest forecast to the most expensive', async () => {

@@ -11,27 +11,54 @@
   min-width: 0;
 }
 
-.side {
-  container-type: inline-size;
+/* Every tile of the card: same border, radius, top edge and type scale. */
+.tile {
   min-width: 0;
-  padding: var(--space-3) var(--space-4);
+  margin: 0;
   border: 1px solid var(--color-border);
-  border-top: 3px solid;
+  border-top: 3px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
 }
 
-/* Market and expected price on the left; expected change, large, on the right. */
-.sideContent {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--space-3);
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.label svg {
+  flex-shrink: 0;
+}
+
+.value {
+  display: block;
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+}
+
+.unit {
+  color: var(--color-muted);
+  font-size: 0.75em;
+  font-weight: 400;
+}
+
+.detail {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
 }
 
 /*
  * Buying and selling use corn yellow (the cheap market) and ink (the expensive one), the same as
- * the two bars of the range comparison. Green and terracotta are left for the expected change.
+ * the bars and markers of the range comparison and the tags of the table. Green and terracotta are
+ * left for the expected change.
  */
 .buy {
   border-top-color: var(--color-level-cheaper);
@@ -41,83 +68,91 @@
   border-top-color: var(--color-level-expensive);
 }
 
+/* Market and expected price on the left; the expected change, centered, in its own segment. */
+.side {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, 42%);
+}
+
+/* Label at the top, market in the middle and price at the bottom: no gap at either end. */
 .sideMain {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.sideTitle {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+.sideMarket,
+.sideMarketFull {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sideMarket {
   font-family: var(--font-display);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   line-height: var(--line-height-tight);
 }
 
-.sidePrice {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--space-2);
-}
-
-.change {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
-  max-width: 9.5rem;
-  text-align: right;
+.sideMarketFull {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
 }
 
 .changeNote {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
-  line-height: 1.35;
+  line-height: 1.4;
+}
+
+/* "frente al último precio" and the price break between them, never inside. */
+.changeNote > span {
+  white-space: nowrap;
+}
+
+.change {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-3);
+  border-left: 1px solid var(--color-border);
+  text-align: center;
 }
 
 .fact {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  margin: 0;
+  justify-content: space-between;
+  gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
 }
 
-.fact dt {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-.fact dd {
+/* The value and, beside it on the same baseline (or under it when it does not fit), its detail. */
+.factRow {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0 var(--space-2);
-  margin: var(--space-1) 0 0;
-  font-size: var(--font-size-lg);
-  font-weight: 700;
+  align-items: baseline;
+  gap: 2px var(--space-3);
+  margin: 0;
 }
 
-.factDetail {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 400;
-}
-
-.factIcon {
-  color: var(--color-muted);
+.distance {
+  font-weight: 600;
 }
 
 .confidence {
@@ -134,21 +169,23 @@
   min-width: 0;
 }
 
-/* Narrow card: the change goes under the price, on one line, still large and colored. */
-@container (max-width: 19rem) {
-  .sideContent {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-2);
+/* The range comparison fills its column, so it ends at the same height as the table. */
+.ranges {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Narrow tile: the change goes under the price, still centered, after a divider. */
+@container (max-width: 20rem) {
+  .sideMain,
+  .change {
+    grid-column: 1 / -1;
   }
 
   .change {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    max-width: none;
-    padding-top: var(--space-2);
+    padding: var(--space-3) var(--space-4);
     border-top: 1px solid var(--color-border);
+    border-left: 0;
   }
 }
 
@@ -167,6 +204,7 @@
 
   .facts {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr;
   }
 }
 

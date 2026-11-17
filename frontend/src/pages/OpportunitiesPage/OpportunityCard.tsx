@@ -1,4 +1,4 @@
-import { Gauge, Route } from 'lucide-react';
+import { ArrowLeftRight, Gauge, Route } from 'lucide-react';
 import type {
   MarketForecast,
   Product,
@@ -38,26 +38,35 @@ interface SideProps {
 
 function Side({ title, side, tone }: SideProps) {
   return (
-    <div className={`${styles.side} ${styles[tone]}`}>
-      <div className={styles.sideContent}>
-        <div className={styles.sideMain}>
-          <span className={styles.sideTitle}>{title}</span>
-          <strong className={styles.sideMarket}>{side.market_name}</strong>
-          <span className={styles.sidePrice}>
-            <PriceTag value={side.predicted_price} size="lg" />
-            <span className={page.caption}>precio esperado</span>
+    <div className={`${styles.tile} ${styles.side} ${styles[tone]}`}>
+      {/* The city on one line, with the full market name under it, so long names never wrap. */}
+      <div className={styles.sideMain}>
+        <span className={styles.label}>{title}</span>
+        <span className={styles.group}>
+          <strong className={styles.sideMarket} title={side.market_name}>
+            {side.city}
+          </strong>
+          <span className={styles.sideMarketFull} title={side.market_name}>
+            {side.market_name}
           </span>
-        </div>
-        {/* How the forecast compares with the latest price observed in this market. */}
-        <p className={styles.change}>
-          <ChangeBadge value={side.expected_change_percent} size="lg" />
-          {side.latest_price !== null && (
-            <span className={styles.changeNote}>
-              frente al último precio ({formatPricePerKg(side.latest_price)})
-            </span>
-          )}
-        </p>
+        </span>
+        <span className={styles.group}>
+          <span className={styles.value}>
+            <PriceTag value={side.predicted_price} size="lg" />
+          </span>
+          <span className={styles.detail}>precio esperado</span>
+        </span>
       </div>
+      {/* How the forecast compares with the latest price observed in this market. */}
+      <p className={styles.change}>
+        <ChangeBadge value={side.expected_change_percent} size="lg" />
+        {side.latest_price !== null && (
+          <span className={styles.changeNote}>
+            <span>frente al último precio</span>{' '}
+            <span>({formatPricePerKg(side.latest_price)})</span>
+          </span>
+        )}
+      </p>
     </div>
   );
 }
@@ -85,20 +94,31 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
           <Side title="Vender en" side={sell} tone="sell" />
         </div>
         <div className={styles.facts}>
-          <dl className={styles.fact}>
-            <dt>Diferencia esperada</dt>
-            <dd className="tabular">
-              {formatPesos(group.difference_per_kg)} por kilo
-              <span className={styles.factDetail}> ({formatPercent(group.difference_pct)})</span>
+          <dl className={`${styles.tile} ${styles.fact}`}>
+            <dt className={styles.label}>
+              <ArrowLeftRight size={16} strokeWidth={1.75} aria-hidden="true" />
+              Diferencia esperada
+            </dt>
+            <dd className={styles.factRow}>
+              <span className={styles.value}>
+                <PriceTag value={group.difference_per_kg} size="lg" />
+              </span>
+              <span className={styles.detail}>
+                {formatPercent(group.difference_pct)} sobre el precio de compra
+              </span>
             </dd>
           </dl>
-          <dl className={styles.fact}>
-            <dt>Distancia aproximada en línea recta</dt>
-            <dd className="tabular">
-              <Route className={styles.factIcon} size={18} strokeWidth={1.75} aria-hidden="true" />
-              {formatInteger(group.distance_km)} km
-              <span className={styles.factDetail}>
-                {' '}
+          <dl className={`${styles.tile} ${styles.fact}`}>
+            <dt className={styles.label}>
+              <Route size={16} strokeWidth={1.75} aria-hidden="true" />
+              Distancia aproximada en línea recta
+            </dt>
+            <dd className={styles.factRow}>
+              <span className={`${styles.value} ${styles.distance} tabular`}>
+                {formatInteger(group.distance_km)}
+                <span className={styles.unit}>{' km'}</span>
+              </span>
+              <span className={styles.detail}>
                 entre {buy.city} y {sell.city}
               </span>
             </dd>
@@ -118,12 +138,12 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
 
       {/* Desktop: the two ranges on the left and the list of markets on the right. */}
       <div className={styles.details}>
-        <div>
+        <div className={styles.ranges}>
           <h3 className={page.subheading}>Rango probable de precio en cada plaza</h3>
           <IntervalComparison buy={buy} sell={sell} />
           <p className={`${page.caption} ${page.captionAfter}`}>
-            El punto indica el precio esperado; la barra, el rango en el que se espera el precio en
-            8 de cada 10 casos.
+            El círculo indica el precio esperado; la barra, el rango en el que se espera el precio
+            en 8 de cada 10 casos.
           </p>
         </div>
         <div>
