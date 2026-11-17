@@ -77,15 +77,18 @@ El color nunca va solo: siempre lo acompañan una flecha y el número con su sig
 terracota oscuro, que sí cumple contraste; el terracota del logo queda para la flecha.
 
 **Nivel de precio** (una plaza frente a las demás que venden la misma variedad, o un mes frente al resto del año). No
-es un cambio, así que no usa verde ni rojo: usa amarillo maíz, blanco y tinta, y signos de pesos.
+es un cambio, así que no usa verde ni rojo: usa amarillo maíz, blanco y tinta, con un ícono dentro de un círculo.
 
-| Significado | Fondo | Texto | Marca |
+| Significado | Fondo | Ícono | Forma del ícono |
 |---|---|---|---|
-| Más barata que la mayoría | `#F2B705` | `#1E2B24` | `$` |
-| Precio parecido al de la mayoría | `#FFFFFF` con borde tinta | `#1E2B24` | `$$` |
-| Más cara que la mayoría | `#1E2B24` | `#FFFFFF` | `$$$` |
+| Más barata que la mayoría | `#F2B705` | `#1E2B24` | Flecha recta hacia abajo |
+| Precio parecido al de la mayoría | `#FFFFFF` con borde tinta | `#1E2B24` | Signo igual |
+| Más cara que la mayoría | `#1E2B24` | `#FFFFFF` | Flecha recta hacia arriba |
 
-Estas marcas aparecen en el mapa, en su leyenda y en la tabla de plazas de Panorama. Los mismos dos colores
+Estos íconos aparecen en el mapa, en su leyenda y en la tabla de plazas de Panorama, siempre con su significado
+escrito al lado. Comparan el precio de una plaza con el de las demás plazas de la misma variedad en la misma semana;
+no dicen si el precio cambió con el tiempo. Se distinguen de un cambio de precio por el color (nunca verde ni rojo),
+por la forma (flecha recta dentro de un círculo, no la flecha quebrada de tendencia) y porque no llevan porcentaje. Los mismos dos colores
 distinguen dónde comprar (amarillo, la plaza barata) y dónde vender (tinta, la plaza cara) en Oportunidades, y el mes
 más barato y el más caro en la gráfica de temporadas. La leyenda del mapa aclara que las marcas no dicen si el precio
 subió o bajó.
@@ -143,14 +146,17 @@ no pesan ni dependen de internet.
 - Panorama: a la izquierda el título con el selector, la frase resumen y el mapa; a la derecha la tabla de plazas
   (que se desplaza dentro de su tarjeta si no cabe) y el origen.
 - Producto: a la izquierda los selectores, las cifras clave y la gráfica de precios; a la derecha temporadas,
-  departamentos y municipios.
+  departamentos y municipios. De los municipios se muestran cinco, con un botón "Ver más" para ver los diez.
+- La lista del selector de productos se abre por encima de las tarjetas que siguen a la franja de título y se
+  desplaza por dentro; la franja no recorta su contenido.
 - Oportunidades y Cómo funciona ocupan todo el ancho y reparten sus bloques en dos o tres columnas.
 
 ## Pie de página
 
 Fondo verde principal con texto crema y una línea amarillo maíz arriba. Lleva el logo dentro de un círculo crema con
-el nombre y el lema, una descripción corta, el enlace al repositorio en GitHub, la fuente de los datos y la última
-semana con datos, los autores y, en una franja más oscura, el nombre de la materia y la universidad.
+el nombre y el lema, una descripción corta, la fuente de los datos y la última semana con datos, los cuatro autores
+(David Aguilar Castillo, Valeria Tocarruncho Mosquera, Andrés Santiago Daza Quintana y Oscar Alejandro Roa Doncel) y,
+en una franja más oscura, el nombre de la materia y la universidad. No lleva enlaces.
 
 ## Tipografía
 

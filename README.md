@@ -139,14 +139,15 @@ La aplicación queda en http://localhost:5173 y consulta la API en http://localh
 
 | Vista | Dirección | Qué muestra |
 |---|---|---|
-| Panorama | `/` | Un producto en todo el país: una frase que resume la semana, un mapa con las plazas marcadas (`$`, `$$` o `$$$`) según si están más baratas, parecidas o más caras que la mayoría (al tocar una plaza se ve su precio y un enlace a su detalle en la vista Producto), una tabla de plazas ordenada por precio (con el cambio frente a hace 4 semanas y un año, y el pronóstico a 2 semanas) y de qué departamentos viene el producto. |
-| Producto | `/producto` | Un producto en una plaza: cuatro cifras clave (último precio, cambio frente a hace 4 semanas y un año, y pronóstico a 4 semanas con su rango); la gráfica del precio semana a semana (1 año, 3 años o todo) con el pronóstico y su rango probable; los meses en que suele estar más barato y más caro; y de qué departamentos y municipios llega a esa plaza. |
+| Panorama | `/` | Un producto en todo el país: una frase que resume la semana, un mapa con las plazas marcadas según si están más baratas, parecidas o más caras que la mayoría (al tocar una plaza se ve su precio y un enlace a su detalle en la vista Producto), una tabla de plazas ordenada por precio (con el cambio frente a hace 4 semanas y un año, y el pronóstico a 2 semanas) y de qué departamentos viene el producto. |
+| Producto | `/producto` | Un producto en una plaza: cuatro cifras clave (último precio, cambio frente a hace 4 semanas y un año, y pronóstico a 4 semanas con su rango); la gráfica del precio semana a semana (1 año, 3 años o todo) con el pronóstico y su rango probable; los meses en que suele estar más barato y más caro; y de qué departamentos y municipios llega a esa plaza (los cinco municipios principales, y los diez con "Ver más"). |
 | Oportunidades | `/oportunidades` | Dónde comprar y dónde vender de 1 a 4 semanas adelante: las dos plazas con su precio esperado y cuánto cambia frente al último precio, la diferencia por kilo, la distancia aproximada en línea recta entre las dos ciudades, qué tan confiable es esa diferencia (con los dos rangos de precio lado a lado) y la lista de todas las plazas de la más barata a la más cara. Siempre recuerda que no se incluyen transporte, almacenamiento ni intermediación. |
 | Cómo funciona | `/como-funciona` | El camino de los datos en cinco pasos, del boletín del DANE al pronóstico; los resultados del modelo en cifras grandes; la comparación de los modelos probados; y lo que Mercao no hace. |
 
 En toda la aplicación un precio que sube se muestra en verde con flecha hacia arriba y uno que baja en rojo con flecha
-hacia abajo. El nivel de precio de una plaza frente a las demás es otra cosa y se marca con signos de pesos (`$`, `$$`,
-`$$$`) en amarillo, blanco y negro. Desde 1200 px de ancho, Panorama y Producto se organizan en dos columnas.
+hacia abajo. El nivel de precio de una plaza frente a las demás de la misma variedad es otra cosa y se marca con una
+flecha hacia abajo (más barata), un signo igual (parecida) o una flecha hacia arriba (más cara), en amarillo, blanco y
+negro. Desde 1200 px de ancho, Panorama y Producto se organizan en dos columnas.
 
 Lo que se elige queda en la dirección para poder compartir el enlace: `producto` (identificador del producto),
 `horizonte` (semanas del pronóstico, de 1 a 4) y `plaza` (identificador de la plaza, solo en Producto). Por ejemplo,
