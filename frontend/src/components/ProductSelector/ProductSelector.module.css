@@ -50,8 +50,10 @@
   top: calc(100% + var(--space-1));
   left: 0;
   right: 0;
-  max-height: 20rem;
+  /* Scrolls inside itself and never grows taller than the screen allows. */
+  max-height: min(20rem, 55vh);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-1);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);

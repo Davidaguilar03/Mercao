@@ -2,7 +2,11 @@
 .band {
   container-type: inline-size;
   position: relative;
-  overflow: hidden;
+  /*
+   * No overflow clipping, and a layer above the cards that follow: the list of the product
+   * selector opens beyond the band and must stay fully visible on top of them.
+   */
+  z-index: 5;
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
   background: linear-gradient(115deg, var(--color-surface) 35%, var(--color-surface-tint) 100%);
@@ -39,12 +43,12 @@
   margin-top: var(--space-2);
 }
 
-/* Narrow band: only a faint corner of the drawing shows, behind the text block. */
+/* Narrow band: the drawing shows faintly in the corner, behind the text block and inside the band. */
 .scene {
   position: absolute;
-  right: -2.5rem;
-  top: -0.25rem;
-  width: 11rem;
+  right: var(--space-2);
+  top: var(--space-2);
+  width: 8.5rem;
   color: var(--color-primary);
   opacity: 0.08;
   pointer-events: none;
