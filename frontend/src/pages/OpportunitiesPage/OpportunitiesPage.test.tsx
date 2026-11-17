@@ -69,7 +69,7 @@ describe('OpportunitiesPage', () => {
 
     expect(await screen.findByText('Confianza baja')).toBeInTheDocument();
     expect(
-      screen.getByText(/Los rangos de precio de las dos plazas se cruzan/),
+      screen.getByText(/Los rangos probables de las dos plazas se superponen/),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('img', {
@@ -85,7 +85,7 @@ describe('OpportunitiesPage', () => {
     renderWithProviders(<OpportunitiesPage />);
 
     expect(await screen.findByText('Confianza alta')).toBeInTheDocument();
-    expect(screen.getByText(/no se cruzan/)).toBeInTheDocument();
+    expect(screen.getByText(/no se superponen/)).toBeInTheDocument();
   });
 
   it('ranks every market of the group from the cheapest forecast to the most expensive', async () => {
@@ -113,9 +113,11 @@ describe('OpportunitiesPage', () => {
     renderWithProviders(<OpportunitiesPage />);
 
     const note = screen.getByRole('note');
-    expect(note).toHaveTextContent('no incluyen transporte, almacenamiento ni intermediación');
-    expect(note).toHaveTextContent('son estimaciones, no precios garantizados');
-    expect(note).toHaveTextContent('no refleja la ruta real por carretera');
+    expect(note).toHaveTextContent(
+      'no incluyen costos de transporte, almacenamiento ni intermediación',
+    );
+    expect(note).toHaveTextContent('constituyen estimaciones, no precios garantizados');
+    expect(note).toHaveTextContent('es menor que el recorrido por carretera');
   });
 
   it('explains when there are not two markets to compare', async () => {

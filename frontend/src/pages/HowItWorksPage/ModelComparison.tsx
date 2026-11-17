@@ -1,4 +1,6 @@
+import { Scale } from 'lucide-react';
 import type { ModelSummary } from '../../api/types';
+import { Notice } from '../../components/Notice/Notice';
 import { formatLongDate, formatPercent } from '../../lib/format';
 import styles from './ModelComparison.module.css';
 
@@ -54,25 +56,25 @@ export function ModelChoiceNote({ summary }: ModelComparisonProps) {
   const { validation } = summary.splits;
 
   return (
-    <div className={styles.note}>
+    <Notice icon={Scale} title="Cómo se eligió">
       <p>
-        <strong>Cómo se eligió.</strong> Se escogió {summary.model_label} con esta regla: «
-        {summary.selection_rule}»
+        Se seleccionó {summary.model_label} con la siguiente regla: «{summary.selection_rule}»
         {validation && (
           <>
             {' '}
-            Para eso se usaron los precios del {formatLongDate(validation.start)} al{' '}
-            {formatLongDate(validation.end)}, antes de hacer la prueba.
+            La selección se hizo con los precios del {formatLongDate(validation.start)} al{' '}
+            {formatLongDate(validation.end)}, antes de la prueba.
           </>
         )}
       </p>
       {chosen && best && best.model !== chosen.model && (
         <p>
-          En la prueba, {best.label} tuvo un error apenas menor ({formatPercent(best.mape_pct)}{' '}
-          frente a {formatPercent(chosen.mape_pct)}). Se mantiene {summary.model_label} porque la
-          elección se hace antes de ver la prueba, para no escoger con ventaja.
+          En la prueba, {best.label} obtuvo un error ligeramente menor (
+          {formatPercent(best.mape_pct)} frente a {formatPercent(chosen.mape_pct)}). Se mantiene{' '}
+          {summary.model_label} porque la selección se realiza antes de observar la prueba, lo que
+          evita un sesgo a favor del resultado.
         </p>
       )}
-    </div>
+    </Notice>
   );
 }

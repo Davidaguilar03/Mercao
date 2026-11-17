@@ -69,9 +69,9 @@ describe('HowItWorksPage', () => {
   it('says honestly that another model did slightly better in the test', async () => {
     renderPage();
 
-    const note = await screen.findByText(/Random Forest tuvo un error apenas menor/);
+    const note = await screen.findByText(/Random Forest obtuvo un error ligeramente menor/);
     expect(plain(note.textContent)).toContain('(13,9 % frente a 14,0 %)');
-    expect(screen.getByText(/Se escogió LightGBM con esta regla/)).toBeInTheDocument();
+    expect(screen.getByText(/Se seleccionó LightGBM con la siguiente regla/)).toBeInTheDocument();
   });
 
   it('keeps the results by horizon and the main variables', async () => {

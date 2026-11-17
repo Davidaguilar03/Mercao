@@ -1,0 +1,64 @@
+/* White surface, thin border and a slim accent on the left edge. No colored fills. */
+.notice {
+  display: flex;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
+}
+
+.info {
+  border-left-color: var(--color-accent);
+}
+
+.brand {
+  border-left-color: var(--color-primary);
+}
+
+.neutral {
+  border-left-color: var(--color-border-strong);
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-muted);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.body ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+.title {
+  font-weight: 600;
+}
+
+.compact {
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+.compact .icon {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.compact .body {
+  gap: var(--space-1);
+}

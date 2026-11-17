@@ -1,4 +1,5 @@
 import { LevelMark } from '../../components/LevelMark/LevelMark';
+import { Notice } from '../../components/Notice/Notice';
 import { SIMILAR_THRESHOLD_PCT, type PriceLevel } from '../../lib/analysis';
 import { LEVEL_LABELS } from '../../lib/chartTheme';
 import styles from './MapLegend.module.css';
@@ -17,13 +18,14 @@ export function MapLegend() {
           </li>
         ))}
       </ul>
-      <p className={styles.note}>
-        Los íconos comparan el precio de cada plaza con el de las demás plazas que venden la misma
-        variedad esta semana (parecido: a menos de {SIMILAR_THRESHOLD_PCT} % del precio del medio).
-        No dicen si el precio cambió con el tiempo: las subidas y bajadas van aparte, en verde si
-        sube y en rojo si baja. Si dos plazas quedan una encima de otra, acerque el mapa con el
-        botón +.
-      </p>
+      <Notice size="compact" className={styles.note}>
+        <p>
+          Cada ícono compara el precio de la plaza con el de las demás plazas que venden la misma
+          variedad en la misma semana. Se considera parecido cuando difiere menos de{' '}
+          {SIMILAR_THRESHOLD_PCT} % del precio central. El ícono no indica la variación del precio
+          en el tiempo. Si dos plazas se superponen, el botón + acerca el mapa.
+        </p>
+      </Notice>
     </div>
   );
 }

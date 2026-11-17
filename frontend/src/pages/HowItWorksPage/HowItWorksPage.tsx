@@ -1,4 +1,4 @@
-import { BookOpen, Download, Newspaper, Store, Target, type LucideIcon } from 'lucide-react';
+import { CircleAlert } from 'lucide-react';
 import { lazy, Suspense } from 'react';
 import { useModelSummary } from '../../api/hooks';
 import type { ModelSummary } from '../../api/types';
@@ -6,6 +6,7 @@ import { Card } from '../../components/Card/Card';
 import table from '../../components/DataTable/DataTable.module.css';
 import { KpiCard, KpiGrid } from '../../components/KpiCard/KpiCard';
 import { PageHeader } from '../../components/layout/PageHeader';
+import { Notice } from '../../components/Notice/Notice';
 import { ErrorState } from '../../components/states/ErrorState';
 import { LoadingState } from '../../components/states/LoadingState';
 import { formatLongDate, formatPercent, formatPesos } from '../../lib/format';
@@ -19,7 +20,6 @@ const ErrorByHorizonChart = lazy(() => import('./ErrorByHorizonChart'));
 const weeksLabel = (horizon: number) => (horizon === 1 ? '1 semana' : `${horizon} semanas`);
 
 interface Step {
-  icon: LucideIcon;
   title: string;
   text: string;
 }
@@ -31,29 +31,24 @@ function buildSteps(summary: ModelSummary | undefined): Step[] {
   const nominal = summary?.interval_nominal_pct ?? 80;
   return [
     {
-      icon: Newspaper,
       title: 'El DANE publica los precios cada semana',
       text: 'Sus encuestadores visitan las centrales mayoristas y registran a cuánto se vende cada producto. Es la fuente oficial (SIPSA).',
     },
     {
-      icon: Download,
       title: 'Mercao los descarga y los limpia',
       text: 'Unifica los nombres de productos y plazas y descarta los datos incompletos. No cambia ningún precio ni agrega datos propios.',
     },
     {
-      icon: BookOpen,
       title: firstYear
         ? `El modelo aprende de los precios desde ${firstYear}`
         : 'El modelo aprende de los precios de años anteriores',
       text: 'Un programa busca patrones en la historia: las temporadas y las subidas y bajadas de cada producto en cada plaza.',
     },
     {
-      icon: Target,
       title: `Estima el precio de las próximas ${weeks} semanas`,
       text: `Entrega un precio esperado y un rango: el precio real debería caer dentro de ese rango unas ${nominal} de cada 100 veces.`,
     },
     {
-      icon: Store,
       title: 'La aplicación lo muestra por plaza',
       text: 'En Panorama, Producto y Oportunidades, junto al último precio real. Al pie de cada página aparece la última semana con datos.',
     },
@@ -79,8 +74,7 @@ export function HowItWorksPage() {
             {buildSteps(summary.data).map((step, index) => (
               <li key={step.title} className={styles.step}>
                 <span className={styles.stepMarker} aria-hidden="true">
-                  <step.icon size={22} />
-                  <span className={styles.stepNumber}>{index + 1}</span>
+                  {index + 1}
                 </span>
                 <div>
                   <h3 className={styles.stepTitle}>{step.title}</h3>
@@ -101,37 +95,50 @@ export function HowItWorksPage() {
         <div className={`${styles.layout} ${summary.data ? styles.layoutReady : ''}`}>
           {summary.data && <ModelDetails summary={summary.data} />}
 
-          <Card
-            title="Lo que Mercao no hace"
-            subtitle="Téngalo presente antes de tomar una decisión con estos datos."
-            className={styles.limits}
-          >
-            <ul className={styles.limitations}>
-              <li>
-                <strong>No garantiza precios.</strong> El pronóstico es una estimación a partir de
-                lo que ha pasado antes. Un paro, una helada o un derrumbe pueden cambiarlo todo de
-                una semana a otra.
-              </li>
-              <li>
-                <strong>No acierta mucho más que suponer que el precio sigue igual.</strong> La
-                mejora es modesta. Úselo como una señal más, no como la única.
-              </li>
-              <li>
-                <strong>No incluye el transporte.</strong> Las diferencias entre plazas no
-                descuentan fletes, cargue, mermas ni intermediación, y la distancia se mide en línea
-                recta.
-              </li>
-              <li>
-                <strong>No muestra el precio que usted va a conseguir.</strong> Son precios
-                mayoristas promedio; el suyo cambia con la calidad, la cantidad y el día de la
-                semana.
-              </li>
-              <li>
-                <strong>No ve igual de bien a lo lejos.</strong> El pronóstico a cuatro semanas
-                falla más que el de una semana.
-              </li>
-            </ul>
-          </Card>
+          <section aria-labelledby="limits-title">
+            <Notice
+              icon={CircleAlert}
+              tone="brand"
+              title={
+                <h2 id="limits-title" className={styles.limitsTitle}>
+                  Lo que Mercao no hace
+                </h2>
+              }
+            >
+              <p>Limitaciones que conviene considerar antes de decidir con estos datos.</p>
+              <ul className={styles.limitations}>
+                <li>
+                  <span className={styles.limit}>No garantiza precios.</span> El pronóstico es una
+                  estimación basada en el comportamiento histórico. Un paro, una helada o un
+                  derrumbe pueden modificar los precios de una semana a otra.
+                </li>
+                <li>
+                  <span className={styles.limit}>
+                    No supera con amplitud el supuesto de que el precio se mantiene.
+                  </span>{' '}
+                  La mejora es modesta; el pronóstico es una señal entre varias, no la única.
+                </li>
+                <li>
+                  <span className={styles.limit}>No incluye el transporte.</span> Las diferencias
+                  entre plazas no descuentan fletes, cargue, mermas ni intermediación, y la
+                  distancia se mide en línea recta.
+                </li>
+                <li>
+                  <span className={styles.limit}>
+                    No indica el precio de una negociación particular.
+                  </span>{' '}
+                  Son precios mayoristas promedio; el precio efectivo varía según la calidad, la
+                  cantidad y el día de la semana.
+                </li>
+                <li>
+                  <span className={styles.limit}>
+                    No mantiene la misma precisión en todos los plazos.
+                  </span>{' '}
+                  El error del pronóstico a cuatro semanas es mayor que el de una semana.
+                </li>
+              </ul>
+            </Notice>
+          </section>
         </div>
 
         {summary.data && (
@@ -232,8 +239,8 @@ function ModelDetails({ summary }: { summary: ModelSummary }) {
             ))}
           </ol>
           <p className={`${page.caption} ${page.captionAfter}`}>
-            En palabras simples: el modelo mira sobre todo qué tan lejos está el precio de hoy de su
-            nivel habitual, de qué producto se trata y en qué época del año estamos.
+            El modelo considera sobre todo la distancia entre el precio actual y su nivel habitual,
+            el producto y la época del año.
             {summary.importance_kind && <> Medida usada: {summary.importance_kind}.</>}
           </p>
         </Card>

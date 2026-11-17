@@ -1,12 +1,14 @@
 import 'leaflet/dist/leaflet.css';
 
 import L from 'leaflet';
+import { WifiOff } from 'lucide-react';
 import { useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl } from 'react-leaflet';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChangeBadge } from '../../components/ChangeBadge/ChangeBadge';
 import { LevelMark } from '../../components/LevelMark/LevelMark';
 import { levelMarkHtml } from '../../components/LevelMark/levelSymbols';
+import { Notice } from '../../components/Notice/Notice';
 import { PriceTag } from '../../components/PriceTag/PriceTag';
 import { marketDetailPath } from '../../hooks/urlSelection';
 import type { PriceLevel } from '../../lib/analysis';
@@ -44,7 +46,7 @@ function boundsOf(markers: MapMarker[]): L.LatLngBounds {
   return L.latLngBounds(points).pad(0.2);
 }
 
-// The same mark as the legend and the table: an arrow or an equal sign on corn yellow, white or ink.
+// The same mark as the legend and the table: a green, gray or terracotta icon on a white circle.
 function levelIcon(level: PriceLevel) {
   return L.divIcon({
     className: styles.marker,
@@ -71,10 +73,12 @@ export default function PriceMap({ productId, markers, horizon }: PriceMapProps)
   return (
     <div>
       {tilesFailed && (
-        <p className={styles.notice} role="status">
-          No se pudo cargar el mapa de fondo (revise su conexión a internet). Los puntos muestran la
-          ubicación aproximada de cada plaza.
-        </p>
+        <Notice icon={WifiOff} size="compact" role="status" className={styles.notice}>
+          <p>
+            No fue posible cargar el mapa de fondo; puede deberse a la conexión a internet. Los
+            íconos indican la ubicación aproximada de cada plaza.
+          </p>
+        </Notice>
       )}
       <MapContainer
         bounds={boundsOf(markers)}

@@ -1,4 +1,4 @@
-import { Route } from 'lucide-react';
+import { Gauge, Route } from 'lucide-react';
 import type {
   MarketForecast,
   Product,
@@ -8,6 +8,7 @@ import type {
 import { Card } from '../../components/Card/Card';
 import { ChangeBadge } from '../../components/ChangeBadge/ChangeBadge';
 import table from '../../components/DataTable/DataTable.module.css';
+import { Notice } from '../../components/Notice/Notice';
 import { PriceTag } from '../../components/PriceTag/PriceTag';
 import { explainConfidence, varietyLabel } from '../../lib/analysis';
 import {
@@ -38,23 +39,25 @@ interface SideProps {
 function Side({ title, side, tone }: SideProps) {
   return (
     <div className={`${styles.side} ${styles[tone]}`}>
-      <div className={styles.sideMain}>
-        <span className={styles.sideTitle}>{title}</span>
-        <strong className={styles.sideMarket}>{side.market_name}</strong>
-        <span className={styles.sidePrice}>
-          <PriceTag value={side.predicted_price} size="lg" />
-          <span className={page.caption}>precio esperado</span>
-        </span>
-      </div>
-      {/* How the forecast compares with the latest price observed in this market. */}
-      <p className={styles.change}>
-        <ChangeBadge value={side.expected_change_percent} size="lg" />
-        {side.latest_price !== null && (
-          <span className={styles.changeNote}>
-            frente al último precio ({formatPricePerKg(side.latest_price)})
+      <div className={styles.sideContent}>
+        <div className={styles.sideMain}>
+          <span className={styles.sideTitle}>{title}</span>
+          <strong className={styles.sideMarket}>{side.market_name}</strong>
+          <span className={styles.sidePrice}>
+            <PriceTag value={side.predicted_price} size="lg" />
+            <span className={page.caption}>precio esperado</span>
           </span>
-        )}
-      </p>
+        </div>
+        {/* How the forecast compares with the latest price observed in this market. */}
+        <p className={styles.change}>
+          <ChangeBadge value={side.expected_change_percent} size="lg" />
+          {side.latest_price !== null && (
+            <span className={styles.changeNote}>
+              frente al último precio ({formatPricePerKg(side.latest_price)})
+            </span>
+          )}
+        </p>
+      </div>
     </div>
   );
 }
@@ -75,36 +78,43 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
       title={`Variedad: ${varietyLabel(group.comparable_group, product)}`}
       subtitle={`Pronóstico para la semana del ${formatWeek(buy.target_week_start)}. Se compararon ${group.markets_compared} plazas.`}
     >
-      <div className={styles.sides}>
-        <Side title="Comprar en" side={buy} tone="buy" />
-        <Side title="Vender en" side={sell} tone="sell" />
-      </div>
-
-      {/* Desktop: difference, distance and confidence side by side. */}
-      <div className={styles.facts}>
-        <dl className={styles.fact}>
-          <dt>Diferencia esperada</dt>
-          <dd className="tabular">
-            {formatPesos(group.difference_per_kg)} por kilo
-            <span className={styles.factDetail}> ({formatPercent(group.difference_pct)})</span>
-          </dd>
-        </dl>
-        <dl className={styles.fact}>
-          <dt>Distancia aproximada en línea recta</dt>
-          <dd className="tabular">
-            <Route className={styles.factIcon} size={20} aria-hidden="true" />
-            {formatInteger(group.distance_km)} km
-            <span className={styles.factDetail}>
-              {' '}
-              entre {buy.city} y {sell.city}
-            </span>
-          </dd>
-        </dl>
-        <div className={`${styles.fact} ${styles.confidence} ${styles[group.confidence]}`}>
-          <strong>Confianza {group.confidence}</strong>
-          <p>{explainConfidence(group.confidence, buy.city, sell.city)}</p>
+      {/* Desktop: the two markets on the left; difference and distance stacked on the right. */}
+      <div className={styles.overview}>
+        <div className={styles.sides}>
+          <Side title="Comprar en" side={buy} tone="buy" />
+          <Side title="Vender en" side={sell} tone="sell" />
+        </div>
+        <div className={styles.facts}>
+          <dl className={styles.fact}>
+            <dt>Diferencia esperada</dt>
+            <dd className="tabular">
+              {formatPesos(group.difference_per_kg)} por kilo
+              <span className={styles.factDetail}> ({formatPercent(group.difference_pct)})</span>
+            </dd>
+          </dl>
+          <dl className={styles.fact}>
+            <dt>Distancia aproximada en línea recta</dt>
+            <dd className="tabular">
+              <Route className={styles.factIcon} size={18} strokeWidth={1.75} aria-hidden="true" />
+              {formatInteger(group.distance_km)} km
+              <span className={styles.factDetail}>
+                {' '}
+                entre {buy.city} y {sell.city}
+              </span>
+            </dd>
+          </dl>
         </div>
       </div>
+
+      <Notice
+        icon={Gauge}
+        size="compact"
+        tone={group.confidence === 'alta' ? 'brand' : 'info'}
+        title={`Confianza ${group.confidence}`}
+        className={styles.confidence}
+      >
+        <p>{explainConfidence(group.confidence, buy.city, sell.city)}</p>
+      </Notice>
 
       {/* Desktop: the two ranges on the left and the list of markets on the right. */}
       <div className={styles.details}>
@@ -112,8 +122,8 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
           <h3 className={page.subheading}>Rango probable de precio en cada plaza</h3>
           <IntervalComparison buy={buy} sell={sell} />
           <p className={`${page.caption} ${page.captionAfter}`}>
-            El punto marca el precio esperado y la barra, el rango donde debería caer el precio 8 de
-            cada 10 veces.
+            El punto indica el precio esperado; la barra, el rango en el que se espera el precio en
+            8 de cada 10 casos.
           </p>
         </div>
         <div>
