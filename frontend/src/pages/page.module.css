@@ -60,6 +60,18 @@
     align-items: start;
   }
 
+  /*
+   * The two columns end at the same height: the last card of each one takes the room left, so
+   * the bottoms line up on every screen.
+   */
+  .alignBottoms {
+    align-items: stretch;
+  }
+
+  .alignBottoms > * > :last-child {
+    flex: 1 0 auto;
+  }
+
   /* The map needs less width than the table beside it. */
   .narrowFirst {
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);

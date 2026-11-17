@@ -47,7 +47,7 @@ export function ProductPage() {
 
   // Desktop: selectors, key figures and price chart on the left; seasons and origins on the right.
   return (
-    <div className={`${page.columns} ${page.wideFirst}`}>
+    <div className={`${page.columns} ${page.wideFirst} ${page.alignBottoms}`}>
       <div className={page.stack}>
         <PageHeader
           title="Producto"
@@ -107,6 +107,7 @@ function ProductPrices({ product, market }: ProductContentProps) {
       <Card
         title="Precio semana a semana"
         subtitle={`${product.canonical_name} en ${market.market_name}. Pesos por kilo.`}
+        className={styles.chartCard}
         actions={
           <div className={styles.ranges} role="group" aria-label="Periodo de la gráfica">
             {RANGES.map((option) => (
@@ -259,9 +260,9 @@ function ProductContext({ product, market }: ProductContentProps) {
 }
 
 /** How many municipalities are shown before "Ver más". */
-const MUNICIPALITIES_SHORT = 5;
+const MUNICIPALITIES_SHORT = 6;
 
-/** The municipalities that send the most: the first five, and the rest on demand. */
+/** The municipalities that send the most: the first six, and the rest on demand. */
 function Municipalities({ items, city }: { items: ShareItem[]; city: string }) {
   const [expanded, setExpanded] = useState(false);
   const shown = expanded ? items : items.slice(0, MUNICIPALITIES_SHORT);

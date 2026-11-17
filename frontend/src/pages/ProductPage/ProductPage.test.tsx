@@ -16,13 +16,38 @@ describe('ProductPage', () => {
     mockApi(fullApi);
     renderWithProviders(<ProductPage />);
 
+    const user = userEvent.setup();
     const select = await screen.findByRole('combobox', { name: 'Plaza' });
-    await vi.waitFor(() => expect(select).toHaveValue('1'));
+    await vi.waitFor(() => expect(select).toHaveValue('Bogotá, D.C., Corabastos'));
+    await user.click(select);
+    const list = screen.getByRole('listbox', { name: 'Plaza' });
     expect(
-      within(select)
+      within(list)
         .getAllByRole('option')
         .map((option) => option.textContent),
     ).toEqual(['Bogotá, D.C., Corabastos', 'Cartago (Valle del Cauca)', 'Pereira, Mercasa']);
+    expect(within(list).getByRole('option', { selected: true })).toHaveTextContent(
+      'Bogotá, D.C., Corabastos',
+    );
+  });
+
+  it('searches the market ignoring accents and selects it with the keyboard', async () => {
+    mockApi(fullApi);
+    const user = userEvent.setup();
+    renderWithProviders(<ProductPage />);
+
+    const select = await screen.findByRole('combobox', { name: 'Plaza' });
+    await vi.waitFor(() => expect(select).toBeEnabled());
+    await user.type(select, 'bogota');
+    const list = screen.getByRole('listbox', { name: 'Plaza' });
+    expect(within(list).getAllByRole('option')).toHaveLength(1);
+    await user.clear(select);
+    await user.type(select, 'xyz');
+    expect(screen.getByText('Ninguna plaza coincide con «xyz».')).toBeInTheDocument();
+    await user.clear(select);
+    await user.type(select, 'pereira{Enter}');
+    expect(currentUrl()).toBe('/?plaza=6');
+    expect(select).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('shows the four key figures in one system: label, large figure and explanation', async () => {
@@ -107,7 +132,7 @@ describe('ProductPage', () => {
     );
   });
 
-  it('shows the top five municipalities and the rest with "Ver más"', async () => {
+  it('shows the top six municipalities and the rest with "Ver más"', async () => {
     const names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     const origins = {
       ...supplyOrigins,
@@ -124,8 +149,8 @@ describe('ProductPage', () => {
     renderWithProviders(<ProductPage />);
 
     const list = await screen.findByRole('list', { name: 'Origen por municipio' });
-    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
-    expect(screen.getByText(/Los 5 municipios que más carga enviaron/)).toBeInTheDocument();
+    expect(within(list).getAllByRole('listitem')).toHaveLength(6);
+    expect(screen.getByText(/Los 6 municipios que más carga enviaron/)).toBeInTheDocument();
 
     const more = screen.getByRole('button', { name: 'Ver más' });
     expect(more).toHaveAttribute('aria-expanded', 'false');
@@ -136,10 +161,10 @@ describe('ProductPage', () => {
     const less = screen.getByRole('button', { name: 'Ver menos' });
     expect(less).toHaveAttribute('aria-expanded', 'true');
     await user.click(less);
-    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(6);
   });
 
-  it('does not offer "Ver más" when there are five municipalities or fewer', async () => {
+  it('does not offer "Ver más" when there are six municipalities or fewer', async () => {
     mockApi(fullApi);
     renderWithProviders(<ProductPage />);
 
@@ -206,14 +231,15 @@ describe('ProductPage', () => {
     renderWithProviders(<ProductPage />, '/producto?producto=1&plaza=6');
 
     const select = await screen.findByRole('combobox', { name: 'Plaza' });
-    await vi.waitFor(() => expect(select).toHaveValue('6'));
+    await vi.waitFor(() => expect(select).toHaveValue('Pereira, Mercasa'));
     await vi.waitFor(() =>
       expect(fetchMock.mock.calls.map(([url]) => String(url))).toContain(
         'http://localhost:8000/api/prices/history?product_id=1&market_id=6&from=2000-01-01',
       ),
     );
 
-    await user.selectOptions(select, 'Cartago (Valle del Cauca)');
+    await user.click(select);
+    await user.click(screen.getByRole('option', { name: 'Cartago (Valle del Cauca)' }));
     expect(currentUrl()).toBe('/producto?producto=1&plaza=8');
   });
 
@@ -222,6 +248,6 @@ describe('ProductPage', () => {
     renderWithProviders(<ProductPage />, '/producto?plaza=4');
 
     const select = await screen.findByRole('combobox', { name: 'Plaza' });
-    await vi.waitFor(() => expect(select).toHaveValue('1'));
+    await vi.waitFor(() => expect(select).toHaveValue('Bogotá, D.C., Corabastos'));
   });
 });
