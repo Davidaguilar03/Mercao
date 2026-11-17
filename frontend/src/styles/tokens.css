@@ -8,10 +8,8 @@
   --color-primary-strong: #17523a; /* hover and pressed states; 9.1:1 on white */
   --color-primary-soft: #e4f1ea;
   --color-accent: #f2b705; /* decorative only; use ink text on top (8.1:1) */
-  --color-accent-soft: #fdf3d0;
   --color-terracotta: #c8553d; /* fills, icons and large shapes; 4.35:1 on white, not for small text */
   --color-terracotta-text: #a8402a; /* terracotta for text; 6.1:1 on white, 5.4:1 on cream */
-  --color-terracotta-soft: #fbeae5;
 
   /* Surfaces and text */
   --color-background: #f7f1e3;
@@ -29,20 +27,23 @@
   --color-surface-tint: #eef5f0;
 
   /* Semantic: price movement, with the market convention (a rise in green, a fall in red). */
-  --color-price-up: var(--color-primary); /* 5.5:1 on its soft background */
-  --color-price-up-bg: var(--color-primary-soft);
-  --color-price-down: var(--color-terracotta-text); /* 5.3:1 on its soft background */
-  --color-price-down-bg: var(--color-terracotta-soft);
+  --color-price-up: var(--color-primary); /* 6.4:1 on white */
+  --color-price-down: var(--color-terracotta-text); /* 6.1:1 on white */
   --color-price-down-shape: var(--color-terracotta); /* icons and shapes only */
-  --color-price-neutral: var(--color-muted); /* 5.3:1 on its soft background */
-  --color-price-neutral-bg: #eeebe2;
+  --color-price-neutral: var(--color-muted); /* 6.3:1 on white */
+  --color-price-neutral-bg: #eeebe2; /* empty track of bars */
 
   /*
-   * Semantic: price level of a market against the others (cheaper, similar, more expensive).
-   * It is not a change, so it never uses the green and red of the price movement.
+   * Semantic: icon of the price level of a market against the others. Arrow up (more expensive)
+   * in green, arrow down (cheaper) in terracotta and equal sign in gray. Icons only; any text
+   * of a level uses ink or --color-terracotta-text.
    */
+  --color-level-up: var(--color-primary); /* 6.4:1 on white */
+  --color-level-down: var(--color-terracotta); /* 4.35:1 on white, enough for an icon (3:1) */
+  --color-level-equal: var(--color-muted); /* 6.3:1 on white */
+
+  /* Where to buy (the cheap market, corn yellow) and where to sell (the expensive one, ink). */
   --color-level-cheaper: var(--color-accent); /* ink on top: 8.1:1 */
-  --color-level-similar: var(--color-surface); /* ink on top: 14.7:1 */
   --color-level-expensive: var(--color-ink); /* white on top: 14.7:1 */
 
   /* Typography */

@@ -3,8 +3,8 @@ import styles from './LevelMark.module.css';
 import { LEVEL_ICON_PATHS } from './levelSymbols';
 
 /**
- * Small decorative mark of a price level against the other markets: arrow down, equal sign or
- * arrow up. The level is always written next to it.
+ * Small mark of a price level against the other markets: arrow down in terracotta, equal sign
+ * in gray or arrow up in green. The level is always written next to it.
  */
 export function LevelMark({ level }: { level: PriceLevel }) {
   return (

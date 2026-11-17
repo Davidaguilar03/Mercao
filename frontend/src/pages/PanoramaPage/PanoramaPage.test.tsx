@@ -48,7 +48,7 @@ describe('PanoramaPage', () => {
       'Precio parecido al de la mayoría',
       'Más cara que la mayoría',
     ]);
-    // Arrow down, equal sign and arrow up, in the level palette (not the colors of a change).
+    // Arrow down in terracotta, equal sign in gray and arrow up in green.
     expect(items.map((item) => item.querySelector('[data-level]')?.className)).toEqual([
       'mark cheaper',
       'mark similar',
@@ -56,7 +56,7 @@ describe('PanoramaPage', () => {
     ]);
     expect(
       screen.getByText(
-        /comparan el precio de cada plaza con el de las demás plazas.*No dicen si el precio cambió con el tiempo/,
+        /compara el precio de la plaza con el de las demás plazas.*no indica la variación del precio en el tiempo/,
       ),
     ).toBeInTheDocument();
   });
