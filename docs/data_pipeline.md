@@ -17,8 +17,8 @@ Todas las fuentes son del Sistema de Información de Precios y Abastecimiento de
 
 | Fuente | Página | Archivos | Uso |
 |---|---|---|---|
-| Anexos de los boletines semanales de precios mayoristas (2012–2026) | https://www.dane.gov.co/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa/mayoristas-boletin-semanal-1 | 729 | Tabla `prices` |
-| Microdatos anuales de abastecimiento (2013–2026) | https://www.dane.gov.co/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa/componente-abastecimientos-1 | 14 | Tablas `supply` y `supply_weekly` |
+| Anexos de los boletines semanales de precios mayoristas (2012 a 2026) | https://www.dane.gov.co/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa/mayoristas-boletin-semanal-1 | 729 | Tabla `prices` |
+| Microdatos anuales de abastecimiento (2013 a 2026) | https://www.dane.gov.co/index.php/estadisticas-por-tema/agropecuario/sistema-de-informacion-de-precios-sipsa/componente-abastecimientos-1 | 14 | Tablas `supply` y `supply_weekly` |
 | Series históricas mensuales de precios y serie agregada de abastecimiento | mismas páginas | 11 | Solo de referencia, no se cargan |
 
 `python -m backend.scripts.download_raw` descubre los enlaces leyendo esas páginas y descarga cada archivo en
@@ -35,7 +35,7 @@ enlace. De ese texto sale la fecha de cada semana, porque los nombres de archivo
 3. **Catálogo** (`domains/catalog`): los nombres publicados se traducen a `product_id` y `market_id` con los CSV de
    `backend/app/domains/catalog/data/`. Solo los productos y mercados del conjunto foco tienen id (sección 5).
 4. **Precios** (`domains/prices/builder.py`): asignación de semana ISO y reglas de limpieza (sección 3).
-5. **Cobertura** (`domains/prices/coverage.py`): cobertura de cada par producto–mercado del conjunto foco y regla
+5. **Cobertura** (`domains/prices/coverage.py`): cobertura de cada par producto-mercado del conjunto foco y regla
    `usable_for_model` (sección 6).
 6. **Abastecimiento** (`domains/supply/builder.py`): corrección de orígenes con DIVIPOLA y agregado por semana ISO
    de los productos y mercados foco, archivo por archivo (sección 4).
@@ -95,7 +95,7 @@ conjunto foco. Para esas series se agrupa por el nombre publicado normalizado (s
 ### 3.4 Regla de saltos de unidad
 
 Está definida en `backend/app/domains/prices/cleaning.py` (`UNIT_JUMP_THRESHOLD = 20`). Para cada serie
-producto–mercado, en orden de semana:
+producto-mercado, en orden de semana:
 
 1. El precio de referencia inicial es el primer precio que está a menos de 20 veces de la mediana de la serie. Así
    se detecta también una serie que empieza en la unidad equivocada.
@@ -244,7 +244,7 @@ son las del centro de la ciudad (aproximadas, para el mapa).
 
 ## 6. Cobertura y pares utilizables
 
-La tabla `coverage` tiene una fila por par producto–mercado del conjunto foco con al menos un precio: 130 de los 143
+La tabla `coverage` tiene una fila por par producto-mercado del conjunto foco con al menos un precio: 130 de los 143
 pares posibles. Columnas: primera y última semana, número de semanas con dato, semanas con dato desde 2016-W01,
 proporción de semanas faltantes desde 2016 (sobre las 567 semanas ISO entre 2016-W01 y la última semana del
 conjunto) y `has_recent_data` (dato en las últimas 8 semanas).
@@ -262,13 +262,13 @@ las últimas 8 semanas.
 | Cebolla junca Aquitania | 5 | Barranquilla (32 %, 2023), Bucaramanga (22 %, 2018) |
 | Tomate chonto | 8 | Cali (79 %, justo bajo el umbral); Medellín y Bucaramanga sin datos |
 | Zanahoria | 7 | Cali (85 %, sin dato desde 2025-07), Barranquilla (39 %), Medellín (0 %, 2014), Pereira (0 %, 2014) |
-| Habichuela | 11 | — |
+| Habichuela | 11 | Ninguna |
 | Arveja verde en vaina | 10 | Cali sin datos (publica «Arveja verde en vaina pastusa») |
 | Plátano hartón verde | 10 | Cartago sin datos |
-| Cilantro | 11 | — |
-| Mora de Castilla | 11 | — |
-| Lulo | 11 | — |
-| Pimentón | 11 | — |
+| Cilantro | 11 | Ninguna |
+| Mora de Castilla | 11 | Ninguna |
+| Lulo | 11 | Ninguna |
+| Pimentón | 11 | Ninguna |
 
 ### 6.1 Grupos comparables
 

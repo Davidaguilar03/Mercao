@@ -15,6 +15,11 @@ const oneDecimalFormat = new Intl.NumberFormat(LOCALE, {
   useGrouping: 'always',
 });
 
+/** Whole number with the dot as thousands separator: 1234 -> "1.234". */
+export function formatInteger(value: number): string {
+  return integerFormat.format(Math.round(value));
+}
+
 /** 2350 -> "$ 2.350" */
 export function formatPesos(value: number): string {
   const rounded = Math.round(value);

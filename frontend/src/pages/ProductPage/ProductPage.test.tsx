@@ -7,6 +7,7 @@ import {
   latestPrices,
   priceHistory,
   seasonality,
+  supplyOrigins,
 } from '../../test/viewFixtures';
 import { ProductPage } from './ProductPage';
 
@@ -15,33 +16,92 @@ describe('ProductPage', () => {
     mockApi(fullApi);
     renderWithProviders(<ProductPage />);
 
+    const user = userEvent.setup();
     const select = await screen.findByRole('combobox', { name: 'Plaza' });
-    await vi.waitFor(() => expect(select).toHaveValue('1'));
+    await vi.waitFor(() => expect(select).toHaveValue('Bogotá, D.C., Corabastos'));
+    await user.click(select);
+    const list = screen.getByRole('listbox', { name: 'Plaza' });
     expect(
-      within(select)
+      within(list)
         .getAllByRole('option')
         .map((option) => option.textContent),
     ).toEqual(['Bogotá, D.C., Corabastos', 'Cartago (Valle del Cauca)', 'Pereira, Mercasa']);
+    expect(within(list).getByRole('option', { selected: true })).toHaveTextContent(
+      'Bogotá, D.C., Corabastos',
+    );
   });
 
-  it('shows the key figures of the product in the market', async () => {
+  it('searches the market ignoring accents and selects it with the keyboard', async () => {
+    mockApi(fullApi);
+    const user = userEvent.setup();
+    renderWithProviders(<ProductPage />);
+
+    const select = await screen.findByRole('combobox', { name: 'Plaza' });
+    await vi.waitFor(() => expect(select).toBeEnabled());
+    await user.type(select, 'bogota');
+    const list = screen.getByRole('listbox', { name: 'Plaza' });
+    expect(within(list).getAllByRole('option')).toHaveLength(1);
+    await user.clear(select);
+    await user.type(select, 'xyz');
+    expect(screen.getByText('Ninguna plaza coincide con «xyz».')).toBeInTheDocument();
+    await user.clear(select);
+    await user.type(select, 'pereira{Enter}');
+    expect(currentUrl()).toBe('/?plaza=6');
+    expect(select).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('shows the four key figures in one system: label, large figure and explanation', async () => {
     mockApi(fullApi);
     renderWithProviders(<ProductPage />);
 
-    const latest = (await screen.findByText('Último precio')).parentElement!;
-    expect(plain(latest.textContent)).toContain('$ 3.063 /kg');
-    expect(plain(latest.textContent)).toContain('Semana del 9 al 15 de noviembre de 2026');
-    expect(plain(screen.getByText('Frente a hace 4 semanas').parentElement!.textContent)).toContain(
-      '+4,8 %',
-    );
-    expect(plain(screen.getByText('Frente a hace un año').parentElement!.textContent)).toContain(
-      '+154,0 %',
-    );
-    const forecast = (await screen.findByText('Pronóstico a 4 semanas')).parentElement!;
-    await vi.waitFor(() => expect(plain(forecast.textContent)).toContain('$ 2.941 /kg'));
-    expect(plain(forecast.textContent)).toContain(
-      'Semana del 7 al 13 de diciembre de 2026. Rango probable: $ 2.172 a $ 3.843',
-    );
+    const figures = await screen.findByRole('group', { name: 'Cifras clave' });
+    await vi.waitFor(() => expect(plain(figures.textContent)).toContain('$ 2.941 /kg'));
+    const cards = [...figures.children];
+    expect(cards).toHaveLength(4);
+    // Every figure, price or percentage, uses the same large style.
+    for (const card of cards) {
+      expect(card.querySelector('p + div > p')).toHaveClass('value');
+    }
+
+    const [latest, fourWeeks, year, forecast] = cards.map((card) => plain(card.textContent));
+    expect(latest).toBe('Último precio$ 3.063 /kgSemana del 9 al 15 de noviembre de 2026');
+    expect(fourWeeks).toContain('Frente a hace 4 semanasSubió+4,8 %Hoy está más caro');
+    expect(year).toContain('Frente a hace un añoSubió+154,0 %Hoy está más caro');
+    expect(cards[1].querySelector('.value')).toHaveClass('up');
+    expect(forecast).toContain('Pronóstico a 4 semanas$ 2.941 /kgRango probable');
+    expect(cards[3]).toHaveAttribute('title', 'Para la semana del 7 al 13 de diciembre de 2026');
+    expect(
+      within(cards[3] as HTMLElement).getByRole('img', {
+        name: /Rango probable: de \$.2\.172 a \$.3\.843/,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the reference price of four weeks and a year ago when the history has it', async () => {
+    const history = {
+      ...priceHistory,
+      series: [
+        { week_start: '2025-11-10', mean_price: 1206, min_price: 1100, max_price: 1300 },
+        { week_start: '2026-10-12', mean_price: 2923, min_price: 2800, max_price: 3000 },
+        { week_start: '2026-11-09', mean_price: 3063, min_price: 2800, max_price: 3400 },
+      ],
+    };
+    mockApi({ ...fullApi, '/api/prices/history': history });
+    renderWithProviders(<ProductPage />);
+
+    const figures = await screen.findByRole('group', { name: 'Cifras clave' });
+    await vi.waitFor(() => expect(plain(figures.textContent)).toContain('Estaba en $ 2.923 /kg'));
+    expect(plain(figures.textContent)).toContain('Estaba en $ 1.206 /kg');
+  });
+
+  it('says so when a change cannot be computed', async () => {
+    mockApi(fullApi);
+    renderWithProviders(<ProductPage />, '/producto?plaza=8');
+
+    // Cartago has no price a year ago in the test data.
+    expect(
+      await screen.findByText('No hay precio de hace un año para comparar.'),
+    ).toBeInTheDocument();
   });
 
   it('describes the price chart in words and changes the period with the range buttons', async () => {
@@ -70,6 +130,46 @@ describe('ProductPage', () => {
     expect(plain(within(municipalities).getAllByRole('listitem')[0].textContent)).toBe(
       'Ipiales (Nariño)2.000 t20,0 %',
     );
+  });
+
+  it('shows the top six municipalities and the rest with "Ver más"', async () => {
+    const names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    const origins = {
+      ...supplyOrigins,
+      municipalities: names.map((name, index) => ({
+        code: `1500${index}`,
+        name: `MUNICIPIO ${name}`,
+        department: 'BOYACÁ',
+        kg: 1000000 - index * 50000,
+        share_pct: 10 - index * 0.5,
+      })),
+    };
+    mockApi({ ...fullApi, '/api/supply/origins': origins });
+    const user = userEvent.setup();
+    renderWithProviders(<ProductPage />);
+
+    const list = await screen.findByRole('list', { name: 'Origen por municipio' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(6);
+    expect(screen.getByText(/Los 6 municipios que más carga enviaron/)).toBeInTheDocument();
+
+    const more = screen.getByRole('button', { name: 'Ver más' });
+    expect(more).toHaveAttribute('aria-expanded', 'false');
+    await user.click(more);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+    expect(screen.getByText(/Los 10 municipios que más carga enviaron/)).toBeInTheDocument();
+
+    const less = screen.getByRole('button', { name: 'Ver menos' });
+    expect(less).toHaveAttribute('aria-expanded', 'true');
+    await user.click(less);
+    expect(within(list).getAllByRole('listitem')).toHaveLength(6);
+  });
+
+  it('does not offer "Ver más" when there are six municipalities or fewer', async () => {
+    mockApi(fullApi);
+    renderWithProviders(<ProductPage />);
+
+    await screen.findByRole('list', { name: 'Origen por municipio' });
+    expect(screen.queryByRole('button', { name: 'Ver más' })).not.toBeInTheDocument();
   });
 
   it('explains why a market has no supply data', async () => {
@@ -131,14 +231,15 @@ describe('ProductPage', () => {
     renderWithProviders(<ProductPage />, '/producto?producto=1&plaza=6');
 
     const select = await screen.findByRole('combobox', { name: 'Plaza' });
-    await vi.waitFor(() => expect(select).toHaveValue('6'));
+    await vi.waitFor(() => expect(select).toHaveValue('Pereira, Mercasa'));
     await vi.waitFor(() =>
       expect(fetchMock.mock.calls.map(([url]) => String(url))).toContain(
         'http://localhost:8000/api/prices/history?product_id=1&market_id=6&from=2000-01-01',
       ),
     );
 
-    await user.selectOptions(select, 'Cartago (Valle del Cauca)');
+    await user.click(select);
+    await user.click(screen.getByRole('option', { name: 'Cartago (Valle del Cauca)' }));
     expect(currentUrl()).toBe('/producto?producto=1&plaza=8');
   });
 
@@ -147,6 +248,6 @@ describe('ProductPage', () => {
     renderWithProviders(<ProductPage />, '/producto?plaza=4');
 
     const select = await screen.findByRole('combobox', { name: 'Plaza' });
-    await vi.waitFor(() => expect(select).toHaveValue('1'));
+    await vi.waitFor(() => expect(select).toHaveValue('Bogotá, D.C., Corabastos'));
   });
 });

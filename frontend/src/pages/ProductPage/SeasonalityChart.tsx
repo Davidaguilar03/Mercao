@@ -11,7 +11,8 @@ import {
   YAxis,
 } from 'recharts';
 import type { Seasonality } from '../../api/types';
-import { CHART_COLORS, TOOLTIP_STYLE } from '../../lib/chartTheme';
+import { useIsNarrowScreen } from '../../hooks/useIsNarrowScreen';
+import { CHART_COLORS, LEVEL_COLORS, TOOLTIP_STYLE } from '../../lib/chartTheme';
 import { formatChange } from '../../lib/format';
 
 interface SeasonalityChartProps {
@@ -48,16 +49,19 @@ function MonthTooltip({ active, payload }: MonthTooltipProps) {
   );
 }
 
+// The same level colors as the map: corn yellow for the cheapest month, ink for the most expensive.
 const BAR_COLORS = {
-  cheapest: CHART_COLORS.primary,
-  expensive: CHART_COLORS.terracotta,
-  normal: CHART_COLORS.neutral,
+  cheapest: LEVEL_COLORS.cheaper,
+  expensive: LEVEL_COLORS.expensive,
+  normal: '#c9c6b8',
 };
 
 /** Monthly price index. Bars grow up or down from 100, the average of the year. */
 export default function SeasonalityChart({ seasonality }: SeasonalityChartProps) {
+  // Twelve three-letter labels do not fit on a phone; initials do.
+  const isNarrow = useIsNarrowScreen();
   const data: MonthBar[] = seasonality.months.map((month) => ({
-    short: month.month_name.slice(0, 3),
+    short: isNarrow ? month.month_name.charAt(0).toUpperCase() : month.month_name.slice(0, 3),
     name: month.month_name,
     index: month.index,
     deviation: Math.round((month.index - 100) * 10) / 10,
@@ -70,7 +74,7 @@ export default function SeasonalityChart({ seasonality }: SeasonalityChartProps)
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 16, right: 4, left: 0, bottom: 0 }} barCategoryGap="18%">
         <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
         <XAxis
@@ -91,7 +95,7 @@ export default function SeasonalityChart({ seasonality }: SeasonalityChartProps)
         <ReferenceLine y={0} stroke={CHART_COLORS.ink} />
         <Bar dataKey="deviation" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={false}>
           {data.map((month) => (
-            <Cell key={month.short} fill={BAR_COLORS[month.highlight ?? 'normal']} />
+            <Cell key={month.name} fill={BAR_COLORS[month.highlight ?? 'normal']} />
           ))}
           {/* Only the cheapest and the most expensive months carry their value. */}
           <LabelList

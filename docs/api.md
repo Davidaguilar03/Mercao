@@ -236,6 +236,14 @@ la confianza:
   del límite inferior del más caro).
 - `"baja"`: los intervalos se solapan; la diferencia puede no darse.
 
+Cada mercado (`buy` y `sell`) trae además `latest_price`, el precio observado en la semana de origen del pronóstico,
+y `expected_change_percent`, el cambio del pronóstico frente a ese precio en porcentaje. Los dos son `null` si esa
+semana no tiene precio.
+
+`distance_km` es la distancia aproximada en línea recta entre las dos ciudades, en kilómetros enteros. Se calcula con
+la fórmula del semiverseno (haversine) sobre las coordenadas de los mercados, que son aproximadas (centro de la
+ciudad). No es la distancia por carretera, que siempre es mayor.
+
 Solo se incluyen grupos con al menos dos mercados con pronóstico. La nota sobre costos se incluye siempre.
 
 ```json
@@ -245,11 +253,11 @@ Solo se incluyen grupos con al menos dos mercados con pronóstico. La nota sobre
     {"comparable_group": "papa-parda-pastusa|kg", "markets_compared": 6,
      "buy": {"market_id": 6, "market_name": "Pereira, Mercasa", "city": "Pereira", "target_iso_year": 2026,
              "target_iso_week": 48, "target_week_start": "2026-11-23", "predicted_price": 2254,
-             "lower_price": 1777, "upper_price": 2769},
+             "lower_price": 1777, "upper_price": 2769, "latest_price": 2317, "expected_change_percent": -2.7},
      "sell": {"market_id": 8, "market_name": "Cartago (Valle del Cauca)", "city": "Cartago", "target_iso_year": 2026,
               "target_iso_week": 48, "target_week_start": "2026-11-23", "predicted_price": 3355,
-              "lower_price": 2645, "upper_price": 4120},
-     "difference_per_kg": 1101, "difference_pct": 48.8, "confidence": "baja"}
+              "lower_price": 2645, "upper_price": 4120, "latest_price": 3477, "expected_change_percent": -3.5},
+     "difference_per_kg": 1101, "difference_pct": 48.8, "confidence": "baja", "distance_km": 25}
   ],
   "message": null,
   "note": "Las diferencias no incluyen costos de transporte ni de intermediación entre mercados. Los precios son pronósticos del precio mayorista medio con un intervalo del 80 %."

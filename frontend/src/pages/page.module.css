@@ -1,24 +1,25 @@
-/* Layout shared by the three main views. */
-.controls {
-  display: flex;
-  flex-direction: column;
+/* Layout shared by the main views. */
+
+/* Two columns on desktop, one below 1200 px. Each column is a stack of cards. */
+.columns {
+  display: grid;
   gap: var(--space-4);
-  margin-bottom: var(--space-5);
 }
 
 .summary {
-  margin-bottom: var(--space-5);
   padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-card-border);
   border-left: 4px solid var(--color-accent);
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  font-size: var(--font-size-lg);
+  box-shadow: var(--shadow-card);
 }
 
 .stack {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  min-width: 0;
 }
 
 .grid {
@@ -36,7 +37,7 @@
 }
 
 .subheading {
-  margin: var(--space-5) 0 var(--space-3);
+  margin: var(--space-4) 0 var(--space-3);
   font-size: var(--font-size-lg);
 }
 
@@ -44,50 +45,40 @@
   margin-top: 0;
 }
 
-.figures {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-  margin: 0;
-}
-
-.figure {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  min-width: 0;
-}
-
-.figure dt {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-.figure dd {
-  margin: 0;
-}
-
-.figureNote {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-}
-
 @media (min-width: 768px) {
-  .controls {
-    flex-direction: row;
-    align-items: flex-end;
-  }
-
   .grid {
     grid-template-columns: 1fr 1fr;
+    /* Cards take the height of their own content. */
+    align-items: start;
+  }
+}
+
+@media (min-width: 1200px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Each column keeps its own height. */
+    align-items: start;
   }
 
-  .figures {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  /*
+   * The two columns end at the same height: the last card of each one takes the room left, so
+   * the bottoms line up on every screen.
+   */
+  .alignBottoms {
+    align-items: stretch;
+  }
+
+  .alignBottoms > * > :last-child {
+    flex: 1 0 auto;
+  }
+
+  /* The map needs less width than the table beside it. */
+  .narrowFirst {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  /* The price chart gets more width than the lists beside it. */
+  .wideFirst {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   }
 }

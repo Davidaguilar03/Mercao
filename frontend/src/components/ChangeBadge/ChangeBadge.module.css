@@ -2,26 +2,42 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* A rising price is bad news for the buyer: terracotta. A falling price: green. */
+.sm {
+  font-size: var(--font-size-sm);
+}
+
+/* Headline figure: as large as a price. */
+.lg {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+}
+
+/* Market convention: a rise in green, a fall in terracotta, no change in gray. */
 .up {
   color: var(--color-price-up);
-  background: var(--color-price-up-bg);
 }
 
 .down {
   color: var(--color-price-down);
-  background: var(--color-price-down-bg);
+}
+
+/* The arrow is a shape, so it can use the brighter terracotta. */
+.down .icon {
+  color: var(--color-price-down-shape);
 }
 
 .flat {
   color: var(--color-price-neutral);
-  background: var(--color-price-neutral-bg);
 }

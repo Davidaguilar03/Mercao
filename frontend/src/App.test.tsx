@@ -4,8 +4,6 @@ import { App } from './App';
 import { health, modelSummary } from './test/fixtures';
 import { mockApi, renderWithProviders } from './test/utils';
 
-const plain = (text: string | null) => (text ?? '').replace(/\u00a0/g, ' ');
-
 function renderApp(route = '/') {
   mockApi({ '/api/health': health, '/api/model/summary': modelSummary });
   return renderWithProviders(<App />, route);
@@ -100,32 +98,36 @@ describe('routing shell', () => {
     expect(await within(footer).findByText(/Datos hasta la semana 46 de 2026/)).toBeInTheDocument();
     expect(footer).toHaveTextContent('Los pronósticos son estimaciones');
   });
-});
 
-describe('Cómo funciona', () => {
-  it('shows the chosen model and its test results against the naive forecast', async () => {
-    renderApp('/como-funciona');
+  it('shows the brand, the four authors and the project in the footer, without links', () => {
+    renderApp();
 
-    expect(await screen.findByRole('heading', { name: 'El modelo elegido' })).toBeInTheDocument();
-    expect(screen.getByText('LightGBM')).toBeInTheDocument();
-    // Random Forest did slightly better in the test and the page says so.
-    expect(screen.getByText(/Random Forest tuvo un error apenas menor/)).toBeInTheDocument();
-
-    const improvement = screen.getByText('Mejora frente al ingenuo').parentElement!;
-    expect(plain(improvement.textContent)).toContain('6,1 %');
-    const row = screen.getByRole('row', { name: /^1 semana/ });
-    expect(plain(row.textContent)).toBe('1 semana9,7 %10,1 %3,6 %58,9 %82,2 %');
-    expect(screen.getByText('Precio vs. media 52 sem.')).toBeInTheDocument();
-    expect(screen.getByText(/No incluye el transporte/)).toBeInTheDocument();
+    const footer = screen.getByRole('contentinfo');
+    expect(within(footer).getByText('Mercao')).toBeInTheDocument();
+    expect(within(footer).getByText('Precios de plaza, claros.')).toBeInTheDocument();
+    expect(
+      within(footer)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual([
+      'David Aguilar Castillo',
+      'Valeria Tocarruncho Mosquera',
+      'Andrés Santiago Daza Quintana',
+      'Oscar Alejandro Roa Doncel',
+    ]);
+    expect(footer).toHaveTextContent(
+      'Proyecto de Inteligencia Computacional, Universidad Pedagógica y Tecnológica de Colombia',
+    );
+    expect(within(footer).queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('explains the failure and offers a retry when the summary cannot be loaded', async () => {
-    mockApi({ '/api/health': health });
-    renderWithProviders(<App />, '/como-funciona');
+  it('puts the selectors of each page inside its header band', () => {
+    renderApp('/oportunidades');
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('No encontrado.');
-    expect(screen.getByRole('button', { name: /Reintentar/ })).toBeInTheDocument();
-    // The limitations do not depend on the API.
-    expect(screen.getByText(/Es una estimación/)).toBeInTheDocument();
+    const band = screen
+      .getByRole('heading', { level: 1, name: 'Oportunidades' })
+      .closest('header')!;
+    expect(within(band).getByRole('combobox', { name: 'Producto' })).toBeInTheDocument();
+    expect(within(band).getByRole('group', { name: 'Pronóstico a' })).toBeInTheDocument();
   });
 });

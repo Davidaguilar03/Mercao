@@ -50,8 +50,10 @@
   top: calc(100% + var(--space-1));
   left: 0;
   right: 0;
-  max-height: 20rem;
+  /* Scrolls inside itself and never grows taller than the screen allows. */
+  max-height: min(20rem, 55vh);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-1);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -64,8 +66,6 @@
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .option {
@@ -94,7 +94,7 @@
   font-weight: 500;
 }
 
-.variety {
+.detail {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
 }

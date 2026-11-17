@@ -58,7 +58,7 @@ def predicted_vs_actual(predictions: pd.DataFrame, title: str, path: Path, horiz
         rows = predictions[predictions["horizon"] == h].sort_values("week_index")
         weeks = [date.fromordinal(int(i + h) * 7 + 1) + timedelta(days=3) for i in rows["week_index"]]
         ax.fill_between(weeks, rows["lower_price"], rows["upper_price"], color="#2a78d6", alpha=0.15, linewidth=0,
-                        label="Intervalo 10 %–90 %")
+                        label="Intervalo 10 % a 90 %")
         ax.plot(weeks, rows["actual_price"], color=TEXT, linewidth=2, label="Precio observado")
         ax.plot(weeks, rows["predicted_price"], color="#2a78d6", linewidth=2, label="Pronóstico")
         ax.set_ylabel("Pesos por kg")

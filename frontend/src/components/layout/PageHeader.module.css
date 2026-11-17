@@ -1,10 +1,150 @@
-.header {
-  margin-bottom: var(--space-5);
+/* The band adapts to its own width, because on desktop it lives inside a page column. */
+.band {
+  container-type: inline-size;
+  position: relative;
+  /*
+   * No overflow clipping, and a layer above the cards that follow: the list of the product
+   * selector opens beyond the band and must stay fully visible on top of them.
+   */
+  z-index: 5;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-4);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
 }
 
 .description {
-  max-width: 44rem;
-  margin-top: var(--space-2);
   color: var(--color-muted);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-sm);
+}
+
+/* Above the corner of the drawing on phones. */
+.title,
+.description,
+.controls {
+  position: relative;
+  z-index: 1;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* Narrow band: the drawing shows faintly in the corner, behind the text block and inside the band. */
+.scene {
+  position: absolute;
+  right: var(--space-2);
+  top: var(--space-2);
+  width: 8.5rem;
+  color: var(--color-primary);
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* Medium band: title and selectors share a row; the drawing sits beside the description. */
+@container (min-width: 480px) {
+  .inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: end;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .controls {
+    grid-column: 2 / span 2;
+    flex-flow: row wrap;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin-top: 0;
+  }
+
+  .controls > * {
+    flex: 1 1 9rem;
+    max-width: 17rem;
+  }
+
+  .controls > fieldset {
+    flex: 0 0 auto;
+    max-width: none;
+  }
+
+  .description {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    align-self: center;
+    max-width: 36rem;
+  }
+
+  .scene {
+    position: static;
+    grid-column: 3;
+    grid-row: 2;
+    width: 9.5rem;
+    opacity: 0.24;
+  }
+}
+
+/* Wide band: title and description on the left, drawing in the middle, selectors on the right. */
+@container (min-width: 860px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+  }
+
+  /* The selectors take the room of the drawing until the band is wide enough for both. */
+  .withControls .scene {
+    display: none;
+  }
+
+  .title {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .description {
+    grid-column: 1;
+    align-self: start;
+    font-size: var(--font-size-md);
+  }
+
+  .scene {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    width: 10.5rem;
+  }
+
+  .controls {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    flex-wrap: nowrap;
+  }
+
+  /* A fixed basis: the selectors ask for the whole width on their own. */
+  .controls > * {
+    flex: 0 0 17rem;
+  }
+
+  .controls > fieldset {
+    flex: 0 0 auto;
+  }
+}
+
+@container (min-width: 1300px) {
+  .withControls .scene {
+    display: block;
+  }
 }

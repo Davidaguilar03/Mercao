@@ -1,14 +1,13 @@
 .ranges {
   display: flex;
   gap: var(--space-2);
-  margin-bottom: var(--space-3);
 }
 
 .rangeButton {
   min-height: 44px;
   padding: 0 var(--space-4);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   font-size: var(--font-size-sm);
   font-weight: 500;
@@ -23,6 +22,26 @@
   border-color: var(--color-primary);
   background: var(--color-primary);
   color: var(--color-on-primary);
+}
+
+/* "Ver más" and "Ver menos" under a list. */
+.moreButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary-strong);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.moreButton:hover {
+  background: var(--color-primary-soft);
 }
 
 .legend {
@@ -72,6 +91,33 @@
 }
 
 .seasonChart {
-  height: 260px;
+  height: 240px;
   margin-top: var(--space-3);
+}
+
+/* Desktop: smaller buttons beside the title, and a chart as tall as the first screen allows. */
+@media (min-width: 1200px) {
+  .rangeButton {
+    min-height: 36px;
+    padding: 0 var(--space-3);
+  }
+
+  .legend {
+    font-size: var(--font-size-xs);
+  }
+
+  /* The chart takes the height its card gets, so the card ends where the right column ends. */
+  .chartCard {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .priceChart {
+    flex: 1 0 auto;
+    height: clamp(260px, calc(100vh - 38rem), 440px);
+  }
+
+  .seasonChart {
+    height: 200px;
+  }
 }

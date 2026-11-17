@@ -1,0 +1,63 @@
+/* Hidden until the page has side gutters (the two-column desktop layout). */
+.backdrop {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .backdrop {
+    /* The free space on each side of the content: the gutter, or the whole margin if it is wider. */
+    --side: max(
+      var(--page-gutter),
+      calc((100vw - var(--content-max-width)) / 2 + var(--page-gutter))
+    );
+    /* Base size of a drawing: it fits the gutter on laptops and grows with the margin. */
+    --base: clamp(46px, calc(var(--side) * 0.42), 104px);
+
+    display: block;
+    position: fixed;
+    inset: var(--header-height) 0 0;
+    z-index: 0;
+    overflow: hidden;
+    color: var(--color-primary);
+    opacity: 0.14;
+    pointer-events: none;
+  }
+
+  .column {
+    position: absolute;
+    top: var(--space-3);
+    bottom: var(--space-3);
+    width: var(--side);
+  }
+
+  .left {
+    left: 0;
+  }
+
+  .right {
+    right: 0;
+  }
+
+  /* Centered in the column; shifted sideways only by the room left over beyond the gutter. */
+  .item {
+    position: absolute;
+    left: calc(50% + var(--shift) * (var(--side) - var(--page-gutter)) * 0.42);
+    display: block;
+    width: calc(var(--base) * var(--size));
+    height: calc(var(--base) * var(--size));
+    transform: translate(-50%, -50%) rotate(var(--rotate));
+  }
+
+  .doodle {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* With real margins the drawings are larger, so they can be fainter. */
+@media (min-width: 1700px) {
+  .backdrop {
+    opacity: 0.11;
+  }
+}

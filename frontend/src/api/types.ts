@@ -162,6 +162,10 @@ export interface RecommendationSide {
   predicted_price: number;
   lower_price: number;
   upper_price: number;
+  /** Price observed in the origin week of the forecast; null if that week has no price. */
+  latest_price: number | null;
+  /** Forecast against the latest price, in percent. */
+  expected_change_percent: number | null;
 }
 
 export interface RecommendationGroup {
@@ -172,6 +176,8 @@ export interface RecommendationGroup {
   difference_per_kg: number;
   difference_pct: number;
   confidence: 'alta' | 'baja';
+  /** Straight-line distance between the two cities, in kilometres. */
+  distance_km: number;
 }
 
 export interface Recommendations {

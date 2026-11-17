@@ -6,20 +6,21 @@ import {
   useSeasonality,
   useSupplyOrigins,
 } from '../../api/hooks';
-import type { MarketForecast, MarketLatestPrice, Product } from '../../api/types';
+import { FULL_HISTORY_START } from '../../api/prices';
+import type { MarketForecast, MarketLatestPrice, PricePoint, Product } from '../../api/types';
 import { Card } from '../../components/Card/Card';
-import { ChangeBadge } from '../../components/ChangeBadge/ChangeBadge';
+import { KpiCard, KpiChangeCard, KpiGrid } from '../../components/KpiCard/KpiCard';
 import { PageHeader } from '../../components/layout/PageHeader';
 import { MarketSelector } from '../../components/MarketSelector/MarketSelector';
-import { PriceTag } from '../../components/PriceTag/PriceTag';
 import { ProductSelector } from '../../components/ProductSelector/ProductSelector';
 import { QueryBoundary } from '../../components/QueryBoundary/QueryBoundary';
+import { RangeBar } from '../../components/RangeBar/RangeBar';
 import { departmentItems, municipalityItems } from '../../components/ShareBars/originItems';
-import { ShareBars } from '../../components/ShareBars/ShareBars';
+import { ShareBars, type ShareItem } from '../../components/ShareBars/ShareBars';
 import { EmptyState } from '../../components/states/EmptyState';
 import { LoadingState } from '../../components/states/LoadingState';
 import { useMarketSelection, useProductSelection } from '../../hooks/urlSelection';
-import { formatPesos, formatWeek, lowerFirst } from '../../lib/format';
+import { addDays, formatPesos, formatPricePerKg, formatWeek, lowerFirst } from '../../lib/format';
 import page from '../page.module.css';
 import {
   buildChartPoints,
@@ -33,9 +34,6 @@ import styles from './ProductPage.module.css';
 // The chart library loads only when a chart is shown.
 const PriceHistoryChart = lazy(() => import('./PriceHistoryChart'));
 const SeasonalityChart = lazy(() => import('./SeasonalityChart'));
-
-/** Earlier than the first SIPSA bulletin, so the API returns the whole history. */
-const HISTORY_START = '2000-01-01';
 const RANGES: HistoryRange[] = ['1y', '3y', 'all'];
 
 export function ProductPage() {
@@ -45,37 +43,44 @@ export function ProductPage() {
   const [marketId, setMarketId] = useMarketSelection(markets?.map((market) => market.market_id));
   const market = markets?.find((item) => item.market_id === marketId);
 
+  // Desktop: selectors, key figures and price chart on the left; seasons and origins on the right.
   return (
-    <>
-      <PageHeader
-        title="Producto"
-        description="La historia de un producto en una plaza: precios, temporadas, origen y pronóstico."
-      />
-      <div className={page.controls}>
-        <ProductSelector value={productId} onChange={setProductId} />
-        <MarketSelector markets={markets ?? []} value={marketId} onChange={setMarketId} />
+    <div className={`${page.columns} ${page.wideFirst} ${page.alignBottoms}`}>
+      <div className={page.stack}>
+        <PageHeader
+          title="Producto"
+          description="La historia de un producto en una plaza: precios, temporadas, origen y pronóstico."
+        >
+          <ProductSelector value={productId} onChange={setProductId} />
+          <MarketSelector markets={markets ?? []} value={marketId} onChange={setMarketId} />
+        </PageHeader>
+        {product ? (
+          <QueryBoundary query={latestQuery} loadingMessage="Cargando los precios…">
+            {() =>
+              market ? (
+                <ProductPrices product={product} market={market} />
+              ) : (
+                <Card>
+                  <EmptyState title="No hay plazas con precios de este producto">
+                    <p>
+                      Ninguna plaza tiene precios suficientes de{' '}
+                      {lowerFirst(product.canonical_name)} para mostrar su historia.
+                    </p>
+                  </EmptyState>
+                </Card>
+              )
+            }
+          </QueryBoundary>
+        ) : (
+          !productsQuery.isError && <LoadingState />
+        )}
       </div>
-      {product ? (
-        <QueryBoundary query={latestQuery} loadingMessage="Cargando los precios…">
-          {() =>
-            market ? (
-              <ProductContent product={product} market={market} />
-            ) : (
-              <Card>
-                <EmptyState title="No hay plazas con precios de este producto">
-                  <p>
-                    Ninguna plaza tiene precios suficientes de {lowerFirst(product.canonical_name)}{' '}
-                    para mostrar su historia.
-                  </p>
-                </EmptyState>
-              </Card>
-            )
-          }
-        </QueryBoundary>
-      ) : (
-        !productsQuery.isError && <LoadingState />
+      {product && market && (
+        <div className={page.stack}>
+          <ProductContext product={product} market={market} />
+        </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -84,37 +89,39 @@ interface ProductContentProps {
   market: MarketLatestPrice;
 }
 
-function ProductContent({ product, market }: ProductContentProps) {
+/** Key figures and weekly price chart of the product in the market. */
+function ProductPrices({ product, market }: ProductContentProps) {
   const productId = product.product_id;
   const marketId = market.market_id;
   const [range, setRange] = useState<HistoryRange>('3y');
-  const historyQuery = usePriceHistory(productId, marketId, { from: HISTORY_START });
+  const historyQuery = usePriceHistory(productId, marketId, { from: FULL_HISTORY_START });
   const forecastsQuery = useForecasts(productId, marketId);
-  const seasonalityQuery = useSeasonality(productId, marketId);
-  const originsQuery = useSupplyOrigins(productId, marketId);
   const forecast = forecastsQuery.data?.markets[0];
 
   return (
-    <div className={page.stack}>
-      <KeyFigures market={market} forecast={forecast} />
+    <>
+      <KeyFigures market={market} forecast={forecast} series={historyQuery.data?.series} />
 
       <Card
         title="Precio semana a semana"
         subtitle={`${product.canonical_name} en ${market.market_name}. Pesos por kilo.`}
+        className={styles.chartCard}
+        actions={
+          <div className={styles.ranges} role="group" aria-label="Periodo de la gráfica">
+            {RANGES.map((option) => (
+              <button
+                key={option}
+                type="button"
+                className={styles.rangeButton}
+                aria-pressed={range === option}
+                onClick={() => setRange(option)}
+              >
+                {RANGE_LABELS[option]}
+              </button>
+            ))}
+          </div>
+        }
       >
-        <div className={styles.ranges} role="group" aria-label="Periodo de la gráfica">
-          {RANGES.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={styles.rangeButton}
-              aria-pressed={range === option}
-              onClick={() => setRange(option)}
-            >
-              {RANGE_LABELS[option]}
-            </button>
-          ))}
-        </div>
         <QueryBoundary query={historyQuery} loadingMessage="Cargando la historia de precios…">
           {(history) => {
             const series = filterByRange(history.series, range);
@@ -161,116 +168,192 @@ function ProductContent({ product, market }: ProductContentProps) {
           }}
         </QueryBoundary>
       </Card>
+    </>
+  );
+}
 
-      <div className={page.grid}>
-        <Card title="Temporadas" subtitle="Qué tan caro o barato suele estar en cada mes.">
-          <QueryBoundary query={seasonalityQuery} loadingMessage="Cargando las temporadas…">
-            {(seasonality) =>
-              seasonality.months.length === 0 ? (
-                <EmptyState title="Sin datos de temporada">
-                  <p>
-                    {seasonality.message ??
-                      'Hace falta al menos un año completo de precios para calcular las temporadas.'}
-                  </p>
-                </EmptyState>
-              ) : (
-                <>
-                  <p>
-                    Suele estar más barato en <strong>{seasonality.cheapest_month}</strong> y más
-                    caro en <strong>{seasonality.most_expensive_month}</strong>.
-                  </p>
-                  <p className={page.caption}>
-                    100 es el precio promedio del año; 112 quiere decir 12 % por encima. Calculado
-                    con los años {seasonality.years_used[0]} a{' '}
-                    {seasonality.years_used[seasonality.years_used.length - 1]}.
-                  </p>
-                  <div className={styles.seasonChart}>
-                    <Suspense fallback={null}>
-                      <SeasonalityChart seasonality={seasonality} />
-                    </Suspense>
-                  </div>
-                  <ul className="visually-hidden">
-                    {seasonality.months.map((month) => (
-                      <li key={month.month}>
-                        {month.month_name}: índice {Math.round(month.index)}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )
-            }
-          </QueryBoundary>
+/** Seasons and origins of the product in the market. */
+function ProductContext({ product, market }: ProductContentProps) {
+  const seasonalityQuery = useSeasonality(product.product_id, market.market_id);
+  const originsQuery = useSupplyOrigins(product.product_id, market.market_id);
+  const origins = originsQuery.data;
+
+  return (
+    <>
+      <Card title="Temporadas" subtitle="Qué tan caro o barato suele estar en cada mes.">
+        <QueryBoundary query={seasonalityQuery} loadingMessage="Cargando las temporadas…">
+          {(seasonality) =>
+            seasonality.months.length === 0 ? (
+              <EmptyState title="Sin datos de temporada">
+                <p>
+                  {seasonality.message ??
+                    'Hace falta al menos un año completo de precios para calcular las temporadas.'}
+                </p>
+              </EmptyState>
+            ) : (
+              <>
+                <p>
+                  Suele estar más barato en <strong>{seasonality.cheapest_month}</strong> y más caro
+                  en <strong>{seasonality.most_expensive_month}</strong>.
+                </p>
+                <p className={page.caption}>
+                  100 es el precio promedio del año; 112 quiere decir 12 % por encima. Calculado con
+                  los años {seasonality.years_used[0]} a{' '}
+                  {seasonality.years_used[seasonality.years_used.length - 1]}.
+                </p>
+                <div className={styles.seasonChart}>
+                  <Suspense fallback={null}>
+                    <SeasonalityChart seasonality={seasonality} />
+                  </Suspense>
+                </div>
+                <ul className="visually-hidden">
+                  {seasonality.months.map((month) => (
+                    <li key={month.month}>
+                      {month.month_name}: índice {Math.round(month.index)}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
+          }
+        </QueryBoundary>
+      </Card>
+      {origins && origins.total_kg > 0 && (
+        <Card
+          title="Departamentos de origen"
+          subtitle={`De dónde llegó la carga a ${market.city} en las últimas 52 semanas con datos.`}
+        >
+          <ShareBars items={departmentItems(origins)} label="Origen por departamento" />
         </Card>
+      )}
 
+      {origins && origins.total_kg > 0 ? (
+        <Municipalities
+          // Each product and market starts with the short list again.
+          key={`${product.product_id}-${market.market_id}`}
+          items={municipalityItems(origins)}
+          city={market.city}
+        />
+      ) : (
         <Card
           title="¿De dónde llega a esta plaza?"
           subtitle="Origen de la carga en las últimas 52 semanas con datos."
         >
           <QueryBoundary query={originsQuery} loadingMessage="Cargando el abastecimiento…">
-            {(origins) =>
-              origins.total_kg === 0 ? (
-                <EmptyState title="Sin datos de abastecimiento para esta plaza">
-                  <p>{origins.message}</p>
-                  <p>
-                    El DANE mide de dónde llega la carga solo en algunas plazas y para algunos
-                    productos, y esta combinación no hace parte de esa medición. Los precios sí
-                    están completos.
-                  </p>
-                </EmptyState>
-              ) : (
-                <>
-                  <h3 className={page.subheading}>Departamentos</h3>
-                  <ShareBars items={departmentItems(origins)} label="Origen por departamento" />
-                  <h3 className={page.subheading}>Municipios que más aportan</h3>
-                  <ShareBars items={municipalityItems(origins)} label="Origen por municipio" />
-                </>
-              )
-            }
+            {(emptyOrigins) => (
+              <EmptyState title="Sin datos de abastecimiento para esta plaza">
+                <p>{emptyOrigins.message}</p>
+                <p>
+                  El DANE mide de dónde llega la carga solo en algunas plazas y para algunos
+                  productos, y esta combinación no hace parte de esa medición. Los precios sí están
+                  completos.
+                </p>
+              </EmptyState>
+            )}
           </QueryBoundary>
         </Card>
-      </div>
-    </div>
+      )}
+    </>
+  );
+}
+
+/** How many municipalities are shown before "Ver más". */
+const MUNICIPALITIES_SHORT = 6;
+
+/** The municipalities that send the most: the first six, and the rest on demand. */
+function Municipalities({ items, city }: { items: ShareItem[]; city: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const shown = expanded ? items : items.slice(0, MUNICIPALITIES_SHORT);
+  return (
+    <Card
+      title="Municipios que más aportan"
+      subtitle={`Los ${shown.length} municipios que más carga enviaron a ${city}.`}
+    >
+      <ShareBars items={shown} label="Origen por municipio" />
+      {items.length > MUNICIPALITIES_SHORT && (
+        <button
+          type="button"
+          className={styles.moreButton}
+          aria-expanded={expanded}
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? 'Ver menos' : 'Ver más'}
+        </button>
+      )}
+    </Card>
   );
 }
 
 interface KeyFiguresProps {
   market: MarketLatestPrice;
   forecast: MarketForecast | undefined;
+  /** Weekly prices of the pair, to show what the price was 4 and 52 weeks ago. */
+  series: PricePoint[] | undefined;
 }
 
-function KeyFigures({ market, forecast }: KeyFiguresProps) {
-  const furthest = forecast?.forecasts[forecast.forecasts.length - 1];
+function price(value: number) {
   return (
-    <dl className={page.figures}>
-      <div className={page.figure}>
-        <dt>Último precio</dt>
-        <dd>
-          <PriceTag value={market.mean_price} size="lg" />
-        </dd>
-        <span className={page.figureNote}>Semana del {formatWeek(market.week_start)}</span>
-      </div>
-      <div className={page.figure}>
-        <dt>Frente a hace 4 semanas</dt>
-        <dd>
-          <ChangeBadge value={market.change_4w_pct} />
-        </dd>
-      </div>
-      <div className={page.figure}>
-        <dt>Frente a hace un año</dt>
-        <dd>
-          <ChangeBadge value={market.change_52w_pct} />
-        </dd>
-      </div>
-      <div className={page.figure}>
-        <dt>Pronóstico a {furthest?.horizon ?? 4} semanas</dt>
-        <dd>{furthest ? <PriceTag value={furthest.predicted_price} size="lg" /> : 'Sin dato'}</dd>
-        {furthest && (
-          <span className={page.figureNote}>
-            Semana del {formatWeek(furthest.target_week_start)}. Rango probable:{' '}
-            {formatPesos(furthest.lower_price)} a {formatPesos(furthest.upper_price)}
-          </span>
-        )}
-      </div>
-    </dl>
+    <>
+      {formatPesos(value)} <small>/kg</small>
+    </>
+  );
+}
+
+function KeyFigures({ market, forecast, series }: KeyFiguresProps) {
+  const furthest = forecast?.forecasts[forecast.forecasts.length - 1];
+  const reference = (weeks: number) => {
+    const weekStart = addDays(market.week_start, -7 * weeks);
+    const past = series?.find((point) => point.week_start === weekStart)?.mean_price;
+    return past === undefined ? null : <>Estaba en {formatPricePerKg(past)}</>;
+  };
+
+  return (
+    <KpiGrid label="Cifras clave" layout="inline">
+      <KpiCard label="Último precio" value={price(market.mean_price)}>
+        Semana del {formatWeek(market.week_start)}
+      </KpiCard>
+      <KpiChangeCard
+        label="Frente a hace 4 semanas"
+        value={market.change_4w_pct}
+        explanations={{
+          up: 'Hoy está más caro',
+          down: 'Hoy está más barato',
+          flat: 'Hoy está igual',
+        }}
+        missing="No hay precio de hace 4 semanas para comparar."
+      >
+        {reference(4)}
+      </KpiChangeCard>
+      <KpiChangeCard
+        label="Frente a hace un año"
+        value={market.change_52w_pct}
+        explanations={{
+          up: 'Hoy está más caro',
+          down: 'Hoy está más barato',
+          flat: 'Hoy está igual',
+        }}
+        missing="No hay precio de hace un año para comparar."
+      >
+        {reference(52)}
+      </KpiChangeCard>
+      {furthest ? (
+        <KpiCard
+          label={`Pronóstico a ${furthest.horizon} semanas`}
+          value={price(furthest.predicted_price)}
+          title={`Para la semana del ${formatWeek(furthest.target_week_start)}`}
+        >
+          Rango probable
+          <RangeBar
+            lower={furthest.lower_price}
+            upper={furthest.upper_price}
+            value={furthest.predicted_price}
+          />
+        </KpiCard>
+      ) : (
+        <KpiCard label="Pronóstico a 4 semanas" value="Sin dato">
+          Esta plaza no tiene pronóstico para este producto.
+        </KpiCard>
+      )}
+    </KpiGrid>
   );
 }

@@ -40,9 +40,25 @@ describe('PanoramaPage', () => {
       .getAllByRole('listitem')
       .map((item) => `${item.textContent}: ${item.getAttribute('data-level')}`);
     expect(levels).toEqual(['Pereira: cheaper', 'Bogotá: similar', 'Cartago: expensive']);
-    // The legend explains the three levels.
-    expect(screen.getAllByText('Más barata que la mayoría').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Más cara que la mayoría').length).toBeGreaterThan(0);
+    // The legend explains the three levels and that they are not price changes.
+    const legend = screen.getByRole('list', { name: 'Nivel de precio de cada plaza' });
+    const items = within(legend).getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual([
+      'Más barata que la mayoría',
+      'Precio parecido al de la mayoría',
+      'Más cara que la mayoría',
+    ]);
+    // Arrow down in terracotta, equal sign in gray and arrow up in green.
+    expect(items.map((item) => item.querySelector('[data-level]')?.className)).toEqual([
+      'mark cheaper',
+      'mark similar',
+      'mark expensive',
+    ]);
+    expect(
+      screen.getByText(
+        /compara el precio de la plaza con el de las demás plazas.*no indica la variación del precio en el tiempo/,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('lists the markets from the cheapest to the most expensive with changes and forecast', async () => {
@@ -50,18 +66,31 @@ describe('PanoramaPage', () => {
     renderWithProviders(<PanoramaPage />);
 
     const table = await screen.findByRole('table');
-    const rows = within(table).getAllByRole('row').slice(1);
+    // After the header row comes the row that names the variety of the group.
+    const [group, ...rows] = within(table).getAllByRole('row').slice(1);
+    expect(group).toHaveTextContent('Variedad: parda pastusa');
+    // Each market says how its price compares with the others, next to the icon of that level.
     expect(rows.map((row) => within(row).getByRole('rowheader').textContent)).toEqual([
-      'Pereira, MercasaMás barata que la mayoría',
-      'Bogotá, D.C., CorabastosPrecio parecido al de la mayoría',
-      'Cartago (Valle del Cauca)Más cara que la mayoría',
+      'Pereira, MercasaMás barata que las demás',
+      'Bogotá, D.C., CorabastosPrecio parecido',
+      'Cartago (Valle del Cauca)Más cara que las demás',
     ]);
+    expect(
+      rows.map((row) => row.querySelector('[data-level]')?.getAttribute('data-level')),
+    ).toEqual(['cheaper', 'similar', 'expensive']);
+    expect(
+      screen.getByText(/compara su precio con el de las demás plazas de la misma variedad/),
+    ).toBeInTheDocument();
     const pereira = plain(rows[0].textContent);
-    expect(pereira).toContain('parda pastusa');
     expect(pereira).toContain('$ 2.317 /kg');
     expect(pereira).toContain('Bajó−10,4 %');
     expect(pereira).toContain('Subió+172,6 %');
     expect(pereira).toContain('$ 2.254 /kg');
+    // Market convention: a rise is marked "up" (green) and a fall "down" (terracotta).
+    const trends = [...rows[0].querySelectorAll('[data-trend]')].map((badge) =>
+      badge.getAttribute('data-trend'),
+    );
+    expect(trends).toEqual(['down', 'up', 'down']);
     // Cartago has no price a year ago.
     expect(plain(rows[2].textContent)).toContain('Sin dato');
   });

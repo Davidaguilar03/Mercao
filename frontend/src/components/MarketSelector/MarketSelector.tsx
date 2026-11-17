@@ -1,5 +1,4 @@
-import { useId } from 'react';
-import styles from './MarketSelector.module.css';
+import { SearchSelect } from '../SearchSelect/SearchSelect';
 
 interface MarketOption {
   market_id: number;
@@ -14,28 +13,20 @@ interface MarketSelectorProps {
   label?: string;
 }
 
+/** Searchable select with the markets of a product, in alphabetical order. */
 export function MarketSelector({ markets, value, onChange, label = 'Plaza' }: MarketSelectorProps) {
-  const id = useId();
-  const sorted = [...markets].sort((a, b) => a.market_name.localeCompare(b.market_name, 'es'));
+  const options = [...markets]
+    .sort((a, b) => a.market_name.localeCompare(b.market_name, 'es'))
+    .map((market) => ({ id: market.market_id, name: market.market_name }));
   return (
-    <div className={styles.wrapper}>
-      <label className={styles.label} htmlFor={id}>
-        {label}
-      </label>
-      <select
-        id={id}
-        className={styles.select}
-        value={value ?? ''}
-        disabled={markets.length === 0}
-        onChange={(event) => onChange(Number(event.target.value))}
-      >
-        {markets.length === 0 && <option value="">Sin plazas disponibles</option>}
-        {sorted.map((market) => (
-          <option key={market.market_id} value={market.market_id}>
-            {market.market_name}
-          </option>
-        ))}
-      </select>
-    </div>
+    <SearchSelect
+      label={label}
+      groups={[{ key: 'markets', options }]}
+      value={value}
+      onChange={onChange}
+      placeholder={markets.length === 0 ? 'Sin plazas disponibles' : 'Busque una plaza'}
+      disabled={markets.length === 0}
+      noResults={(query) => `Ninguna plaza coincide con «${query}».`}
+    />
   );
 }

@@ -1,98 +1,86 @@
-.grid {
+/* Steps: a vertical timeline on phones, a row joined by a line on desktop. */
+.steps {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+}
+
+/* Line that joins one step with the next. */
+.step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 2.25rem;
+  bottom: calc(-1 * var(--space-4));
+  left: 1.125rem;
+  width: 1px;
+  background: var(--color-card-border);
+}
+
+.stepMarker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-card-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.stepTitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.stepText {
+  margin-top: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.sectionHeading {
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+/* The sections after the results: one column, or two on desktop once the results are loaded. */
+.layout {
   display: grid;
   gap: var(--space-4);
 }
 
-.section {
-  margin-top: var(--space-4);
+.layout > * {
+  min-width: 0;
 }
 
-.prose {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.meta,
-.caption {
+.sectionHeading p {
+  margin-top: var(--space-1);
   color: var(--color-muted);
-  font-size: var(--font-size-sm);
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--space-3);
-  margin: 0;
-}
-
-.stat {
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-background);
-}
-
-.stat dt {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-.stat dd {
-  margin: var(--space-1) 0;
-  color: var(--color-primary);
-  font-family: var(--font-display);
-  font-size: var(--font-size-2xl);
-  font-weight: 600;
-  line-height: var(--line-height-tight);
-}
-
-.stat p {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-}
-
-.subheading {
-  margin-top: var(--space-5);
-  font-size: var(--font-size-lg);
-}
-
-.caption {
-  margin: var(--space-1) 0 var(--space-3);
 }
 
 /* Reserves the space while the chart loads. */
 .chart {
-  height: 260px;
+  height: 240px;
 }
 
 .tableWrapper {
   margin-top: var(--space-4);
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  min-width: 36rem;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.table th,
-.table td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  text-align: right;
-  white-space: nowrap;
-}
-
-.table th:first-child {
-  text-align: left;
-}
-
-.table thead th {
-  color: var(--color-muted);
-  font-weight: 600;
-  white-space: normal;
 }
 
 .features {
@@ -108,40 +96,78 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
 }
 
 .featureTrack {
   grid-column: 1 / -1;
-  height: 8px;
-  border-radius: var(--radius-pill);
+  height: 12px;
+  border-radius: var(--radius-sm);
   background: var(--color-price-neutral-bg);
 }
 
 .featureBar {
   display: block;
   height: 100%;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   background: var(--color-primary);
 }
 
-.features + .caption {
-  margin: var(--space-4) 0 0;
+.limitsTitle {
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  font-weight: 600;
 }
 
-.limitations {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: 0;
-  padding-left: var(--space-5);
+.limit {
+  font-weight: 600;
 }
 
-.limitations li::marker {
-  color: var(--color-terracotta);
+.footnote {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
 }
 
-@media (min-width: 768px) {
-  .grid {
+@media (min-width: 900px) {
+  .steps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .step {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .step:not(:last-child)::before {
+    top: 1.125rem;
+    bottom: auto;
+    left: 2.75rem;
+    right: calc(-1 * var(--space-4));
+    width: auto;
+    height: 1px;
+  }
+}
+
+/* One wide column: the limitations fit in two columns. */
+@media (min-width: 900px) and (max-width: 1199.98px) {
+  .limitations {
     grid-template-columns: 1fr 1fr;
+    gap: var(--space-3) var(--space-6);
+  }
+}
+
+/* Desktop: the sections flow into two balanced columns, in the same reading order. */
+@media (min-width: 1200px) {
+  .layoutReady {
+    display: block;
+    columns: 2;
+    column-gap: var(--space-4);
+  }
+
+  .layoutReady > * {
+    break-inside: avoid;
+    margin-bottom: var(--space-4);
   }
 }

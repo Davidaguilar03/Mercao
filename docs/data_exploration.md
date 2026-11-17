@@ -12,7 +12,7 @@ _Reporte generado el 2026-11-15 a partir de los archivos descargados en `data/ra
 | prices_monthly | Series históricas de precios mayoristas (precio promedio mensual por producto y mercado) | 10 |
 | supply | Abastecimiento: serie histórica agregada + microdatos anuales por mercado, origen y alimento | 15 |
 
-La página del componente de precios mayoristas solo publica, en «Información histórica», páginas mensuales con los **boletines diarios**. La serie semanal se reconstruyó con los anexos de los boletines semanales (2012–2026), que tienen precio mínimo, máximo y medio por producto y mercado. También se descargaron las series históricas mensuales oficiales (2013–2026) como referencia. No se descargaron los anexos diarios porque existe la serie semanal.
+La página del componente de precios mayoristas solo publica, en «Información histórica», páginas mensuales con los **boletines diarios**. La serie semanal se reconstruyó con los anexos de los boletines semanales (2012 a 2026), que tienen precio mínimo, máximo y medio por producto y mercado. También se descargaron las series históricas mensuales oficiales (2013 a 2026) como referencia. No se descargaron los anexos diarios porque existe la serie semanal.
 
 ## 2. Precios mayoristas semanales
 
@@ -21,7 +21,7 @@ La página del componente de precios mayoristas solo publica, en «Información 
 - Filas (producto × mercado × semana): **3.274.754**
 - Semanas calendario en el rango: 731; semanas sin ningún archivo: **3**.
   - Semanas faltantes (fecha de cierre, primeras 25): 2014-05-16, 2015-12-18, 2021-11-12
-- Día de cierre de la semana según la etiqueta: viernes (699), jueves (14), miércoles (14), sábado (1). Las semanas cortas o largas coinciden con festivos (Semana Santa, fin de año); cada archivo se asigna a la semana sábado–viernes de su fecha de cierre (si la etiqueta cierra en sábado se toma el viernes anterior).
+- Día de cierre de la semana según la etiqueta: viernes (699), jueves (14), miércoles (14), sábado (1). Las semanas cortas o largas coinciden con festivos (Semana Santa, fin de año); cada archivo se asigna a la semana sábado-viernes de su fecha de cierre (si la etiqueta cierra en sábado se toma el viernes anterior).
 - Etiquetas con más de 7 días (probable error de DANE): `Anexo_Bol_Semanal_SIPSA_abril5_2013.xls` → «28 de marzo al 5 de abril de 2013»; `Sem_01may_2020__08may_2020.xlsx` → «01 de mayo de 2020 - 08 de mayo de 2020»; `Sem_07ago_2020__14ago_2020.xlsx` → «07 de agosto de 2020 - 14 de agosto de 2020»; `Sem_11abr_2020__17abr_2020.xlsx` → «09 de abril de 2020 - 17 de abril de 2020»; `Sem_13abr_21abr_2017.xls` → «13 de abril - 21 de abril de 2017»; `Sem_1may_8may_2015.xls` → «1 al 8 de mayo de 2015»; `Sem_20jul__27jul_2018.xlsx` → «20 de julio de 2018 - 27 de julio de 2018»; `Sem_26dic_2020__31dic_2020.xlsx` → «24 de diciembre de 2020 - 31 de diciembre de 2020»; `Sem_30mar_2019__05abr_2019.xlsx` → «30 de marzo de 2019 - 06 de abril de 2019»; `anex_02jul_al_08jul_2022.xlsx` → «01 de julio de 2022 - 08 de julio de 2022»; `anex_19mar_al_25mar_2022.xlsx` → «18 de marzo de 2022 - 25 de marzo de 2022»; `anex_31dic_al_06ene_2023.xlsx` → «30 de diciembre de 2022 - 06 de enero de 2023»; `anex-SIPSASemanal-29mar-04abr-2025.xlsx` → «28 de marzo de 2025 - 4 de abril de 2025»
 - Archivos sin fecha interpretable (excluidos): `Anexo_Bol_Semanal_100may10_2014.xls` («Boletín número 100»)
 - La fecha de cada archivo se toma del texto que acompaña el enlace en la página de DANE (los nombres de archivo no siguen un patrón: p. ej. `Anexo_Bol_Semanal_abr19_2014.xls`, `Anex_12mar_al_18mar_2022.xlsx`).
@@ -270,9 +270,9 @@ Aceite de palma, Aceite girasol, Aceite soya, Aceite vegetal mezcla, Acelga, Agu
 
 </details>
 
-### 2.3 Semanas con dato por par producto–mercado
+### 2.3 Semanas con dato por par producto-mercado
 
-- Pares producto–mercado: **8.547**
+- Pares producto-mercado: **8.547**
 - Semanas con dato por par: mediana 405, p25 131, p75 677, máximo 728 (de 731 semanas posibles).
 - Proporción de semanas faltantes dentro de la vida de cada par (entre su primera y última semana): mediana 1.7%, p75 6.2%.
 - Pares con ≥ 90 % de cobertura sobre todo el periodo: **2287**; desde 2018: **3451**.
@@ -294,7 +294,7 @@ Aceite de palma, Aceite girasol, Aceite soya, Aceite vegetal mezcla, Acelga, Agu
 | anex-SIPSA-SerieHistoricaMayorista-Dic2023.xlsx | 13 | Enero:7, Febrero:7, Marzo:7 … | Fecha · Grupo · Producto · Mercado · Precio promedio por kilogramo* | 2023-01-01 a 2023-12-01 | 12 | 53.807 |
 
 - Frecuencia **mensual** (una fecha por mes: día 1). Es un promedio mensual por producto y mercado, sin mínimo ni máximo.
-- Cambios entre años: la columna de mercado se llama «Fuente» (2013–2018) o «Mercado» (2019 en adelante); la de precio «Precio» o «Precio promedio por kilogramo*»; desde 2024 aparece «Código CPC»; 2013–2017 vienen en un solo archivo con una hoja por año y 2023 con una hoja por mes.
+- Cambios entre años: la columna de mercado se llama «Fuente» (2013 a 2018) o «Mercado» (2019 en adelante); la de precio «Precio» o «Precio promedio por kilogramo*»; desde 2024 aparece «Código CPC»; 2013 a 2017 vienen en un solo archivo con una hoja por año y 2023 con una hoja por mes.
 - Nota en el archivo: «* Los precios reportados para los huevos y el bocadillo son $/unidad y los del aceite, el vinagre y el jugo de frutas $/litro.»
 - Productos solo en mensual: 0; solo en semanal: 13.
 
@@ -336,7 +336,7 @@ Archivo `Series-historicas-abastecimiento-2013-2026.xlsx`:
 - **Sí** reporta cantidad por mercado **y** por origen: código y nombre de departamento y municipio de procedencia (DIVIPOLA).
 - Unidad: **kilogramos** (`Cant Kg`). Frecuencia: registros diarios (fecha de ingreso al mercado).
 - Desde 2024 el municipio puede ser un país (código ISO 3166-1) para alimentos importados: 199.656 filas con código no numérico.
-- Las hojas de datos se dividen por semestre (2013–2023) o cuatrimestre (2024–2026); los nombres de columnas cambian («Código Departamento» → «Divipola Depto Proc.», «Municipio Proc.» → «Municipio de Colombia / País Proc.») y en 2024 se agrega «Código CPC».
+- Las hojas de datos se dividen por semestre (2013 a 2023) o cuatrimestre (2024 a 2026); los nombres de columnas cambian («Código Departamento» → «Divipola Depto Proc.», «Municipio Proc.» → «Municipio de Colombia / País Proc.») y en 2024 se agrega «Código CPC».
 - Número de alimentos distintos por archivo: 2013: 135, 2014: 153, 2015: 164, 2016: 163, 2017: 163, 2018: 171, 2019: 171, 2020: 177, 2021: 177, 2022: 190, 2023: 188, 2024: 188, 2025: 188, 2026: 192. El catálogo cambia entre años (en los primeros años hay categorías agregadas como «Hortalizas de hoja» o «Verduras y hortalizas otras»).
 - Nombres de papa en abastecimiento por año:
   - 2013: Papa Morasurco, Papa R-12, Papa capira, Papa criolla, Papa nevada, Papa parda pastusa, Papa suprema, Papa única
@@ -498,7 +498,7 @@ Otros mercados con buena cobertura (puntaje = cobertura media en los 30 producto
 ## 7. Calidad de datos y riesgos
 
 - **Huecos**: 3 semanas sin archivo en el rango; además cada par tiene semanas sin dato (sección 2.3).
-- **Duplicados**: 560 filas repiten semana–producto–mercado; 74 combinaciones con precios distintos.
+- **Duplicados**: 560 filas repiten semana-producto-mercado; 74 combinaciones con precios distintos.
 - **Rangos incoherentes** (mín > máx o medio fuera de [mín, máx]): 1281 filas.
 - **Precios no positivos o faltantes** en precio medio: 2 filas.
 - **Saltos extremos** (el precio medio se duplica o cae a la mitad de una semana a la siguiente): 4486 casos en 1320 pares.
@@ -515,8 +515,8 @@ Otros mercados con buena cobertura (puntaje = cobertura media en los 30 producto
 - **Riesgos para el pronóstico**:
   - Series con huecos requieren imputación o modelos que toleren faltantes; las semanas con festivos tienen etiquetas de 4 a 9 días (sección 2), lo que distorsiona la comparación semana a semana.
   - Choques no estacionales (paro nacional 2021, pandemia 2020, fenómenos de El Niño/La Niña) generan picos que un modelo con solo rezagos no anticipa.
-  - Precio en pesos corrientes: la inflación (≈ 2013–2026) introduce tendencia; conviene deflactar o modelar variaciones.
-  - Volatilidad alta en hortalizas de ciclo corto (tomate, cebolla); horizontes de 3–4 semanas tendrán errores grandes.
+  - Precio en pesos corrientes: la inflación (≈ 2013 a 2026) introduce tendencia; conviene deflactar o modelar variaciones.
+  - Volatilidad alta en hortalizas de ciclo corto (tomate, cebolla); horizontes de 3 a 4 semanas tendrán errores grandes.
   - Abastecimiento y precios no comparten catálogo; unirlos exige equivalencias manuales.
   - Boyacá: Chiquinquirá (Boyacá) tiene datos del 2012-11-16 al 2026-11-13; los demás mercados de Boyacá tienen series más cortas o con más huecos (tabla 2.2).
   - Papa parda pastusa en Chiquinquirá (Boyacá) dejó de reportarse: último dato la semana al 2025-11-28.

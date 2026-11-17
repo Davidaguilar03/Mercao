@@ -134,13 +134,13 @@ export function explainConfidence(
 ): string {
   if (confidence === 'alta') {
     return (
-      `Los rangos de precio de las dos plazas no se cruzan: aun si el precio en ${buyCity} resulta ` +
-      `más alto de lo esperado y el de ${sellCity} más bajo, la diferencia se mantiene.`
+      `Los rangos probables de las dos plazas no se superponen: la diferencia se mantiene aun si ` +
+      `el precio en ${buyCity} resulta superior al esperado y el de ${sellCity}, inferior.`
     );
   }
   return (
-    `Los rangos de precio de las dos plazas se cruzan: el precio en ${buyCity} podría terminar ` +
-    `tan alto como el de ${sellCity}, así que la diferencia puede ser menor o no darse.`
+    `Los rangos probables de las dos plazas se superponen: el precio en ${buyCity} podría igualar ` +
+    `al de ${sellCity}, por lo que la diferencia puede ser menor o no presentarse.`
   );
 }
 

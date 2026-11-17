@@ -11,6 +11,7 @@ import type {
   Seasonality,
   SupplyOrigins,
 } from '../api/types';
+import { percentChange } from '../lib/analysis';
 import { health, modelSummary, products } from './fixtures';
 
 export const markets: Market[] = [
@@ -243,6 +244,11 @@ function side(market: MarketForecast, horizon: number): RecommendationSide {
     predicted_price: forecast.predicted_price,
     lower_price: forecast.lower_price,
     upper_price: forecast.upper_price,
+    latest_price: market.last_observed_price,
+    expected_change_percent:
+      market.last_observed_price === null
+        ? null
+        : percentChange(market.last_observed_price, forecast.predicted_price),
   };
 }
 
@@ -264,6 +270,7 @@ export function recommendationsFor(horizon: number): Recommendations {
         difference_per_kg: sell.predicted_price - buy.predicted_price,
         difference_pct: 48.8,
         confidence: 'baja',
+        distance_km: 25,
       },
     ],
     message: null,

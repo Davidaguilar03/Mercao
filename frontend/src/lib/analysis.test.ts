@@ -113,15 +113,15 @@ describe('buildSummary', () => {
 describe('explainConfidence', () => {
   it('explains a high confidence: the ranges do not cross', () => {
     const text = explainConfidence('alta', 'Bucaramanga', 'Medellín');
-    expect(text).toContain('no se cruzan');
+    expect(text).toContain('no se superponen');
     expect(text).toContain('Bucaramanga');
     expect(text).toContain('la diferencia se mantiene');
   });
 
   it('explains a low confidence: the ranges cross', () => {
     const text = explainConfidence('baja', 'Pereira', 'Cartago');
-    expect(text).toContain('se cruzan');
-    expect(text).toContain('puede ser menor o no darse');
+    expect(text).toContain('se superponen');
+    expect(text).toContain('puede ser menor o no presentarse');
   });
 });
 

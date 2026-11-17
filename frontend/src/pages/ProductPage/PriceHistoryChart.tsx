@@ -58,7 +58,7 @@ export default function PriceHistoryChart({ points, range }: PriceHistoryChartPr
     range === 'all' ? String(new Date(value).getUTCFullYear()) : formatMonthYear(value);
 
   return (
-    <ResponsiveContainer width="100%" height={320}>
+    <ResponsiveContainer width="100%" height="100%">
       <ComposedChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
         <XAxis

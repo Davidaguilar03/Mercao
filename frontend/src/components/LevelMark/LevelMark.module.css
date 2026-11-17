@@ -1,0 +1,33 @@
+/*
+ * Price level of a market against the others of the same variety: a white circle with the icon
+ * and the outline in one color. Arrow up in green, arrow down in terracotta, equal sign in gray.
+ */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+
+.mark svg {
+  width: 62%;
+  height: 62%;
+}
+
+.cheaper {
+  color: var(--color-level-down);
+}
+
+.similar {
+  color: var(--color-level-equal);
+}
+
+.expensive {
+  color: var(--color-level-up);
+}

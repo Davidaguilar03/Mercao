@@ -1,61 +1,298 @@
-.sides {
+/* The two markets, and beside them (desktop) or under them the difference and the distance. */
+.overview {
   display: grid;
   gap: var(--space-3);
 }
 
-.side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--color-background);
+.sides,
+.facts {
+  display: grid;
+  gap: var(--space-3);
   min-width: 0;
 }
 
-.sideTitle {
+/* Every tile of the card: same border, radius, top edge and type scale. */
+.tile {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--color-muted);
   font-size: var(--font-size-sm);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+.label svg {
+  flex-shrink: 0;
+}
+
+.value {
+  display: block;
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+}
+
+.unit {
+  color: var(--color-muted);
+  font-size: 0.75em;
+  font-weight: 400;
+}
+
+.detail {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+}
+
+/*
+ * Buying and selling use corn yellow (the cheap market) and ink (the expensive one), the same as
+ * the bars and markers of the range comparison and the tags of the table. Green and terracotta are
+ * left for the expected change.
+ */
+.buy {
+  border-top-color: var(--color-level-cheaper);
+}
+
+.sell {
+  border-top-color: var(--color-level-expensive);
+}
+
+/*
+ * Label on top; the city with the expected change at its right; the expected price and the
+ * latest price under it, with the recent prices drawn at their right.
+ */
+.side {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  grid-template-areas:
+    'label label'
+    'top top'
+    'price spark'
+    'note spark';
+  grid-template-columns: minmax(0, 1fr) 7rem;
+  align-content: space-between;
+  column-gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  isolation: isolate;
+}
+
+.side > .label {
+  grid-area: label;
+}
+
+.top {
+  display: flex;
+  grid-area: top;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  margin-top: var(--space-2);
+}
+
+.market {
+  flex: 1;
+}
+
+/* Raised toward the label row, above the top of the city name. */
+.change {
+  display: flex;
+  flex: none;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: -9px;
+}
+
+.price {
+  grid-area: price;
+  align-self: end;
+  margin-top: var(--space-3);
+}
+
+/* Takes the space of the price and the line under it, without adding any height. */
+.spark {
+  position: relative;
+  grid-area: spark;
+  min-height: 0;
+  margin-top: var(--space-3);
+}
+
+.spark:empty {
+  display: none;
+}
+
+/*
+ * Decoration only: just above the start of the sparkline, under the expected change. Its box may
+ * reach into the sparkline's, but the drawing keeps a margin inside it, so the strokes never touch
+ * a line that starts at its highest point.
+ */
+.doodle {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  grid-area: spark;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+
+/* Identity colors: corn yellow outlined in ink for buying, ink for selling. */
+.buy .doodle {
+  color: var(--color-level-cheaper);
+  filter: drop-shadow(0.6px 0 0 var(--color-ink)) drop-shadow(-0.6px 0 0 var(--color-ink))
+    drop-shadow(0 0.6px 0 var(--color-ink)) drop-shadow(0 -0.6px 0 var(--color-ink));
+}
+
+.sell .doodle {
+  color: var(--color-level-expensive);
+}
+
+.note {
+  grid-area: note;
+  margin-top: 3px;
+  font-size: var(--font-size-xs);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sideMarket,
+.sideMarketFull {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sideMarket {
   font-family: var(--font-display);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   line-height: var(--line-height-tight);
 }
 
-.difference {
-  margin-top: var(--space-4);
-  font-size: var(--font-size-lg);
+.sideMarketFull {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* The difference and the distance carry the brand green, so the four tiles share one system. */
+.fact {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border-top-color: var(--color-primary);
+}
+
+/* The value and, beside it on the same baseline (or under it when it does not fit), its detail. */
+.factRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--space-3);
+  margin: 0;
+}
+
+.distance {
+  font-weight: 600;
 }
 
 .confidence {
   margin-top: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border-left: 4px solid;
-  border-radius: var(--radius-md);
 }
 
-.confidence p {
-  margin-top: var(--space-1);
-  font-size: var(--font-size-sm);
+.details {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 }
 
-.alta {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
+.details > * {
+  min-width: 0;
 }
 
-.baja {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+/* The range comparison fills its column, so it ends at the same height as the table. */
+.ranges {
+  display: flex;
+  flex-direction: column;
 }
 
-@media (min-width: 480px) {
-  .sides {
+/* Phones: one column, with the change under the price, left aligned, and no trend line. */
+@media (max-width: 639px) {
+  .side {
+    grid-template-areas:
+      'label'
+      'market'
+      'price'
+      'change'
+      'note'
+      'spark';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .top {
+    display: contents;
+  }
+
+  .market {
+    grid-area: market;
+    margin-top: var(--space-2);
+  }
+
+  .change {
+    grid-area: change;
+    justify-content: flex-start;
+    margin-top: 2px;
+  }
+
+  /* The sparkline goes under the change, as wide as the card. */
+  .spark {
+    height: 3rem;
+  }
+
+  .doodle {
+    display: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .sides,
+  .facts {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Desktop: the two markets side by side on the left; difference and distance stacked on the right. */
+@media (min-width: 1024px) {
+  .overview {
+    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+  }
+
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .details {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-5);
   }
 }

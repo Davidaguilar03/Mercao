@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { PageBackdrop } from '../illustrations/PageBackdrop';
 import styles from './AppLayout.module.css';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -10,6 +11,7 @@ export function AppLayout() {
         Saltar al contenido
       </a>
       <Header />
+      <PageBackdrop />
       <main id="main-content" className={styles.main}>
         <Outlet />
       </main>
