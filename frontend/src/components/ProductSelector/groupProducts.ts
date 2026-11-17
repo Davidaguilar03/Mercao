@@ -1,18 +1,10 @@
 import type { Product } from '../../api/types';
+import { normalizeText } from '../SearchSelect/normalizeText';
 
 export interface ProductGroup {
   family: string;
   label: string;
   products: Product[];
-}
-
-/** Lowercase without accents, so "platano" finds "Plátano". */
-export function normalizeText(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
 }
 
 // The API family is a plain key ("platano"). The readable name is the product name without its
