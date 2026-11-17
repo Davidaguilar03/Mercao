@@ -42,17 +42,22 @@ describe('PanoramaPage', () => {
     expect(levels).toEqual(['Pereira: cheaper', 'Bogotá: similar', 'Cartago: expensive']);
     // The legend explains the three levels and that they are not price changes.
     const legend = screen.getByRole('list', { name: 'Nivel de precio de cada plaza' });
-    expect(
-      within(legend)
-        .getAllByRole('listitem')
-        .map((item) => item.textContent),
-    ).toEqual([
-      '$Más barata que la mayoría',
-      '$$Precio parecido al de la mayoría',
-      '$$$Más cara que la mayoría',
+    const items = within(legend).getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual([
+      'Más barata que la mayoría',
+      'Precio parecido al de la mayoría',
+      'Más cara que la mayoría',
+    ]);
+    // Arrow down, equal sign and arrow up, in the level palette (not the colors of a change).
+    expect(items.map((item) => item.querySelector('[data-level]')?.className)).toEqual([
+      'mark cheaper',
+      'mark similar',
+      'mark expensive',
     ]);
     expect(
-      screen.getByText(/No dicen si el precio subió o bajó.*en verde si sube y en rojo si baja/),
+      screen.getByText(
+        /comparan el precio de cada plaza con el de las demás plazas.*No dicen si el precio cambió con el tiempo/,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -64,12 +69,18 @@ describe('PanoramaPage', () => {
     // After the header row comes the row that names the variety of the group.
     const [group, ...rows] = within(table).getAllByRole('row').slice(1);
     expect(group).toHaveTextContent('Variedad: parda pastusa');
-    // Each market carries the mark of its price level (one to three peso signs) and its meaning.
+    // Each market says how its price compares with the others, next to the icon of that level.
     expect(rows.map((row) => within(row).getByRole('rowheader').textContent)).toEqual([
-      '$Pereira, MercasaMás barata',
-      '$$Bogotá, D.C., CorabastosPrecio parecido',
-      '$$$Cartago (Valle del Cauca)Más cara',
+      'Pereira, MercasaMás barata que las demás',
+      'Bogotá, D.C., CorabastosPrecio parecido',
+      'Cartago (Valle del Cauca)Más cara que las demás',
     ]);
+    expect(
+      rows.map((row) => row.querySelector('[data-level]')?.getAttribute('data-level')),
+    ).toEqual(['cheaper', 'similar', 'expensive']);
+    expect(
+      screen.getByText(/compara su precio con el de las demás plazas de la misma variedad/),
+    ).toBeInTheDocument();
     const pereira = plain(rows[0].textContent);
     expect(pereira).toContain('$ 2.317 /kg');
     expect(pereira).toContain('Bajó−10,4 %');

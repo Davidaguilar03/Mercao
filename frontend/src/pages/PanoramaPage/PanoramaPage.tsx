@@ -132,6 +132,10 @@ function PricesAndOrigins({ product }: { product: Product }) {
           subtitle={`Precio mayorista promedio por kilo en la semana del ${formatWeek(weekStart)}, de la plaza más barata a la más cara.`}
         >
           <MarketsTable groups={groups} product={product} horizon={PANORAMA_HORIZON} />
+          <p className={`${page.caption} ${page.captionAfter}`}>
+            El ícono junto a cada plaza compara su precio con el de las demás plazas de la misma
+            variedad; no indica si el precio subió o bajó.
+          </p>
           {forecastsQuery.isError && (
             <p className={`${page.caption} ${page.captionAfter}`} role="alert">
               No pudimos cargar los pronósticos; la tabla muestra solo los precios.

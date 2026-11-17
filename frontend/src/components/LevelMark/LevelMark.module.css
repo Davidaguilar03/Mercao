@@ -1,6 +1,6 @@
 /*
- * Price level of a market against the others. It uses corn yellow, white and ink, never the green
- * and terracotta of a price change, and the number of peso signs repeats what the color says.
+ * Price level of a market against the others of the same variety. It uses corn yellow, white and
+ * ink, never the green and terracotta of a price change, and the icon repeats what the color says.
  */
 .mark {
   display: inline-flex;
@@ -8,15 +8,15 @@
   justify-content: center;
   flex-shrink: 0;
   box-sizing: border-box;
-  width: 30px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border: 1.5px solid var(--color-ink);
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  border-radius: 50%;
+}
+
+.mark svg {
+  width: 62%;
+  height: 62%;
 }
 
 .cheaper {

@@ -6,7 +6,7 @@ import { MapContainer, Marker, Popup, TileLayer, Tooltip, ZoomControl } from 're
 import { Link, useSearchParams } from 'react-router-dom';
 import { ChangeBadge } from '../../components/ChangeBadge/ChangeBadge';
 import { LevelMark } from '../../components/LevelMark/LevelMark';
-import { LEVEL_SYMBOLS, levelMarkClassName } from '../../components/LevelMark/levelSymbols';
+import { levelMarkHtml } from '../../components/LevelMark/levelSymbols';
 import { PriceTag } from '../../components/PriceTag/PriceTag';
 import { marketDetailPath } from '../../hooks/urlSelection';
 import type { PriceLevel } from '../../lib/analysis';
@@ -44,14 +44,14 @@ function boundsOf(markers: MapMarker[]): L.LatLngBounds {
   return L.latLngBounds(points).pad(0.2);
 }
 
-// The same mark as the legend and the table: peso signs on corn yellow, white or ink.
+// The same mark as the legend and the table: an arrow or an equal sign on corn yellow, white or ink.
 function levelIcon(level: PriceLevel) {
   return L.divIcon({
     className: styles.marker,
-    html: `<span class="${levelMarkClassName(level)}">${LEVEL_SYMBOLS[level]}</span>`,
-    iconSize: [36, 26],
-    iconAnchor: [18, 13],
-    popupAnchor: [0, -12],
+    html: levelMarkHtml(level),
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -14],
   });
 }
 

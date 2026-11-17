@@ -17,11 +17,10 @@
   font-size: var(--font-size-sm);
 }
 
-/* The level mark fills the marker, with larger text and a white ring to stand out on the map. */
+/* The level mark fills the marker, with a white ring to stand out on the map. */
 .marker > span {
   width: 100%;
   height: 100%;
-  font-size: 12px;
   box-shadow:
     0 0 0 2px #ffffff,
     var(--shadow-md);

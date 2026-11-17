@@ -31,9 +31,9 @@ export const LEVEL_LABELS: Record<PriceLevel, string> = {
 
 /** Short form for tight places, next to the level mark. */
 export const LEVEL_SHORT_LABELS: Record<PriceLevel, string> = {
-  cheaper: 'Más barata',
+  cheaper: 'Más barata que las demás',
   similar: 'Precio parecido',
-  expensive: 'Más cara',
+  expensive: 'Más cara que las demás',
 };
 
 export const TOOLTIP_STYLE = {

@@ -5,7 +5,7 @@ import styles from './MapLegend.module.css';
 
 const LEVELS: PriceLevel[] = ['cheaper', 'similar', 'expensive'];
 
-/** Explains the marks of the map: price level against the other markets, not price change. */
+/** Explains the icons of the map: price level against the other markets, not change over time. */
 export function MapLegend() {
   return (
     <div className={styles.legend}>
@@ -18,10 +18,11 @@ export function MapLegend() {
         ))}
       </ul>
       <p className={styles.note}>
-        Las marcas comparan cada plaza con el precio del medio entre las que venden la misma
-        variedad (parecido: a menos de {SIMILAR_THRESHOLD_PCT} %). No dicen si el precio subió o
-        bajó: eso va con flechas, en verde si sube y en rojo si baja. Si dos plazas quedan una
-        encima de otra, acerque el mapa con el botón +.
+        Los íconos comparan el precio de cada plaza con el de las demás plazas que venden la misma
+        variedad esta semana (parecido: a menos de {SIMILAR_THRESHOLD_PCT} % del precio del medio).
+        No dicen si el precio cambió con el tiempo: las subidas y bajadas van aparte, en verde si
+        sube y en rojo si baja. Si dos plazas quedan una encima de otra, acerque el mapa con el
+        botón +.
       </p>
     </div>
   );
