@@ -8,12 +8,10 @@
 }
 
 .sm {
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
 }
 
-/* Headline figure: as large as a price, colored text without the pill. */
+/* Headline figure: as large as a price. */
 .lg {
   font-size: var(--font-size-2xl);
   font-weight: 700;
@@ -42,16 +40,4 @@
 
 .flat {
   color: var(--color-price-neutral);
-}
-
-.sm.up {
-  background: var(--color-price-up-bg);
-}
-
-.sm.down {
-  background: var(--color-price-down-bg);
-}
-
-.sm.flat {
-  background: var(--color-price-neutral-bg);
 }

@@ -11,10 +11,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  /* A soft light behind the top of the page, so the cream is not a flat fill. */
-  background:
-    radial-gradient(70rem 26rem at 50% -6rem, #fffdf7 0%, transparent 72%) no-repeat,
-    var(--color-background);
+  background: var(--color-background);
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: var(--font-size-md);

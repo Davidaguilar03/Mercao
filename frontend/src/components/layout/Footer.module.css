@@ -63,29 +63,10 @@
   font-size: var(--font-size-sm);
 }
 
-/* Small heading with a corn-yellow mark; the text stays cream to keep its contrast. */
 .heading {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.heading::before {
-  content: '';
-  width: 14px;
-  height: 3px;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
-}
-
-.note {
-  padding-top: var(--space-2);
-  border-top: 1px solid rgb(247 241 227 / 28%);
+  font-family: var(--font-display);
+  font-size: var(--font-size-md);
+  font-weight: 600;
 }
 
 /* One name per line; the four names keep the same left edge on every screen. */

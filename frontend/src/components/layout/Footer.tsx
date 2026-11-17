@@ -48,13 +48,13 @@ export function Footer() {
         <div className={styles.block}>
           <h2 className={styles.heading}>Datos</h2>
           <p>
-            <strong>Fuente:</strong> Sistema de Información de Precios y Abastecimiento del Sector
-            Agropecuario (SIPSA), DANE.
+            Fuente: Sistema de Información de Precios y Abastecimiento del Sector Agropecuario
+            (SIPSA), DANE.
           </p>
           <p className="tabular">
             <LatestWeek />
           </p>
-          <p className={styles.note}>
+          <p>
             Los pronósticos son estimaciones a partir de precios pasados, no precios garantizados.
           </p>
         </div>

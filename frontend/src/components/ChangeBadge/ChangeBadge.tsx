@@ -5,7 +5,7 @@ import styles from './ChangeBadge.module.css';
 interface ChangeBadgeProps {
   /** Percentage change of a price; null when it cannot be computed. */
   value: number | null;
-  /** "lg" shows the change as a headline figure, without the pill. */
+  /** "lg" shows the change as a headline figure. */
   size?: 'sm' | 'lg';
 }
 
