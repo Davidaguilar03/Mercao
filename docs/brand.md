@@ -94,9 +94,13 @@ la misma semana; no dicen si el precio cambió con el tiempo. Se distinguen de u
 recta dentro de un círculo, no la flecha quebrada de tendencia) y porque no llevan porcentaje. La leyenda del mapa
 aclara que los íconos no indican la variación del precio en el tiempo.
 
-**Comprar y vender.** En Oportunidades, la plaza donde comprar se marca con amarillo maíz y la plaza donde vender con
-tinta: en el borde superior de sus tarjetas, en las dos barras de rango y en las etiquetas de la tabla. Los mismos dos
-colores marcan el mes más barato y el más caro en la gráfica de temporadas.
+**Comprar y vender.** En Oportunidades, la plaza donde comprar se identifica con amarillo maíz y la plaza donde vender
+con tinta. Esta pareja no se cruza con la convención de cambio de precio (verde si sube, terracota si baja), que queda
+solo para los porcentajes. Se aplica en el borde superior de las tarjetas "Comprar en" y "Vender en", en las barras y
+los círculos del rango probable, en la muestra de la leyenda de ese gráfico y en las etiquetas "Comprar" y "Vender" de
+la tabla de plazas. Sobre blanco, el amarillo maíz va siempre con un contorno en tinta (barra y círculo) para que se
+distinga. La zona donde los dos rangos se cruzan se marca con un rayado gris, que no pertenece a ninguna de las dos
+plazas. Los mismos dos colores marcan el mes más barato y el más caro en la gráfica de temporadas.
 
 ### Contraste
 
@@ -161,6 +165,15 @@ no pesan ni dependen de internet.
 - Oportunidades: en cada variedad, a la izquierda las tarjetas "Comprar en" y "Vender en", una junto a la otra; a
   la derecha, apiladas, la diferencia esperada y la distancia; debajo, a todo el ancho, la nota de confianza; y
   después los rangos y la lista de plazas. En celulares todo va en una columna, en ese orden.
+- Los cuatro bloques de cada variedad en Oportunidades comparten borde, radio, margen interno y escala de letra: rótulo
+  pequeño en gris, valor grande del tamaño de un precio destacado y una línea secundaria en gris. "Comprar en" y
+  "Vender en" tienen siempre la misma altura: la ciudad va en una sola línea, con el nombre completo de la plaza debajo
+  (recortado si no cabe y completo al pasar el puntero), y el cambio esperado ocupa un segmento propio a la derecha,
+  separado por una línea fina y centrado en ambos sentidos (debajo del precio en celulares). La diferencia esperada y
+  la distancia, apiladas, suman exactamente la altura de esas dos tarjetas.
+- El rango probable de cada plaza usa un solo eje de precios con pocas marcas en pesos, las dos barras en los colores
+  de comprar y vender, el precio esperado como un círculo con su valor encima y, si los rangos se cruzan, una franja
+  rayada con el rótulo "Zona donde los rangos se cruzan". El gráfico crece hasta la altura de la tabla de plazas.
 - Oportunidades y Cómo funciona ocupan todo el ancho y reparten sus bloques en dos o tres columnas.
 
 ## Pie de página
