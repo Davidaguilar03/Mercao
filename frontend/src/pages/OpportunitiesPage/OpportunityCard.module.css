@@ -133,18 +133,29 @@
   display: none;
 }
 
-/* Decoration only: small and faint, just above and to the left of the sparkline. */
+/*
+ * Decoration only: above the left part of the sparkline, in the gap under the expected change.
+ * The gap is 28 px tall; the drawing sits inside its box with a margin, so it never touches.
+ */
 .doodle {
   position: absolute;
-  top: -10px;
-  right: calc(100% + var(--space-2));
-  z-index: -1;
+  top: -16px;
+  left: 0;
   grid-area: spark;
-  width: 2rem;
-  height: 2rem;
-  color: var(--color-ink);
-  opacity: 0.06;
+  width: 28px;
+  height: 28px;
   pointer-events: none;
+}
+
+/* Identity colors: corn yellow outlined in ink for buying, ink for selling. */
+.buy .doodle {
+  color: var(--color-level-cheaper);
+  filter: drop-shadow(0.6px 0 0 var(--color-ink)) drop-shadow(-0.6px 0 0 var(--color-ink))
+    drop-shadow(0 0.6px 0 var(--color-ink)) drop-shadow(0 -0.6px 0 var(--color-ink));
+}
+
+.sell .doodle {
+  color: var(--color-level-expensive);
 }
 
 .note {
