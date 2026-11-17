@@ -1,4 +1,4 @@
-import { ArrowLeftRight, Gauge, Route } from 'lucide-react';
+import { ArrowLeftRight, Gauge, Minus, Route, TrendingDown, TrendingUp } from 'lucide-react';
 import type {
   MarketForecast,
   Product,
@@ -17,6 +17,8 @@ import {
   formatPesos,
   formatPricePerKg,
   formatWeek,
+  getTrend,
+  type Trend,
 } from '../../lib/format';
 import page from '../page.module.css';
 import { IntervalComparison } from './IntervalComparison';
@@ -36,12 +38,28 @@ interface SideProps {
   tone: 'buy' | 'sell';
 }
 
+const TREND_ICONS = { up: TrendingUp, down: TrendingDown, flat: Minus };
+
+function TrendIcon({ trend }: { trend: Trend }) {
+  const Icon = TREND_ICONS[trend];
+  return (
+    <Icon
+      className={`${styles.trendIcon} ${styles[trend]}`}
+      strokeWidth={2}
+      aria-hidden="true"
+      data-trend-icon={trend}
+    />
+  );
+}
+
 function Side({ title, side, tone }: SideProps) {
+  const trend =
+    side.expected_change_percent === null ? null : getTrend(side.expected_change_percent);
   return (
     <div className={`${styles.tile} ${styles.side} ${styles[tone]}`}>
       <span className={styles.label}>{title}</span>
       {/* The city on one line, with the full market name under it, so long names never wrap. */}
-      <span className={styles.group}>
+      <span className={`${styles.group} ${styles.market}`}>
         <strong className={styles.sideMarket} title={side.market_name}>
           {side.city}
         </strong>
@@ -49,21 +67,21 @@ function Side({ title, side, tone }: SideProps) {
           {side.market_name}
         </span>
       </span>
-      {/* Expected price on the left and, on the same baseline, its change against the latest price. */}
-      <span className={styles.group}>
-        <span className={styles.priceRow}>
-          <span className={styles.value} title="Precio esperado">
-            <span className="visually-hidden">Precio esperado: </span>
-            <PriceTag value={side.predicted_price} size="lg" />
-          </span>
-          <ChangeBadge value={side.expected_change_percent} size="lg" />
-        </span>
-        {side.latest_price !== null && (
-          <span className={styles.detail}>
-            frente al último precio ({formatPricePerKg(side.latest_price)})
-          </span>
-        )}
+      {/* The expected change, top right, beside the city. */}
+      <span className={styles.change}>
+        <ChangeBadge value={side.expected_change_percent} size="lg" />
       </span>
+      <span className={`${styles.value} ${styles.price}`} title="Precio esperado">
+        <span className="visually-hidden">Precio esperado: </span>
+        <PriceTag value={side.predicted_price} size="lg" />
+      </span>
+      {/* A trend line beside the price that repeats the direction of the change. */}
+      {trend && <TrendIcon trend={trend} />}
+      {side.latest_price !== null && (
+        <span className={`${styles.detail} ${styles.note}`}>
+          frente al último precio ({formatPricePerKg(side.latest_price)})
+        </span>
+      )}
     </div>
   );
 }

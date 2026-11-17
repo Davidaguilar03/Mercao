@@ -10,11 +10,11 @@ describe('OpportunitiesPage', () => {
     renderWithProviders(<OpportunitiesPage />);
 
     const buy = (await screen.findByText('Comprar en')).parentElement!;
-    expect(plain(buy.textContent)).toContain('Pereira, MercasaPrecio esperado: $ 2.254 /kg');
+    expect(plain(buy.textContent)).toContain('Pereira, Mercasa');
+    expect(plain(buy.textContent)).toContain('Precio esperado: $ 2.254 /kg');
     const sell = screen.getByText('Vender en').parentElement!;
-    expect(plain(sell.textContent)).toContain(
-      'Cartago (Valle del Cauca)Precio esperado: $ 3.355 /kg',
-    );
+    expect(plain(sell.textContent)).toContain('Cartago (Valle del Cauca)');
+    expect(plain(sell.textContent)).toContain('Precio esperado: $ 3.355 /kg');
     expect(plain(screen.getByText('Diferencia esperada').parentElement!.textContent)).toBe(
       'Diferencia esperada$ 1.101 /kg48,8 % sobre el precio de compra',
     );
@@ -28,20 +28,24 @@ describe('OpportunitiesPage', () => {
     mockApi(fullApi);
     renderWithProviders(<OpportunitiesPage />);
 
-    // The market, then the expected price and its change on one row, then the latest price.
+    // The market with the expected change at its right, then the expected price and the latest one.
     const buy = (await screen.findByText('Comprar en')).closest<HTMLElement>('.side')!;
     expect(within(buy).getByText('Pereira')).toHaveAttribute('title', 'Pereira, Mercasa');
     expect(plain(buy.textContent)).toBe(
-      'Comprar enPereiraPereira, MercasaPrecio esperado: $ 2.254 /kg' +
-        'Bajó\u22122,7 %frente al último precio ($ 2.317 /kg)',
+      'Comprar enPereiraPereira, MercasaBajó−2,7 %' +
+        'Precio esperado: $ 2.254 /kgfrente al último precio ($ 2.317 /kg)',
     );
     const sell = screen.getByText('Vender en').closest('.side')!;
     expect(plain(sell.textContent)).toContain(
-      'Bajó\u22123,5 %frente al último precio ($ 3.477 /kg)',
+      'Bajó\u22123,5 %Precio esperado: $ 3.355 /kgfrente al último precio ($ 3.477 /kg)',
     );
     const change = sell.querySelector('[data-trend]');
     expect(change).toHaveAttribute('data-trend', 'down');
     expect(change).toHaveClass('lg', 'down');
+    // Beside the price, a trend line in the same direction and color as the change.
+    const icon = sell.querySelector('[data-trend-icon]');
+    expect(icon).toHaveAttribute('data-trend-icon', 'down');
+    expect(icon).toHaveClass('down');
   });
 
   it('says there is no data when a market has no latest price', async () => {
@@ -54,6 +58,7 @@ describe('OpportunitiesPage', () => {
     const buy = (await screen.findByText('Comprar en')).closest('.side')!;
     expect(buy).toHaveTextContent('Sin dato');
     expect(buy).not.toHaveTextContent('frente al último precio');
+    expect(buy.querySelector('[data-trend-icon]')).toBeNull();
   });
 
   it('shows the straight-line distance between the two cities', async () => {

@@ -68,13 +68,71 @@
   border-top-color: var(--color-level-expensive);
 }
 
-/* One column: label, market, then the expected price and its change on one row. */
+/*
+ * Label on top; the city with the expected change at its right; the expected price with a trend
+ * line at its right; and the latest price as a small line under it.
+ */
 .side {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-areas:
+    'label label'
+    'market change'
+    'price icon'
+    'note note';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: space-between;
+  column-gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+}
+
+.side > .label {
+  grid-area: label;
+}
+
+.market {
+  grid-area: market;
+  margin-top: var(--space-2);
+}
+
+.change {
+  display: flex;
+  grid-area: change;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+.price {
+  grid-area: price;
+  align-self: end;
+  margin-top: var(--space-3);
+}
+
+/* About as tall as the price figure, in the color of the change. */
+.trendIcon {
+  grid-area: icon;
+  align-self: end;
+  justify-self: end;
+  width: 2rem;
+  height: 2rem;
+}
+
+.up {
+  color: var(--color-price-up);
+}
+
+.down {
+  color: var(--color-price-down-shape);
+}
+
+.flat {
+  color: var(--color-price-neutral);
+}
+
+.note {
+  grid-area: note;
+  margin-top: 3px;
+  font-size: var(--font-size-xs);
 }
 
 .group {
@@ -99,19 +157,6 @@
 
 .sideMarketFull {
   color: var(--color-muted);
-  font-size: var(--font-size-xs);
-}
-
-/* Price on the left, change on the right, on one baseline; the change wraps under it, left aligned. */
-.priceRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 2px var(--space-3);
-}
-
-.side .detail {
   font-size: var(--font-size-xs);
 }
 
@@ -156,6 +201,28 @@
 .ranges {
   display: flex;
   flex-direction: column;
+}
+
+/* Phones: one column, with the change under the price, left aligned, and no trend line. */
+@media (max-width: 639px) {
+  .side {
+    grid-template-areas:
+      'label'
+      'market'
+      'price'
+      'change'
+      'note';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .change {
+    justify-content: flex-start;
+    margin-top: 2px;
+  }
+
+  .trendIcon {
+    display: none;
+  }
 }
 
 @media (min-width: 640px) {
