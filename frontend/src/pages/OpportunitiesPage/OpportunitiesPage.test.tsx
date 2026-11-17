@@ -1,7 +1,12 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { currentUrl, mockApi, plain, renderWithProviders } from '../../test/utils';
-import { emptyRecommendations, fullApi, recommendationsFor } from '../../test/viewFixtures';
+import {
+  emptyRecommendations,
+  fullApi,
+  priceHistory,
+  recommendationsFor,
+} from '../../test/viewFixtures';
 import { OpportunitiesPage } from './OpportunitiesPage';
 
 describe('OpportunitiesPage', () => {
@@ -42,10 +47,48 @@ describe('OpportunitiesPage', () => {
     const change = sell.querySelector('[data-trend]');
     expect(change).toHaveAttribute('data-trend', 'down');
     expect(change).toHaveClass('lg', 'down');
-    // Beside the price, a trend line in the same direction and color as the change.
-    const icon = sell.querySelector('[data-trend-icon]');
-    expect(icon).toHaveAttribute('data-trend-icon', 'down');
-    expect(icon).toHaveClass('down');
+  });
+
+  it('draws the recent prices of each market and the forecast point colored by direction', async () => {
+    const recommendations = recommendationsFor(2);
+    recommendations.groups[0].sell.expected_change_percent = 4.2;
+    const fetchMock = mockApi({ ...fullApi, '/api/recommendations': recommendations });
+    renderWithProviders(<OpportunitiesPage />);
+
+    const sparklines = () =>
+      screen.queryAllByRole('img', { name: 'Precio de las últimas 12 semanas y pronóstico' });
+    await waitFor(() => expect(sparklines()).toHaveLength(2));
+    const [buy, sell] = sparklines();
+    expect(buy).toHaveAttribute('title', 'Precio de las últimas 12 semanas y pronóstico');
+    // Only the weeks inside the last 12 are drawn: two of the four in the mocked history.
+    expect(buy.querySelector('.line')).toHaveAttribute(
+      'd',
+      expect.stringMatching(/^M[^L]+L[^L]+$/),
+    );
+    expect(buy.querySelector('.forecastLine')).not.toBeNull();
+    expect(buy.querySelector('.dot')).toHaveAttribute('data-trend', 'down');
+    expect(buy.querySelector('.dot')).toHaveClass('down');
+    expect(sell.querySelector('.dot')).toHaveAttribute('data-trend', 'up');
+    expect(sell.querySelector('.dot')).toHaveClass('up');
+    // One history request per market, the same query the Producto view uses.
+    const history = fetchMock.mock.calls
+      .map(([url]) => String(url))
+      .filter((url) => url.includes('/api/prices/history'));
+    expect(history).toHaveLength(2);
+    expect(history.every((url) => url.includes('from=2000-01-01'))).toBe(true);
+  });
+
+  it('leaves the sparkline space empty when the market has no recent prices', async () => {
+    mockApi({
+      ...fullApi,
+      '/api/prices/history': { ...priceHistory, series: [] },
+    });
+    renderWithProviders(<OpportunitiesPage />);
+
+    await screen.findByText('Comprar en');
+    expect(
+      screen.queryByRole('img', { name: 'Precio de las últimas 12 semanas y pronóstico' }),
+    ).not.toBeInTheDocument();
   });
 
   it('says there is no data when a market has no latest price', async () => {
@@ -58,7 +101,6 @@ describe('OpportunitiesPage', () => {
     const buy = (await screen.findByText('Comprar en')).closest('.side')!;
     expect(buy).toHaveTextContent('Sin dato');
     expect(buy).not.toHaveTextContent('frente al último precio');
-    expect(buy.querySelector('[data-trend-icon]')).toBeNull();
   });
 
   it('shows the straight-line distance between the two cities', async () => {

@@ -6,6 +6,7 @@ import {
   useSeasonality,
   useSupplyOrigins,
 } from '../../api/hooks';
+import { FULL_HISTORY_START } from '../../api/prices';
 import type { MarketForecast, MarketLatestPrice, PricePoint, Product } from '../../api/types';
 import { Card } from '../../components/Card/Card';
 import { KpiCard, KpiChangeCard, KpiGrid } from '../../components/KpiCard/KpiCard';
@@ -33,9 +34,6 @@ import styles from './ProductPage.module.css';
 // The chart library loads only when a chart is shown.
 const PriceHistoryChart = lazy(() => import('./PriceHistoryChart'));
 const SeasonalityChart = lazy(() => import('./SeasonalityChart'));
-
-/** Earlier than the first SIPSA bulletin, so the API returns the whole history. */
-const HISTORY_START = '2000-01-01';
 const RANGES: HistoryRange[] = ['1y', '3y', 'all'];
 
 export function ProductPage() {
@@ -96,7 +94,7 @@ function ProductPrices({ product, market }: ProductContentProps) {
   const productId = product.product_id;
   const marketId = market.market_id;
   const [range, setRange] = useState<HistoryRange>('3y');
-  const historyQuery = usePriceHistory(productId, marketId, { from: HISTORY_START });
+  const historyQuery = usePriceHistory(productId, marketId, { from: FULL_HISTORY_START });
   const forecastsQuery = useForecasts(productId, marketId);
   const forecast = forecastsQuery.data?.markets[0];
 

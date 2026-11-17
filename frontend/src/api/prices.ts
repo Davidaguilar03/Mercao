@@ -10,6 +10,12 @@ export function getLatestPrices(productId: number): Promise<LatestPrices> {
   return apiGet<LatestPrices>('/api/prices/latest', { product_id: productId });
 }
 
+/**
+ * Earlier than the first SIPSA bulletin, so the API returns the whole history. Views that ask
+ * for it from here share one cached query.
+ */
+export const FULL_HISTORY_START = '2000-01-01';
+
 export interface PriceHistoryRange {
   from?: string;
   to?: string;

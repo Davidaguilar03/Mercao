@@ -69,37 +69,47 @@
 }
 
 /*
- * Label on top; the city with the expected change at its right; the expected price with a trend
- * line at its right; and the latest price as a small line under it.
+ * Label on top; the city with the expected change at its right; the expected price and the
+ * latest price under it, with the recent prices drawn at their right.
  */
 .side {
+  position: relative;
   display: grid;
+  overflow: hidden;
   grid-template-areas:
     'label label'
-    'market change'
-    'price icon'
-    'note note';
-  grid-template-columns: minmax(0, 1fr) auto;
+    'top top'
+    'price spark'
+    'note spark';
+  grid-template-columns: minmax(0, 1fr) 7rem;
   align-content: space-between;
   column-gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+  isolation: isolate;
 }
 
 .side > .label {
   grid-area: label;
 }
 
-.market {
-  grid-area: market;
+.top {
+  display: flex;
+  grid-area: top;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
   margin-top: var(--space-2);
+}
+
+.market {
+  flex: 1;
 }
 
 .change {
   display: flex;
-  grid-area: change;
+  flex: none;
   align-items: center;
   justify-content: flex-end;
-  margin-top: var(--space-2);
 }
 
 .price {
@@ -108,25 +118,29 @@
   margin-top: var(--space-3);
 }
 
-/* About as tall as the price figure, in the color of the change. */
-.trendIcon {
-  grid-area: icon;
-  align-self: end;
-  justify-self: end;
-  width: 2rem;
-  height: 2rem;
+/* Takes the space of the price and the line under it, without adding any height. */
+.spark {
+  position: relative;
+  grid-area: spark;
+  min-height: 0;
+  margin-top: var(--space-3);
 }
 
-.up {
-  color: var(--color-price-up);
+.spark:empty {
+  display: none;
 }
 
-.down {
-  color: var(--color-price-down-shape);
-}
-
-.flat {
-  color: var(--color-price-neutral);
+/* Decoration only: faint, in the bottom right corner, behind the sparkline. */
+.doodle {
+  position: absolute;
+  right: -10px;
+  bottom: -12px;
+  z-index: -1;
+  width: 6rem;
+  height: 6rem;
+  color: var(--color-ink);
+  opacity: 0.06;
+  pointer-events: none;
 }
 
 .note {
@@ -211,16 +225,32 @@
       'market'
       'price'
       'change'
-      'note';
+      'note'
+      'spark';
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .top {
+    display: contents;
+  }
+
+  .market {
+    grid-area: market;
+    margin-top: var(--space-2);
+  }
+
   .change {
+    grid-area: change;
     justify-content: flex-start;
     margin-top: 2px;
   }
 
-  .trendIcon {
+  /* The sparkline goes under the change, as wide as the card. */
+  .spark {
+    height: 3rem;
+  }
+
+  .doodle {
     display: none;
   }
 }

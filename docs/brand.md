@@ -170,9 +170,12 @@ no pesan ni dependen de internet.
   superior de color: amarillo maíz en "Comprar en", tinta en "Vender en" y verde principal en la diferencia esperada y
   la distancia. "Comprar en" y "Vender en" son compactas y tienen siempre la misma altura: la ciudad va en una sola
   línea, con el nombre completo de la plaza debajo (recortado si no cabe y completo al pasar el puntero) y el cambio
-  esperado arriba a la derecha, a la altura de la ciudad; luego el precio esperado, con a su derecha una línea de
-  tendencia que sube, baja o queda plana en el mismo color del cambio, y debajo una línea pequeña con el último precio.
-  En celulares el cambio va bajo el precio, alineado a la izquierda, y la línea de tendencia no se muestra. La diferencia esperada y la distancia, apiladas, suman exactamente la altura de esas dos tarjetas.
+  esperado arriba a la derecha, a la altura de la ciudad; luego el precio esperado y debajo una línea pequeña con el
+  último precio. A su derecha, una gráfica mínima con el precio promedio semanal de las últimas 12 semanas de esa plaza
+  (línea fina en el color de comprar o vender, con un relleno muy suave), un tramo punteado hasta el pronóstico y el
+  punto del pronóstico en el color del cambio (verde si sube, terracota si baja); sin ejes ni rótulos. Detrás, muy
+  tenue, el canasto (comprar) o el costal (vender) de las ilustraciones de la plaza. En celulares el cambio va bajo el
+  precio, alineado a la izquierda, la gráfica ocupa todo el ancho debajo y la ilustración no se muestra. La diferencia esperada y la distancia, apiladas, suman exactamente la altura de esas dos tarjetas.
 - El rango probable de cada plaza usa un solo eje de precios con pocas marcas en pesos, las dos barras en los colores
   de comprar y vender, el precio esperado como un círculo con su valor encima y, si los rangos se cruzan, una franja
   rayada con el rótulo "Zona donde los rangos se cruzan". El gráfico crece hasta la altura de la tabla de plazas.

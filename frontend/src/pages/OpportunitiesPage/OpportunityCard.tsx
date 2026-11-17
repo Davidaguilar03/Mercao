@@ -1,4 +1,4 @@
-import { ArrowLeftRight, Gauge, Minus, Route, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowLeftRight, Gauge, Route } from 'lucide-react';
 import type {
   MarketForecast,
   Product,
@@ -7,6 +7,7 @@ import type {
 } from '../../api/types';
 import { Card } from '../../components/Card/Card';
 import { ChangeBadge } from '../../components/ChangeBadge/ChangeBadge';
+import { Doodle } from '../../components/illustrations/MarketDoodles';
 import table from '../../components/DataTable/DataTable.module.css';
 import { Notice } from '../../components/Notice/Notice';
 import { PriceTag } from '../../components/PriceTag/PriceTag';
@@ -17,11 +18,10 @@ import {
   formatPesos,
   formatPricePerKg,
   formatWeek,
-  getTrend,
-  type Trend,
 } from '../../lib/format';
 import page from '../page.module.css';
 import { IntervalComparison } from './IntervalComparison';
+import { MarketSparkline } from './MarketSparkline';
 import styles from './OpportunityCard.module.css';
 
 interface OpportunityCardProps {
@@ -36,47 +36,38 @@ interface SideProps {
   title: string;
   side: RecommendationSide;
   tone: 'buy' | 'sell';
+  productId: number;
 }
 
-const TREND_ICONS = { up: TrendingUp, down: TrendingDown, flat: Minus };
-
-function TrendIcon({ trend }: { trend: Trend }) {
-  const Icon = TREND_ICONS[trend];
-  return (
-    <Icon
-      className={`${styles.trendIcon} ${styles[trend]}`}
-      strokeWidth={2}
-      aria-hidden="true"
-      data-trend-icon={trend}
-    />
-  );
-}
-
-function Side({ title, side, tone }: SideProps) {
-  const trend =
-    side.expected_change_percent === null ? null : getTrend(side.expected_change_percent);
+function Side({ title, side, tone, productId }: SideProps) {
   return (
     <div className={`${styles.tile} ${styles.side} ${styles[tone]}`}>
+      {/* A faint drawing from the market set in the corner: a basket to buy, a sack to sell. */}
+      <Doodle name={tone === 'buy' ? 'basket' : 'sack'} className={styles.doodle} />
       <span className={styles.label}>{title}</span>
       {/* The city on one line, with the full market name under it, so long names never wrap. */}
-      <span className={`${styles.group} ${styles.market}`}>
-        <strong className={styles.sideMarket} title={side.market_name}>
-          {side.city}
-        </strong>
-        <span className={styles.sideMarketFull} title={side.market_name}>
-          {side.market_name}
+      <div className={styles.top}>
+        <span className={`${styles.group} ${styles.market}`}>
+          <strong className={styles.sideMarket} title={side.market_name}>
+            {side.city}
+          </strong>
+          <span className={styles.sideMarketFull} title={side.market_name}>
+            {side.market_name}
+          </span>
         </span>
-      </span>
-      {/* The expected change, top right, beside the city. */}
-      <span className={styles.change}>
-        <ChangeBadge value={side.expected_change_percent} size="lg" />
-      </span>
+        {/* The expected change, top right, beside the city. */}
+        <span className={styles.change}>
+          <ChangeBadge value={side.expected_change_percent} size="lg" />
+        </span>
+      </div>
       <span className={`${styles.value} ${styles.price}`} title="Precio esperado">
         <span className="visually-hidden">Precio esperado: </span>
         <PriceTag value={side.predicted_price} size="lg" />
       </span>
-      {/* A trend line beside the price that repeats the direction of the change. */}
-      {trend && <TrendIcon trend={trend} />}
+      {/* The recent weekly prices of the market and the step to the forecast. */}
+      <div className={styles.spark}>
+        <MarketSparkline productId={productId} side={side} tone={tone} />
+      </div>
       {side.latest_price !== null && (
         <span className={`${styles.detail} ${styles.note}`}>
           frente al último precio ({formatPricePerKg(side.latest_price)})
@@ -105,8 +96,8 @@ export function OpportunityCard({ group, product, horizon, forecasts }: Opportun
       {/* Desktop: the two markets on the left; difference and distance stacked on the right. */}
       <div className={styles.overview}>
         <div className={styles.sides}>
-          <Side title="Comprar en" side={buy} tone="buy" />
-          <Side title="Vender en" side={sell} tone="sell" />
+          <Side title="Comprar en" side={buy} tone="buy" productId={product.product_id} />
+          <Side title="Vender en" side={sell} tone="sell" productId={product.product_id} />
         </div>
         <div className={styles.facts}>
           <dl className={`${styles.tile} ${styles.fact}`}>
