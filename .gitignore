@@ -1,7 +1,23 @@
+# Python
 .venv/
 __pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Node y frontend compilado
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Datos y modelos (se reconstruyen con el pipeline y el entrenamiento)
 data/raw/
 data/interim/
 data/processed/
-.idea/
 models/
+
+# Editores y sistema operativo
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
