@@ -1,8 +1,9 @@
 // Small fetch client for the Mercao API (read-only, GET requests only).
 
-const DEFAULT_API_URL = 'http://localhost:8000';
+// In development the API runs apart on port 8000. The production build is served by the API itself, so it uses
+// relative URLs (/api). An empty VITE_API_URL also means relative URLs, through the Vite dev or preview proxy.
+const DEFAULT_API_URL = import.meta.env.DEV ? 'http://localhost:8000' : '';
 
-// An empty VITE_API_URL means relative URLs, served through the Vite dev proxy or a reverse proxy.
 export const API_BASE_URL = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/+$/, '');
 
 export type QueryParams = Record<string, string | number | undefined>;

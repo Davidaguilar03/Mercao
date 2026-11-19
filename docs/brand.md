@@ -227,10 +227,10 @@ Las dos fuentes van dentro de la aplicación (paquetes `@fontsource-variable`), 
 
 ## Espacios, bordes y sombras
 
-- Espaciado en múltiplos de 4 px: 4, 8, 12, 16, 24, 32, 48 y 64 (`--space-1` a `--space-8`).
+- Espaciado en múltiplos de 4 px: 4, 8, 12, 16, 24, 32 y 48 (`--space-1` a `--space-7`).
 - Radios: 6 px (elementos pequeños y avisos), 10 px (campos y botones), 16 px (tarjetas) y píldora solo para las
   etiquetas "Comprar", "Vender" y "Elegido".
-- Sombras suaves y de un solo tono (`--shadow-sm`, `--shadow-md`, `--shadow-lg`).
+- Sombras suaves y de un solo tono (`--shadow-sm` y `--shadow-md`).
 - Tamaños de pantalla: desde 360 px (celulares); 480 px, 768 px (aparece el menú horizontal), 1024 px y 1200 px
   (dos columnas y dibujos en los costados).
 - Botones y enlaces del menú miden al menos 44 px de alto para que se puedan tocar con el dedo.

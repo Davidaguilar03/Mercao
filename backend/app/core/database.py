@@ -1,11 +1,10 @@
-"""SQLAlchemy engine, session factory and declarative base."""
+"""SQLAlchemy engine, request session and declarative base."""
 
 from collections.abc import Iterator
-from contextlib import contextmanager
 
 from fastapi import Request
 from sqlalchemy import Engine, create_engine, event
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session
 
 from backend.app.core.config import get_settings
 
@@ -31,21 +30,6 @@ def create_db_engine(url: str | None = None, bulk_load: bool = False) -> Engine:
             cursor.close()
 
     return engine
-
-
-@contextmanager
-def session_scope(engine: Engine | None = None) -> Iterator[Session]:
-    """Yield a session that commits on success and rolls back on error."""
-    factory = sessionmaker(bind=engine or create_db_engine())
-    session = factory()
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        session.close()
 
 
 def get_session(request: Request) -> Iterator[Session]:
