@@ -12,7 +12,12 @@ uvicorn backend.app.main:app --reload
 - CORS: permitido para el servidor de desarrollo de Vite (`http://localhost:5173`, `npm run dev`) y para el de vista
   previa (`http://localhost:4173`, `npm run preview`). Se cambia con la variable de entorno `MERCAO_CORS_ORIGINS`
   (orígenes separados por comas; reemplaza la lista por defecto).
-- Otras variables: `MERCAO_DATABASE_URL` (otra base) y `MERCAO_MODELS_DIR` (otra carpeta de modelos).
+- Otras variables: `MERCAO_DATABASE_URL` (otra base), `MERCAO_MODELS_DIR` (otra carpeta de modelos) y
+  `MERCAO_FRONTEND_DIST` (otra carpeta del frontend compilado).
+- Frontend compilado: si existe `frontend/dist/index.html` (se genera con `npm run build`), el mismo servidor sirve el
+  frontend en http://localhost:8000. Los archivos de `frontend/dist` se entregan tal cual y cualquier otra ruta fuera
+  de `/api` (por ejemplo `/producto`) responde con `index.html`, para que las rutas del frontend funcionen al recargar.
+  Una ruta inexistente bajo `/api` sigue respondiendo 404 en JSON. Sin esa carpeta solo se sirve la API.
 
 ## Convenciones
 
@@ -306,8 +311,9 @@ Cada dominio con endpoints tiene `router.py` (solo HTTP), `service.py` (lógica)
 `schemas.py` (modelos de respuesta de pydantic), en `backend/app/domains/{catalog,prices,supply,forecasting,
 recommendations}`. Lo compartido está en `backend/app/core`: configuración (`config.py`), sesión de base de datos como
 dependencia de FastAPI (`database.py`) y manejadores de errores (`errors.py`). La aplicación se crea en
-`backend/app/main.py` (`create_app`). `/api/health` está en el router de precios porque informa la última semana de
+`backend/app/main.py` (`create_app`), que también monta el frontend compilado (`serve_frontend`). `/api/health` está en el router de precios porque informa la última semana de
 precios.
 
 Pruebas: `backend/tests/test_api.py` construye una base diminuta en un directorio temporal (2 productos, 3 mercados,
 precios semanales sintéticos desde 2016, algunas filas de abastecimiento y pronósticos) y nunca usa la base real.
+`backend/tests/test_frontend_serving.py` prueba el servicio del frontend con una carpeta `dist` diminuta y temporal.
